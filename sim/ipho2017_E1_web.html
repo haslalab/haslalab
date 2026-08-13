@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IPhO 2017 E1 — Laser Deflection Diffusion Experiment</title>
+<style>
+  :root{
+    --bg:#f4f6f8; --panel:#ffffff; --ink:#1b2430; --muted:#5b6b7c;
+    --line:#d8e0e8; --accent:#2c6f9b; --accent-soft:#eaf4fb;
+    --laser:#d81010; --disp-bg:#101418; --disp-fg:#8fd6ff;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,
+         "Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  }
+  .wrap{max-width:1400px;margin:0 auto;padding:16px;display:flex;gap:16px;align-items:flex-start}
+  @media (max-width:1080px){ .wrap{flex-direction:column} }
+
+  /* ── control panel ── */
+  .panel{
+    flex:0 0 290px; background:var(--panel); border:1px solid var(--line);
+    border-radius:10px; padding:14px; position:sticky; top:16px;
+  }
+  @media (max-width:1080px){ .panel{position:static;flex:1 1 auto;width:100%} }
+  .panel h2{
+    font-size:12px; letter-spacing:.04em; text-transform:uppercase;
+    color:var(--accent); margin:16px 0 7px; padding-bottom:5px;
+    border-bottom:1px solid var(--line);
+  }
+  .panel h2:first-of-type{margin-top:0}
+  label.row{display:block;margin:9px 0 3px;color:var(--muted);font-size:12.5px}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  button{
+    width:100%; padding:8px 10px; margin:4px 0; cursor:pointer;
+    background:#fff; border:1px solid var(--line); border-radius:6px;
+    font:inherit; font-size:13px; color:var(--ink); text-align:left;
+    transition:background .12s,border-color .12s;
+  }
+  button:hover:not(:disabled){background:var(--accent-soft);border-color:var(--accent)}
+  button:disabled{opacity:.42;cursor:not-allowed}
+  button.primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+  button.primary:hover:not(:disabled){background:#22587c}
+  .conc{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:4px 0 2px}
+  .conc button{width:auto;flex:1;text-align:center;padding:6px 4px}
+  .conc button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .conc span{font-size:12px;color:var(--muted)}
+  .disp{
+    background:var(--disp-bg); border-radius:6px; padding:8px 12px; margin:6px 0;
+    text-align:right; color:var(--disp-fg);
+    font:700 26px/1 ui-monospace,Consolas,monospace; letter-spacing:.05em;
+  }
+  .inline{display:flex;gap:8px;align-items:center;margin:6px 0}
+  .inline select{
+    flex:1;padding:6px;border:1px solid var(--line);border-radius:6px;
+    font:inherit;background:#fff;color:var(--ink)
+  }
+  .chk{display:flex;align-items:center;gap:7px;margin:6px 0;cursor:pointer;font-size:13px}
+  .chk input{accent-color:var(--accent);width:16px;height:16px}
+  .readout{
+    font:12.5px ui-monospace,Consolas,monospace; color:var(--muted);
+    background:#f7f9fb; border:1px solid var(--line); border-radius:6px;
+    padding:6px 8px; margin-top:8px;
+  }
+  .note{font-size:11.5px;color:#8494a3;line-height:1.6;margin-top:10px}
+
+  /* ── stage ── */
+  .stage{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
+  .card h3{margin:0 0 8px;font-size:13px;font-weight:600;color:var(--muted)}
+  canvas{display:block;width:100%;height:auto;border-radius:6px;touch-action:none}
+  #bench{cursor:grab}
+  #bench.dragging{cursor:grabbing}
+  #paper{cursor:crosshair;max-width:660px;margin:0 auto}
+
+  /* ── header ── */
+  header{
+    max-width:1400px;margin:0 auto;padding:18px 16px 0;
+    display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap
+  }
+  header h1{margin:0;font-size:19px;font-weight:650}
+  header p{margin:3px 0 0;font-size:13px;color:var(--muted)}
+  .lang{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;background:#fff}
+  .lang button{
+    width:auto;margin:0;border:0;border-radius:0;padding:7px 15px;
+    font-size:13px;font-weight:600;color:var(--muted);text-align:center
+  }
+  .lang button.on{background:var(--accent);color:#fff}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1 id="t-title"></h1>
+    <p id="t-sub"></p>
+  </div>
+  <div class="lang">
+    <button id="btn-ko" class="on">한국어</button>
+    <button id="btn-en">English</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- ═══════════ CONTROLS ═══════════ -->
+  <aside class="panel">
+    <h2 id="t-h-laser"></h2>
+    <label class="chk"><input type="checkbox" id="laserOn" checked><span id="t-laseron"></span></label>
+    <label class="row" id="t-focus"></label>
+    <input type="range" id="focus" min="0" max="1" step="0.01" value="0.35">
+    <label class="row" id="t-theta"></label>
+    <input type="range" id="theta" min="25" max="75" step="0.5" value="45">
+
+    <h2 id="t-h-sol"></h2>
+    <div class="conc" id="concBox"></div>
+    <button id="btnFill" class="primary"></button>
+    <button id="btnDrip" disabled></button>
+    <div class="readout" id="dripState">—</div>
+    <button id="btnStart" disabled></button>
+    <button id="btnEmpty"></button>
+
+    <h2 id="t-h-watch"></h2>
+    <div class="disp" id="clock">--:--</div>
+    <div class="inline">
+      <span id="t-speed" style="font-size:12.5px;color:var(--muted)"></span>
+      <select id="speed">
+        <option>1</option><option>10</option><option>30</option>
+        <option selected>60</option><option>120</option><option>300</option>
+        <option>600</option><option>1800</option>
+      </select>
+      <span style="color:var(--muted)">×</span>
+    </div>
+    <button id="btnJump"></button>
+
+    <h2 id="t-h-paper"></h2>
+    <button id="btnTrace"></button>
+    <button id="btnFresh"></button>
+    <button id="btnPng"></button>
+    <div class="readout" id="cursor">—</div>
+    <div class="readout" id="geom">—</div>
+    <p class="note" id="t-note"></p>
+  </aside>
+
+  <!-- ═══════════ STAGE ═══════════ -->
+  <div class="stage">
+    <div class="card">
+      <h3 id="t-benchcap"></h3>
+      <canvas id="bench"></canvas>
+    </div>
+    <div class="card">
+      <h3 id="t-papercap"></h3>
+      <canvas id="paper"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ══════════════════════════════════════════════════════════════
+   0.  i18n  —  language is switched by a button, no page reload
+   ══════════════════════════════════════════════════════════════ */
+const T = {
+  ko:{
+    title:"IPhO 2017 E1 — 레이저 편향에 의한 확산계수 측정",
+    sub:"가상 광학 벤치 · 벤치 위의 부품을 끌어서 배치하세요",
+    hLaser:"광원 모듈", laserOn:"다이오드 레이저 켜기",
+    focus:"초점 (레이저 뒤쪽을 돌림)", theta:"레이저 회전 (선의 기울기)",
+    hSol:"용액", perVol:"/ 150 mL",
+    fill:"1.  흰 선까지 소금물을 붓는다",
+    drip:"2.  피펫을 눌러 물을 떨어뜨린다 (누르고 있기)",
+    drops:"떨어뜨린 방울",
+    start:"3.  스톱워치 시작",
+    empty:"셀을 비우고 헹군다",
+    hWatch:"스톱워치", speed:"배속", jump:"30분 지점으로 건너뛰기",
+    hPaper:"모눈종이", trace:"연필로 선을 따라 그린다",
+    fresh:"새 종이로 바꾼다", png:"종이를 PNG로 저장",
+    benchcap:"광학 레일 — 부품을 끌어서 배치 (레이저 높이 / 셀 위치 / 스크린 위치·높이)",
+    papercap:"스크린 위의 모눈종이 (30 × 30 cm, 가는 눈금 1 mm / 굵은 눈금 1 cm)",
+    cursor:"커서", none:"—",
+    note:"셀과 스크린은 레일을 따라, 레이저와 스크린은 위아래로 끌 수 있습니다. "+
+         "Z₀·d·Z는 레일 눈금에서, ξᵢ·δᵢ는 모눈에서 직접 읽으세요. "+
+         "확산 셀: 6.5 × 0.8 × 9.5 cm. 프로그램은 아무것도 계산해 주지 않습니다."
+  },
+  en:{
+    title:"IPhO 2017 E1 — Diffusion Coefficient from Laser Deflection",
+    sub:"Virtual optical bench · drag the components into position",
+    hLaser:"Light source module", laserOn:"diode laser on",
+    focus:"focus (rotate the back of the laser)", theta:"rotation of the laser (angle of the line)",
+    hSol:"Solutions", perVol:"/ 150 mL",
+    fill:"1.  pour the salt solution up to the white line",
+    drip:"2.  squeeze the pipette (press and hold)",
+    drops:"drops released",
+    start:"3.  start the stopwatch",
+    empty:"empty and rinse the cell",
+    hWatch:"Stopwatch", speed:"speed", jump:"jump to 30 min",
+    hPaper:"Millimetre block paper", trace:"trace the line with a pencil",
+    fresh:"take a fresh sheet", png:"save the sheet as PNG",
+    benchcap:"optical rail — drag the components into position",
+    papercap:"millimetre block paper on the screen (30 × 30 cm, fine 1 mm / bold 1 cm)",
+    cursor:"cursor", none:"—",
+    note:"Drag the cell and the screen along the rail, and the laser or screen up and down. "+
+         "Read Z₀, d and Z off the rail scale, and ξᵢ, δᵢ off the millimetre grid. "+
+         "Diffusion cell: 6.5 × 0.8 × 9.5 cm. Nothing is computed for you."
+  }
+};
+let lang = "ko";
+
+/* ══════════════════════════════════════════════════════════════
+   1.  APPARATUS  —  identical to the Python constants
+   ══════════════════════════════════════════════════════════════ */
+const RAIL_LEN=85.0, SCREEN_SIZE=30.0, CELL_D=0.8, CELL_W=6.5, CELL_H=9.5;
+const CELL_FOOT=1.0, FILL_LINE=5.0, BENCH_TOP=33.0;
+const LASER_X=0.0, LASER_Y0=4.5, CELL_X0=10.4, SCREEN_X0=64.6, SCREEN_Y0=15.0;
+const LASER_Y_RANGE=[2.5,8.0], SCREEN_Y_RANGE=[9.0,24.0], CELL_X_RANGE=[3.0,40.0];
+
+/* ── physics constants (calibrated to the official marking scheme) ── */
+const D_A=2.29e-5, D_B=-5.25e-5;        // D(C0)      [cm^2/s]
+const DNDC_A=0.2036, DNDC_B=-0.420;     // dn/dC(C0)  [mL/g]
+const SIG_MASS=0.25, SIG_VOLUME=1.0, SIG_D_REL=0.025, SIG_H=0.06;
+const SIG_STOP=2.0, SIG_ROUGH=0.006;
+const HAND_OFFSET=0.010, HAND_WANDER=0.011;
+/* the pipette: the diffusion starts with the first drop, not with the stopwatch */
+const WDROP_RISE=0.075, WDROPS_DEFAULT=40, WDROP_RATE=6.0;
+const N_POINTS=2200, PRESET_CONC=[23.0,28.0,33.0];
+
+/* ── random helpers (replaces numpy.random.default_rng) ── */
+const uni=(a,b)=>a+Math.random()*(b-a);
+function norm(mu,sd){                       // Box–Muller
+  let u=0,v=0; while(u===0)u=Math.random(); while(v===0)v=Math.random();
+  return mu + sd*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   2.  Pour  —  one filling of the cell; all errors drawn once
+        (direct transcription of the Python class)
+   ══════════════════════════════════════════════════════════════ */
+class Pour{
+  constructor(grams, volume=150.0){
+    this.grams = grams;
+    const mass = grams + norm(0,SIG_MASS);
+    const vol  = volume + norm(0,SIG_VOLUME);
+    this.C0    = Math.max(mass,0.1)/Math.max(vol,1.0);            // g/mL
+    this.D     = Math.max((D_A+D_B*this.C0)*(1+norm(0,SIG_D_REL)), 1e-6);
+    this.dndC  = DNDC_A + DNDC_B*this.C0;                          // mL/g
+    this.dh    = norm(0,SIG_H);                                    // cm
+    this.t_off = norm(0,SIG_STOP);
+    this._k=[], this._p=[], this._a=[];
+    for(let i=0;i<6;i++){
+      this._k.push(uni(0.3,1.8));
+      this._p.push(uni(0,2*Math.PI));
+      this._a.push(norm(0,SIG_ROUGH));
+    }
+  }
+  tEff(tDiff){ return Math.max(tDiff, 1.0); }
+  rough(xi){
+    let s=0;
+    for(let i=0;i<6;i++) s += this._a[i]*Math.sin(this._k[i]*xi + this._p[i]);
+    return s;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   3.  STATE
+   ══════════════════════════════════════════════════════════════ */
+const S = {
+  laserY:LASER_Y0, cellX:CELL_X0, screenX:SCREEN_X0, screenY:SCREEN_Y0,
+  laserOn:true, focus:0.35, theta:45.0,
+  conc:23.0, pour:null, filled:false,
+  wlevel:0.0, dripping:false, dropCredit:0, dropsLeft:0,
+  tFirst:false, tDiff:0.0, tStop0:null, started:false,
+  speed:60.0, pencil:[], drag:null, benchDirty:true, paperDirty:true
+};
+
+/* ── geometry (the Python @property block) ── */
+const Z0  = ()=> S.cellX - LASER_X;
+const Zd  = ()=> S.screenX - S.cellX - CELL_D;
+const mag = ()=> (Z0() + CELL_D + Zd())/Math.max(Z0(),1e-3);
+const hInt= ()=> CELL_FOOT + FILL_LINE - S.laserY + (S.pour ? S.pour.dh : 0);
+const xiMid=()=> S.screenY - S.laserY;
+
+/* ══════════════════════════════════════════════════════════════
+   4.  THE PHYSICS  —  trace_xy()
+        xi     = Y (Z0 + d + Z)/Z0
+        delta  = Z d (dn/dY)
+        dn/dY  = (dn/dC) C0 /(2 sqrt(pi D t)) exp(-(h-Y)^2/(4 D t))
+   ══════════════════════════════════════════════════════════════ */
+function traceXY(){
+  const half = SCREEN_SIZE/2;
+  const cot  = 1/Math.tan(S.theta*Math.PI/180);
+  const m    = mag(), h = hInt(), Z = Zd(), c = xiMid();
+  const live = S.tFirst && S.pour;
+  let t=0,s=0,pre=0;
+  if(live){
+    t = S.pour.tEff(S.tDiff);
+    s = 2*Math.sqrt(S.pour.D*t);
+    pre = S.pour.C0/(s*Math.sqrt(Math.PI));
+  }
+  const xs=[], ys=[];
+  for(let i=0;i<N_POINTS;i++){
+    const xi = c - half + (2*half)*i/(N_POINTS-1);
+    const x  = half + (xi - c)*cot;
+    if(x < -1 || x > SCREEN_SIZE+1) continue;
+    let y = half + (xi - c);
+    if(live){
+      const Y = xi/m;
+      const dCdY = pre*Math.exp(-Math.pow((h-Y)/s,2));
+      y = y - Z*CELL_D*S.pour.dndC*dCdY + S.pour.rough(xi);
+    }
+    xs.push(x); ys.push(y);
+  }
+  return [xs,ys];
+}
+
+/* ── hand-drawn pencil deviation ── */
+function handWander(arc){
+  const span = Math.max(arc[arc.length-1]-arc[0],1e-6);
+  const base = norm(0,HAND_OFFSET);
+  const out = arc.map(()=>base);
+  for(let k=0;k<4;k++){
+    const period = uni(0.25,1.0)*span, amp = norm(0,HAND_WANDER), ph = uni(0,2*Math.PI);
+    for(let i=0;i<arc.length;i++) out[i] += amp*Math.sin(2*Math.PI*arc[i]/period + ph);
+  }
+  return out;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   5.  CANVAS SET-UP
+   ══════════════════════════════════════════════════════════════ */
+const benchCv=document.getElementById("bench"), bx=benchCv.getContext("2d");
+const paperCv=document.getElementById("paper"), px=paperCv.getContext("2d");
+const paperBg=document.createElement("canvas"), pbg=paperBg.getContext("2d");
+
+const BX0=-5, BX1=RAIL_LEN+6, BY0=-3.2, BY1=BENCH_TOP;   // bench cm-window
+let bs=1, ps=1;                                           // px per cm
+
+function fitCanvas(cv,ctx,wCss,hCss){
+  const dpr = Math.min(window.devicePixelRatio||1, 2);
+  cv.width = Math.round(wCss*dpr); cv.height = Math.round(hCss*dpr);
+  cv.style.height = hCss+"px";
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+function layout(){
+  const w = benchCv.parentElement.clientWidth-24;
+  bs = w/(BX1-BX0);
+  fitCanvas(benchCv,bx,w,(BY1-BY0)*bs);
+  const pw = Math.min(paperCv.parentElement.clientWidth-24, 660);
+  ps = pw/SCREEN_SIZE;
+  fitCanvas(paperCv,px,pw,pw);
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  paperBg.width=Math.round(pw*dpr); paperBg.height=Math.round(pw*dpr);
+  pbg.setTransform(dpr,0,0,dpr,0,0);
+  S.benchDirty=S.paperDirty=true;
+}
+/* cm → px */
+const BX=x=>(x-BX0)*bs, BY=y=>(BY1-y)*bs;
+const PX=x=>x*ps,       PY=y=>(SCREEN_SIZE-y)*ps;
+/* px → cm (bench) */
+const bcmX=p=>p/bs+BX0, bcmY=p=>BY1-p/bs;
+
+/* ══════════════════════════════════════════════════════════════
+   6.  BENCH DRAWING
+   ══════════════════════════════════════════════════════════════ */
+function drawBench(){
+  const w=benchCv.clientWidth, h=(BY1-BY0)*bs;
+  bx.clearRect(0,0,w,h);
+  bx.fillStyle="#fbfcfd"; bx.fillRect(0,0,w,h);
+
+  /* rail + scale */
+  bx.fillStyle="#4a4a4a";
+  bx.fillRect(BX(-2),BY(0),(RAIL_LEN+4)*bs,2.6*bs);
+  bx.strokeStyle="#e8e8e8"; bx.fillStyle="#f0f0f0";
+  bx.font="9px ui-monospace,monospace"; bx.textAlign="center";
+  for(let t=0;t<=RAIL_LEN+1e-6;t+=1){
+    const big = Math.abs(t%5)<1e-6;
+    bx.lineWidth = big?1.0:0.6;
+    bx.beginPath();
+    bx.moveTo(BX(t),BY(-0.15));
+    bx.lineTo(BX(t),BY(-0.15-(big?0.85:0.45)));
+    bx.stroke();
+    if(big) bx.fillText(t.toFixed(0), BX(t), BY(-2.30));
+  }
+
+  /* beam */
+  if(S.laserOn){
+    const xs=S.screenX;
+    const top=S.screenY+SCREEN_SIZE/2, bot=S.screenY-SCREEN_SIZE/2;
+    bx.fillStyle="rgba(255,59,59,0.13)";
+    bx.beginPath();
+    bx.moveTo(BX(LASER_X+1.2),BY(S.laserY));
+    bx.lineTo(BX(xs),BY(top)); bx.lineTo(BX(xs),BY(bot));
+    bx.closePath(); bx.fill();
+    bx.strokeStyle="rgba(224,32,32,0.55)"; bx.lineWidth=0.8;
+    for(let i=0;i<7;i++){
+      const f=-1+2*i/6, ye=S.screenY+f*SCREEN_SIZE/2;
+      bx.beginPath();
+      bx.moveTo(BX(LASER_X+1.2),BY(S.laserY)); bx.lineTo(BX(xs),BY(ye)); bx.stroke();
+    }
+  }
+
+  const box=(x,y,w_,h_,fill,stroke,lw)=>{
+    bx.fillStyle=fill; bx.fillRect(BX(x),BY(y+h_),w_*bs,h_*bs);
+    if(stroke){bx.strokeStyle=stroke;bx.lineWidth=lw||1;bx.strokeRect(BX(x),BY(y+h_),w_*bs,h_*bs);}
+  };
+
+  /* laser module */
+  box(LASER_X-2.4,0,1.4,S.laserY-1.1,"#8a8a8a","#444");
+  box(LASER_X-2.0,S.laserY-1.1,3.2,2.2,"#2e3d52","#101820");
+  bx.strokeStyle="#c8102e"; bx.lineWidth=1; bx.setLineDash([2,3]);
+  bx.beginPath(); bx.moveTo(BX(LASER_X),BY(0)); bx.lineTo(BX(LASER_X),BY(S.laserY+1.6)); bx.stroke();
+  bx.setLineDash([]);
+  bx.fillStyle="#ffd24d"; bx.beginPath();
+  bx.arc(BX(LASER_X+1.2),BY(S.laserY),3.2,0,7); bx.fill();
+  bx.fillStyle="#223"; bx.font="9px sans-serif"; bx.textAlign="left";
+  bx.fillText("laser + cyl. lens", BX(LASER_X-2.2), BY(S.laserY+2.4));
+
+  /* diffusion cell */
+  const cx=S.cellX, cb=CELL_FOOT;
+  box(cx-0.9,0,1.8,cb,"#8a8a8a","#444");
+  box(cx,cb,CELL_D,CELL_H,"#eaf4fb","#31506b",1.3);
+  if(S.filled){
+    box(cx,cb,CELL_D,FILL_LINE,"#7fb6d8");
+    if(S.wlevel>0){
+      box(cx,cb+FILL_LINE,CELL_D,S.wlevel,"#dff0fa");
+      bx.strokeStyle="#2c6f9b"; bx.lineWidth=1;
+      bx.beginPath(); bx.moveTo(BX(cx),BY(cb+FILL_LINE));
+      bx.lineTo(BX(cx+CELL_D),BY(cb+FILL_LINE)); bx.stroke();
+    }
+    if(S.dripping && S.dropsLeft>0){          /* the pipette above the cell rim */
+      bx.fillStyle="#2c6f9b";
+      bx.beginPath(); bx.arc(BX(cx+CELL_D/2),BY(cb+CELL_H+1.2),2.4,0,7); bx.fill();
+    }
+  }
+  bx.strokeStyle="#ffffff"; bx.lineWidth=1.8;
+  bx.beginPath(); bx.moveTo(BX(cx-0.35),BY(cb+FILL_LINE));
+  bx.lineTo(BX(cx+CELL_D+0.35),BY(cb+FILL_LINE)); bx.stroke();
+  bx.fillStyle="#223"; bx.fillText("cell", BX(cx+CELL_D+0.6), BY(cb+CELL_H-0.6));
+
+  /* screen */
+  const sx=S.screenX, sy=S.screenY;
+  box(sx-0.9,0,1.8,sy-SCREEN_SIZE/2,"#8a8a8a","#444");
+  box(sx,sy-SCREEN_SIZE/2,0.7,SCREEN_SIZE,"#fbfbf4","#555",1.2);
+  bx.fillText("screen", BX(sx+1.2), BY(sy+SCREEN_SIZE/2-0.8));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   7.  PAPER  (static grid + pencil traces cached offscreen)
+   ══════════════════════════════════════════════════════════════ */
+function drawPaperBg(){
+  const w=paperCv.clientWidth;
+  pbg.clearRect(0,0,w,w);
+  pbg.fillStyle="#fdfefe"; pbg.fillRect(0,0,w,w);
+  pbg.strokeStyle="#cfe0ef"; pbg.lineWidth=0.4;
+  pbg.beginPath();
+  for(let k=0;k<=SCREEN_SIZE+1e-6;k+=0.1){
+    pbg.moveTo(PX(k),0); pbg.lineTo(PX(k),w);
+    pbg.moveTo(0,PY(k)); pbg.lineTo(w,PY(k));
+  }
+  pbg.stroke();
+  pbg.strokeStyle="#7fa8c9"; pbg.lineWidth=0.9;
+  pbg.beginPath();
+  for(let k=0;k<=SCREEN_SIZE+1e-6;k+=1){
+    pbg.moveTo(PX(k),0); pbg.lineTo(PX(k),w);
+    pbg.moveTo(0,PY(k)); pbg.lineTo(w,PY(k));
+  }
+  pbg.stroke();
+  /* pencil traces */
+  pbg.lineJoin="round"; pbg.lineCap="round";
+  for(const t of S.pencil){
+    pbg.strokeStyle=t.col; pbg.lineWidth=t.lw;
+    pbg.beginPath();
+    for(let i=0;i<t.x.length;i++){
+      const X=PX(t.x[i]), Y=PY(t.y[i]);
+      i?pbg.lineTo(X,Y):pbg.moveTo(X,Y);
+    }
+    pbg.stroke();
+  }
+  /* border */
+  pbg.strokeStyle="#8fa6b8"; pbg.lineWidth=1; pbg.strokeRect(0.5,0.5,w-1,w-1);
+}
+function drawPaper(){
+  const w=paperCv.clientWidth;
+  px.clearRect(0,0,w,w);
+  px.drawImage(paperBg,0,0,w,w);
+  if(!S.laserOn) return;
+  const [xs,ys]=traceXY();
+  if(!xs.length) return;
+  px.strokeStyle="#d81010";
+  px.lineWidth = 0.9 + 7.0*Math.pow(S.focus,1.6);
+  px.globalAlpha = 0.95 - 0.45*S.focus;
+  px.lineJoin="round"; px.lineCap="round";
+  px.beginPath();
+  for(let i=0;i<xs.length;i++){
+    const X=PX(xs[i]), Y=PY(ys[i]);
+    i?px.lineTo(X,Y):px.moveTo(X,Y);
+  }
+  px.stroke();
+  px.globalAlpha=1;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   8.  DRAGGING
+   ══════════════════════════════════════════════════════════════ */
+function hit(x,y){
+  if(Math.abs(x-S.screenX)<2.5 && y>S.screenY-17 && y<S.screenY+17) return "screen";
+  if(x>S.cellX-1.4 && x<S.cellX+CELL_D+1.4 && y>-0.5 && y<CELL_FOOT+CELL_H+1) return "cell";
+  if(x>LASER_X-3.0 && x<LASER_X+2.0 && y>S.laserY-2.5 && y<S.laserY+2.5) return "laser";
+  return null;
+}
+const clamp=(v,a,b)=>Math.min(Math.max(v,a),b);
+function benchPt(e){
+  const r=benchCv.getBoundingClientRect();
+  return [bcmX(e.clientX-r.left), bcmY(e.clientY-r.top)];
+}
+benchCv.addEventListener("pointerdown",e=>{
+  const [x,y]=benchPt(e); S.drag=hit(x,y);
+  if(S.drag){ benchCv.setPointerCapture(e.pointerId); benchCv.classList.add("dragging"); }
+});
+benchCv.addEventListener("pointermove",e=>{
+  if(!S.drag) return;
+  const [x,y]=benchPt(e);
+  if(S.drag==="laser") S.laserY=clamp(y,...LASER_Y_RANGE);
+  else if(S.drag==="cell")
+    S.cellX=clamp(x,CELL_X_RANGE[0],Math.min(CELL_X_RANGE[1],S.screenX-CELL_D-5));
+  else if(S.drag==="screen"){
+    S.screenX=clamp(x,S.cellX+CELL_D+5,RAIL_LEN);
+    S.screenY=clamp(y,...SCREEN_Y_RANGE);
+  }
+  S.benchDirty=true; updGeom();
+});
+const stopDrag=()=>{S.drag=null;benchCv.classList.remove("dragging");};
+benchCv.addEventListener("pointerup",stopDrag);
+benchCv.addEventListener("pointercancel",stopDrag);
+
+paperCv.addEventListener("pointermove",e=>{
+  const r=paperCv.getBoundingClientRect();
+  const x=(e.clientX-r.left)/ps, y=SCREEN_SIZE-(e.clientY-r.top)/ps;
+  document.getElementById("cursor").textContent =
+    `${T[lang].cursor}:  x = ${(Math.round(x*20)/20).toFixed(2)} cm   y = ${(Math.round(y*20)/20).toFixed(2)} cm`;
+});
+paperCv.addEventListener("pointerleave",()=>{
+  document.getElementById("cursor").textContent = T[lang].none;
+});
+
+function updGeom(){
+  document.getElementById("geom").textContent =
+    `Z₀ = ${Z0().toFixed(1)}   d = ${CELL_D.toFixed(1)}   Z = ${Zd().toFixed(1)} cm`;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   9.  ACTIONS
+   ══════════════════════════════════════════════════════════════ */
+const $=id=>document.getElementById(id);
+
+$("laserOn").onchange = e=>{ S.laserOn=e.target.checked; };
+$("focus").oninput    = e=>{ S.focus=parseFloat(e.target.value); };
+$("theta").oninput    = e=>{ S.theta=parseFloat(e.target.value); };
+$("speed").onchange   = e=>{ S.speed=parseFloat(e.target.value); };
+
+function buildConc(){
+  const box=$("concBox"); box.innerHTML="";
+  PRESET_CONC.forEach(g=>{
+    const b=document.createElement("button");
+    b.textContent=`${g.toFixed(0)} g`;
+    if(g===S.conc) b.className="on";
+    b.onclick=()=>{ S.conc=g; buildConc(); };
+    box.appendChild(b);
+  });
+  const s=document.createElement("span"); s.textContent=T[lang].perVol; box.appendChild(s);
+}
+
+$("btnFill").onclick=()=>{
+  S.pour=new Pour(S.conc); S.filled=true;
+  S.wlevel=0; S.dropsLeft=WDROPS_DEFAULT; S.dropCredit=0;
+  S.tFirst=false; S.tDiff=0; S.tStop0=null; S.started=false;
+  $("btnDrip").disabled=false; $("btnStart").disabled=false;
+  S.benchDirty=true; updDrip();
+};
+/* hold the pipette down; the drops fall at the rate the pipette can deliver */
+const dripOn =e=>{ if(!$("btnDrip").disabled){ S.dripping=true; e.preventDefault(); } };
+const dripOff=()=>{ S.dripping=false; };
+$("btnDrip").addEventListener("pointerdown",dripOn);
+addEventListener("pointerup",dripOff);
+addEventListener("pointercancel",dripOff);
+
+$("btnStart").onclick=()=>{
+  if(!S.tFirst || S.started) return;
+  S.started=true;
+  S.tStop0 = S.tDiff + S.pour.t_off;   /* the reaction time is the student's error */
+  $("btnStart").disabled=true;
+};
+$("btnEmpty").onclick=()=>{
+  S.filled=false; S.pour=null; S.wlevel=0; S.dropsLeft=0;
+  S.tFirst=false; S.tDiff=0; S.tStop0=null; S.started=false;
+  $("btnDrip").disabled=true; $("btnStart").disabled=true;
+  S.benchDirty=true; updDrip();
+};
+$("btnJump").onclick=()=>{ if(S.tFirst) S.tDiff=Math.max(S.tDiff,1800.0); };
+
+function updDrip(){
+  const d=T[lang];
+  $("dripState").textContent = S.filled
+    ? `${d.drops}: ${WDROPS_DEFAULT-S.dropsLeft} / ${WDROPS_DEFAULT}`
+    : "—";
+}
+
+$("btnTrace").onclick=()=>{
+  if(!S.laserOn) return;
+  const [xs,ys]=traceXY();
+  if(!xs.length) return;
+  const arc=[0];
+  for(let i=1;i<xs.length;i++)
+    arc.push(arc[i-1]+Math.hypot(xs[i]-xs[i-1], ys[i]-ys[i-1]));
+  const wx=handWander(arc), wy=handWander(arc);
+  const g=Math.round(uni(74,100));
+  S.pencil.push({
+    x:xs.map((v,i)=>v+wx[i]),
+    y:ys.map((v,i)=>v+wy[i]),
+    lw:uni(0.75,1.05),
+    col:`rgb(${g},${g+4},${g+8})`
+  });
+  S.paperDirty=true;
+};
+$("btnFresh").onclick=()=>{ S.pencil.length=0; S.paperDirty=true; };
+$("btnPng").onclick=()=>{
+  const a=document.createElement("a");
+  a.download="mm_paper.png";
+  a.href=paperBg.toDataURL("image/png");
+  a.click();
+};
+
+/* ══════════════════════════════════════════════════════════════
+   10.  LANGUAGE
+   ══════════════════════════════════════════════════════════════ */
+function applyLang(){
+  const d=T[lang];
+  document.documentElement.lang = lang;
+  $("t-title").textContent=d.title;   $("t-sub").textContent=d.sub;
+  $("t-h-laser").textContent=d.hLaser;$("t-laseron").textContent=d.laserOn;
+  $("t-focus").textContent=d.focus;   $("t-theta").textContent=d.theta;
+  $("t-h-sol").textContent=d.hSol;
+  $("btnFill").textContent=d.fill;    $("btnStart").textContent=d.start;
+  $("btnDrip").textContent=d.drip;    updDrip();
+  $("btnEmpty").textContent=d.empty;
+  $("t-h-watch").textContent=d.hWatch;$("t-speed").textContent=d.speed;
+  $("btnJump").textContent=d.jump;
+  $("t-h-paper").textContent=d.hPaper;$("btnTrace").textContent=d.trace;
+  $("btnFresh").textContent=d.fresh;  $("btnPng").textContent=d.png;
+  $("t-benchcap").textContent=d.benchcap; $("t-papercap").textContent=d.papercap;
+  $("t-note").textContent=d.note;
+  $("cursor").textContent=d.none;
+  $("btn-ko").className = lang==="ko"?"on":"";
+  $("btn-en").className = lang==="en"?"on":"";
+  buildConc(); updGeom();
+}
+$("btn-ko").onclick=()=>{ lang="ko"; applyLang(); };
+$("btn-en").onclick=()=>{ lang="en"; applyLang(); };
+
+/* ══════════════════════════════════════════════════════════════
+   11.  MAIN LOOP
+   ══════════════════════════════════════════════════════════════ */
+let last=performance.now();
+function tick(now){
+  const dt=(now-last)/1000; last=now;
+
+  /* the pipette */
+  if(S.dripping && S.filled && S.dropsLeft>0){
+    S.dropCredit += dt*WDROP_RATE;
+    const landed = Math.min(Math.floor(S.dropCredit), S.dropsLeft);
+    if(landed>0){
+      S.dropCredit -= landed; S.dropsLeft -= landed;
+      if(!S.tFirst){ S.tFirst=true; S.tDiff=0; }   /* diffusion starts here */
+      S.wlevel = Math.min(S.wlevel + landed*WDROP_RISE, CELL_H-FILL_LINE-0.2);
+      S.benchDirty=true; updDrip();
+    }
+  }else S.dropCredit=0;
+
+  /* the true diffusion time runs from the first drop */
+  if(S.tFirst) S.tDiff += dt*S.speed;
+
+  /* the stopwatch only shows what the student started */
+  const clk=$("clock");
+  if(S.started){
+    const t=Math.max(S.tDiff-S.tStop0,0);
+    clk.textContent=`${String(Math.floor(t/60)).padStart(2,"0")}:`+
+                    `${String(Math.floor(t%60)).padStart(2,"0")}`;
+  }else clk.textContent="--:--";
+
+  if(S.benchDirty){ drawBench(); S.benchDirty=false; }
+  if(S.paperDirty){ drawPaperBg(); S.paperDirty=false; }
+  drawPaper();
+  requestAnimationFrame(tick);
+}
+
+/* ── boot ── */
+window.addEventListener("resize",()=>{layout();});
+layout(); applyLang(); requestAnimationFrame(tick);
+</script>
+</body>
+</html>

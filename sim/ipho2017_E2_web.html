@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IPhO 2017 E2 — Parallel Dipole Line Magnetic Trap</title>
+<style>
+  :root{
+    --bg:#f4f6f8; --panel:#fff; --ink:#1b2430; --muted:#5b6b7c;
+    --line:#d8e0e8; --accent:#2c6f9b; --accent-soft:#eaf4fb;
+    --disp-bg:#101418; --disp-fg:#8fd6ff; --mag:#b9bec4; --rod:#2b2f36;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,
+         "Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+  .wrap{max-width:1400px;margin:0 auto;padding:16px;display:flex;gap:16px;align-items:flex-start}
+  @media(max-width:1080px){.wrap{flex-direction:column}}
+  .panel{flex:0 0 300px;background:var(--panel);border:1px solid var(--line);
+    border-radius:10px;padding:14px;position:sticky;top:16px}
+  @media(max-width:1080px){.panel{position:static;width:100%;flex:1 1 auto}}
+  .panel h2{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);
+    margin:16px 0 7px;padding-bottom:5px;border-bottom:1px solid var(--line)}
+  .panel h2:first-of-type{margin-top:0}
+  label.row{display:block;margin:9px 0 3px;color:var(--muted);font-size:12.5px}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  button{width:100%;padding:8px 10px;margin:4px 0;cursor:pointer;background:#fff;
+    border:1px solid var(--line);border-radius:6px;font:inherit;font-size:13px;
+    color:var(--ink);text-align:left;transition:background .12s,border-color .12s}
+  button:hover:not(:disabled){background:var(--accent-soft);border-color:var(--accent)}
+  button:disabled{opacity:.42;cursor:not-allowed}
+  button.primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+  button.primary:hover:not(:disabled){background:#22587c}
+  .seg{display:flex;gap:5px;margin:5px 0}
+  .seg button{flex:1;text-align:center;padding:6px 4px;margin:0}
+  .seg button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .disp{background:var(--disp-bg);border-radius:6px;padding:9px 12px;margin:6px 0;
+    text-align:right;color:var(--disp-fg);
+    font:700 24px/1.15 ui-monospace,Consolas,monospace;letter-spacing:.04em}
+  .disp small{display:block;font:400 10px/1.4 ui-monospace,monospace;
+    color:#5d7f96;letter-spacing:.12em;text-transform:uppercase;text-align:left}
+  .disp.off{color:#3a4a55}
+  .readout{font:12.5px ui-monospace,Consolas,monospace;color:var(--muted);
+    background:#f7f9fb;border:1px solid var(--line);border-radius:6px;padding:6px 8px;margin-top:8px}
+  .chk{display:flex;align-items:center;gap:7px;margin:6px 0;cursor:pointer;font-size:13px}
+  .chk input{accent-color:var(--accent);width:16px;height:16px}
+  .note{font-size:11.5px;color:#8494a3;line-height:1.6;margin-top:10px}
+  .warn{font-size:11.5px;color:#a4551f;background:#fdf4ec;border:1px solid #f0dcc8;
+    border-radius:6px;padding:6px 8px;margin-top:8px;line-height:1.55}
+
+  .stage{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
+  .card h3{margin:0 0 8px;font-size:13px;font-weight:600;color:var(--muted)}
+  canvas{display:block;width:100%;height:auto;border-radius:6px;touch-action:none}
+
+  header{max-width:1400px;margin:0 auto;padding:18px 16px 0;display:flex;
+    justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+  header h1{margin:0;font-size:19px;font-weight:650}
+  header p{margin:3px 0 0;font-size:13px;color:var(--muted)}
+  .lang{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;background:#fff}
+  .lang button{width:auto;margin:0;border:0;border-radius:0;padding:7px 15px;
+    font-size:13px;font-weight:600;color:var(--muted);text-align:center}
+  .lang button.on{background:var(--accent);color:#fff}
+
+  .tabs{max-width:1400px;margin:14px auto 0;padding:0 16px;display:flex;gap:6px;flex-wrap:wrap}
+  .tabs button{width:auto;margin:0;padding:9px 16px;border-radius:8px 8px 0 0;
+    border-bottom-color:transparent;font-size:13px;font-weight:550}
+  .tabs button.on{background:var(--panel);border-color:var(--line);
+    border-bottom-color:var(--panel);color:var(--accent)}
+
+  table.data{width:100%;border-collapse:collapse;font:12px ui-monospace,Consolas,monospace}
+  table.data th{text-align:right;color:var(--muted);font-weight:500;padding:4px 6px;
+    border-bottom:1px solid var(--line);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase}
+  table.data td{text-align:right;padding:3px 6px;border-bottom:1px solid #eef2f6}
+  .tablewrap{max-height:230px;overflow:auto;margin-top:6px}
+</style>
+</head>
+<body>
+
+<header>
+  <div><h1 id="t-title"></h1><p id="t-sub"></p></div>
+  <div class="lang">
+    <button id="lang-ko" class="on">한국어</button>
+    <button id="lang-en">English</button>
+  </div>
+</header>
+
+<div class="tabs">
+  <button id="tab-a1" class="on"></button>
+  <button id="tab-a2"></button>
+  <button id="tab-b"></button>
+</div>
+
+<!-- ═══════════════ A1 : magnetisation ═══════════════ -->
+<div class="wrap" id="view-a1">
+  <aside class="panel">
+    <h2 id="t-h-meter"></h2>
+    <label class="chk"><input type="checkbox" id="meterOn"><span id="t-meteron"></span></label>
+    <div class="disp off" id="dispB"><small id="t-field"></small>-- . --- mT</div>
+    <button id="btnZero"></button>
+    <div class="readout" id="zeroRead">—</div>
+
+    <h2 id="t-h-probe"></h2>
+    <label class="chk"><input type="checkbox" id="magOn" checked><span id="t-magon"></span></label>
+    <label class="row" id="t-ruler"></label>
+    <input type="range" id="ruler" min="0" max="26" step="0.5" value="6">
+    <label class="row" id="t-phi"></label>
+    <input type="range" id="phi" min="-60" max="60" step="1" value="0">
+    <div class="warn" id="t-warn"></div>
+
+    <h2 id="t-h-rec"></h2>
+    <button id="btnRec" class="primary"></button>
+    <button id="btnDel"></button>
+    <button id="btnCsv"></button>
+    <p class="note" id="t-note1"></p>
+  </aside>
+  <div class="stage">
+    <div class="card"><h3 id="t-cap1"></h3><canvas id="cvA1"></canvas></div>
+    <div class="card"><h3 id="t-cap1b"></h3>
+      <div class="tablewrap"><table class="data" id="tblA1"></table></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ A2 : levitation and oscillation ═══════════════ -->
+<div class="wrap" id="view-a2" style="display:none">
+  <aside class="panel">
+    <h2 id="t-h-rod"></h2>
+    <div class="seg" id="rodSeg"></div>
+    <label class="row" id="t-len"></label>
+    <input type="range" id="rodLen" min="4" max="14" step="1" value="8">
+    <button id="btnPlace" class="primary"></button>
+    <button id="btnRemove"></button>
+
+    <h2 id="t-h-ruler"></h2>
+    <label class="chk"><input type="checkbox" id="insRuler"><span id="t-insruler"></span></label>
+    <div class="readout" id="t-rulerhint"></div>
+
+    <h2 id="t-h-osc"></h2>
+    <label class="row" id="t-amp"></label>
+    <input type="range" id="amp" min="0.5" max="4" step="0.1" value="3">
+    <button id="btnPush" disabled></button>
+
+    <h2 id="t-h-sw"></h2>
+    <div class="disp" id="swDisp"><small id="t-sw"></small>0.00 s</div>
+    <button id="btnSw"></button>
+    <button id="btnLap"></button>
+    <button id="btnSwReset"></button>
+    <div class="tablewrap"><table class="data" id="tblLap"></table></div>
+    <p class="note" id="t-note2"></p>
+  </aside>
+  <div class="stage">
+    <div class="card"><h3 id="t-cap2"></h3><canvas id="cvFront"></canvas></div>
+    <div class="card"><h3 id="t-cap3"></h3><canvas id="cvTop"></canvas></div>
+  </div>
+</div>
+
+<!-- ═══════════════ B : tiltmeter ═══════════════ -->
+<div class="wrap" id="view-b" style="display:none">
+  <aside class="panel">
+    <h2 id="t-h-tilt"></h2>
+    <div class="readout" id="t-tiltsetup"></div>
+    <label class="row" id="t-turn"></label>
+    <input type="range" id="turns" min="0" max="3" step="0.125" value="0">
+    <button id="btnLevel"></button>
+
+    <h2 id="t-h-read"></h2>
+    <div class="disp" id="dzDisp"><small id="t-dz"></small>-- . -- mm</div>
+    <button id="btnRecB" class="primary"></button>
+    <button id="btnDelB"></button>
+    <div class="tablewrap"><table class="data" id="tblB"></table></div>
+    <p class="note" id="t-note3"></p>
+  </aside>
+  <div class="stage">
+    <div class="card"><h3 id="t-cap4"></h3><canvas id="cvTilt"></canvas></div>
+    <div class="card"><h3 id="t-cap5"></h3><canvas id="cvTopB"></canvas></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ══════════════════════════════════════════════════════════════
+   0.  i18n
+   ══════════════════════════════════════════════════════════════ */
+const T={
+ko:{
+ title:"IPhO 2017 E2 — 평행 쌍극자선(PDL) 자기 트랩",
+ sub:"가상 실험대 · 테슬라미터와 자, 스톱워치만 제공됩니다",
+ tabA1:"[1] 자화 M", tabA2:"[2][3][4] 부양 · 진동", tabB:"[6] 경사계",
+
+ hMeter:"테슬라미터", meterOn:"전원 켜기", field:"자기장",
+ magon:"자석을 레일에 올림", zero:"영점 오프셋 B₀ 기록  (A.1)", zeroNone:"B₀ 미기록",
+ hProbe:"프로브와 자석", ruler:"자석 표면부터의 자 눈금 (mm)",
+ phi:"자석 회전 (자화 방향)",
+ warn:"홀 소자는 자석 끝보다 4.0 mm 뒤에 있습니다. 자 눈금 0 mm(= x 4 mm)에서는 "+
+      "센서가 포화되고 프로브가 휘므로 쓰지 마세요.",
+ hRec:"측정 기록", rec:"현재 값 기록", del:"마지막 줄 삭제", csv:"CSV로 저장",
+ note1:"x는 자석 중심에서 홀 소자까지의 거리입니다. 기록된 값에서 B₀를 빼는 것, "+
+       "ln B – ln x 그래프, 지수 p와 자화 M은 모두 직접 하셔야 합니다.",
+ cap1:"자석과 홀 프로브 (위에서 본 모습)", cap1b:"측정 표",
+ thN:"i", thRuler:"자 눈금 (mm)", thX:"x (mm)", thB:"B_raw (mT)",
+
+ hRod:"흑연 막대", len:"길이 (mm)",
+ place:"트랩 가운데에 막대를 놓는다", remove:"막대를 꺼낸다",
+ hRuler:"삽입 자", insruler:"삽입 자를 자석 위에 누른다",
+ rulerhint:"자석 표면(0)에서 위로 mm 눈금. 막대 위치를 읽으세요.",
+ hOsc:"진동", amp:"이쑤시개로 밀어낼 거리 (mm)", push:"살짝 밀고 놓는다",
+ hSw:"스톱워치", sw:"경과", swStart:"시작", swStop:"정지",
+ lap:"랩 기록", swReset:"초기화",
+ note2:"부양 높이 y₀, 진동 주기, 감쇠 시간상수는 전부 눈금과 스톱워치로 직접 재야 합니다. "+
+       "자화율도 계산해 주지 않습니다.",
+ cap2:"트랩 단면 (그림 7a)", cap3:"위에서 본 모습 — 낙타등 퍼텐셜 방향(z)",
+
+ hTilt:"경사 조절 나사",
+ tiltsetup:"두 나사 사이 거리 D = 22.0 cm  ·  샤프심 HB/0.5, 길이 8 mm",
+ turn:"나사 회전수 N (turn)", level:"수평으로 되돌린다",
+ hRead:"막대 위치", dz:"변위 Δz", recB:"현재 값 기록", delB:"마지막 줄 삭제",
+ note3:"나사산 크기 S와 이상적인 Q 인자는 직접 구하세요. 여기서는 회전수와 변위만 읽힙니다.",
+ cap4:"경사계 구성 (그림 9, 기울기는 과장해 그림)", cap5:"트랩 위에서 본 막대 위치",
+ thTurn:"N (turn)", thDz:"Δz (mm)",
+ lapN:"n", lapT:"t (s)", lapD:"Δt (s)"
+},
+en:{
+ title:"IPhO 2017 E2 — Parallel Dipole Line Magnetic Trap",
+ sub:"virtual bench · you get a Teslameter, a ruler and a stopwatch, nothing else",
+ tabA1:"[1] magnetisation M", tabA2:"[2][3][4] levitation & oscillation", tabB:"[6] tiltmeter",
+
+ hMeter:"Teslameter", meterOn:"power on", field:"field",
+ magon:"magnet on the rail", zero:"record the zero offset B₀  (A.1)", zeroNone:"B₀ not recorded",
+ hProbe:"probe and magnet", ruler:"ruler reading from the magnet surface (mm)",
+ phi:"rotation of the magnet (magnetisation)",
+ warn:"The Hall element sits 4.0 mm behind the tip. Do not use a ruler reading of 0 mm "+
+      "(x = 4 mm): the sensor saturates and the probe flexes.",
+ hRec:"measurements", rec:"record this reading", del:"delete last row", csv:"save as CSV",
+ note1:"x is the distance from the centre of the magnet to the Hall element. Subtracting B₀, "+
+       "the ln B – ln x plot, the exponent p and the magnetisation M are all your work.",
+ cap1:"magnet and Hall probe (top view)", cap1b:"data table",
+ thN:"i", thRuler:"ruler (mm)", thX:"x (mm)", thB:"B_raw (mT)",
+
+ hRod:"graphite rod", len:"length (mm)",
+ place:"place the rod in the centre of the trap", remove:"take the rod out",
+ hRuler:"insert ruler", insruler:"press the insert ruler onto the magnets",
+ rulerhint:"millimetre scale upwards from the magnet surface (0). Read off the rod.",
+ hOsc:"oscillation", amp:"displacement with the toothpick (mm)", push:"displace and release",
+ hSw:"stopwatch", sw:"elapsed", swStart:"start", swStop:"stop",
+ lap:"lap", swReset:"reset",
+ note2:"The levitation height y₀, the period and the damping time constant are all yours to "+
+       "measure. No susceptibility is computed for you.",
+ cap2:"cross-section of the trap (Fig. 7a)", cap3:"top view — camelback direction (z)",
+
+ hTilt:"adjustment screw",
+ tiltsetup:"distance between the screws D = 22.0 cm  ·  HB/0.5 lead, 8 mm long",
+ turn:"screw turns N", level:"return to level",
+ hRead:"rod position", dz:"displacement Δz", recB:"record this reading", delB:"delete last row",
+ note3:"The thread size S and the ideal Q factor are yours to work out. This bench only shows "+
+       "turns and displacement.",
+ cap4:"tiltmeter set-up (Fig. 9, tilt drawn exaggerated)", cap5:"rod position, seen from above",
+ thTurn:"N (turn)", thDz:"Δz (mm)",
+ lapN:"n", lapT:"t (s)", lapD:"Δt (s)"
+}};
+let lang = (new URLSearchParams(location.search).get("lang")==="en") ? "en" : "ko";
+
+/* ══════════════════════════════════════════════════════════════
+   1.  PHYSICS  —  transcribed from the Python bench
+   ══════════════════════════════════════════════════════════════ */
+const MU0=1.257e-6, R=3.2e-3, LMAG=25.4e-3, GM=1.5e-3, A_PDL=R+GM/2;
+const RHO=1680.0, GRAV=9.8, C1=198.6;
+const X_OFFSET=4.0e-3, METER_FS=0.300;
+const ROD_D={"HB/0.3":0.38e-3,"HB/0.5":0.56e-3,"HB/0.7":0.70e-3,"HB/0.9":0.90e-3};
+const M_TRUE=1.10e6, CHI_TRUE=-1.45e-4;
+const Y0_FINITE=1.06, TAU_A=3.15, TAU_B=29.40;
+const D_TILT=0.220, S_TRUE=0.80e-3, TILT_EXAG=20.0;
+
+const uni=(a,b)=>a+Math.random()*(b-a);
+function norm(mu,sd){let u=0,v=0;while(u===0)u=Math.random();while(v===0)v=Math.random();
+  return mu+sd*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+
+/* field of a diametrically magnetised cylinder, with the finite-length roll-over */
+function bMagnet(x,M){ x=Math.max(x,1e-4);
+  return MU0*M*R*R/(2*x*x)*Math.pow(1+Math.pow(x/LMAG,10),-0.1); }
+const fY=u=>4*u*(3-u*u)*(1-u*u)/Math.pow(1+u*u,5);
+
+function levitationHeight(M,chi){
+  const coef=MU0*M*M*Math.abs(chi)/2*Math.pow(R,4)/Math.pow(A_PDL,5);
+  const target=RHO*GRAV/coef;
+  let uBest=0.5,best=1e9,top=0,fmax=-1;
+  for(let i=0;i<40000;i++){const u=0.02+(0.99-0.02)*i/39999; const f=fY(u);
+    if(f>fmax){fmax=f;top=i;}}
+  for(let i=top;i<40000;i++){const u=0.02+(0.99-0.02)*i/39999;
+    const e=Math.abs(fY(u)-target); if(e<best){best=e;uBest=u;}}
+  return uBest*A_PDL;
+}
+const omegaZ=(chi,M)=>Math.sqrt(-C1*MU0*chi*M*M/RHO);
+function tauDamping(d,l){const r=d*1e3/2, L=l*1e3;
+  return TAU_A+TAU_B*r*r*Math.log(0.607*L/r);}
+
+/* one bench; its small imperfections are drawn once */
+const B={
+  M:M_TRUE*(1+norm(0,0.012)),
+  chi:CHI_TRUE*(1+norm(0,0.02)),
+  B0:norm(0,1.2e-3), drift:norm(0,0.15e-3),
+  tauScale:1+norm(0,0.03), S:S_TRUE*(1+norm(0,0.04)), D:D_TILT
+};
+B.y0 = levitationHeight(B.M,B.chi)*Y0_FINITE*(1+norm(0,0.02));
+B.omega = omegaZ(B.chi,B.M);
+const benchTau=(d,l)=>tauDamping(d,l)*B.tauScale;
+const teslaTrue=(x,phiDeg)=>bMagnet(x,B.M)*Math.cos(2*phiDeg*Math.PI/180)+B.B0+B.drift;
+
+/* ══════════════════════════════════════════════════════════════
+   2.  STATE
+   ══════════════════════════════════════════════════════════════ */
+const S={
+  tab:"a1",
+  meterOn:false, magOn:true, ruler:6.0, phi:0, zeroRec:null, rows:[], reading:0,
+  rodKey:"HB/0.5", rodLen:8, placed:false, insRuler:false,
+  amp:3.0, oscT0:null, simT:0,
+  swRun:false, swT0:0, swVal:0, laps:[],
+  turns:0, rowsB:[]
+};
+const $=id=>document.getElementById(id);
+
+/* ══════════════════════════════════════════════════════════════
+   3.  CANVAS HELPERS
+   ══════════════════════════════════════════════════════════════ */
+function fit(cv,ratio){
+  const dpr=Math.min(devicePixelRatio||1,2), w=cv.clientWidth||700, h=w*ratio;
+  cv.width=Math.round(w*dpr); cv.height=Math.round(h*dpr);
+  cv.style.height=h+"px";
+  const c=cv.getContext("2d"); c.setTransform(dpr,0,0,dpr,0,0);
+  return [c,w,h];
+}
+function grid(c,w,h){ c.fillStyle="#fbfcfd"; c.fillRect(0,0,w,h); }
+
+/* ── A1 : magnet seen from above, with the probe on its rail ── */
+function drawA1(){
+  const [c,w,h]=fit($("cvA1"),0.42); grid(c,w,h);
+  const mm = w/46;                       // px per mm, window -8 … 38 mm
+  const X = v=>(v+8)*mm, Ymid=h*0.44;
+  const Rm=R*1e3, xh=S.ruler+X_OFFSET*1e3;
+
+  /* rail scale in mm */
+  c.strokeStyle="#c8d4e0"; c.fillStyle="#8fa2b4";
+  c.font="9px ui-monospace,monospace"; c.textAlign="center";
+  for(let v=0;v<=36;v++){
+    const big=v%5===0; c.lineWidth=big?1:0.6;
+    c.beginPath(); c.moveTo(X(v),h-26); c.lineTo(X(v),h-26+(big?9:5)); c.stroke();
+    if(big) c.fillText(v,X(v),h-6);
+  }
+  c.fillStyle="#5b6b7c"; c.textAlign="left";
+  c.fillText("x (mm) — from magnet centre", X(0), h-34);
+
+  /* magnet */
+  if(S.magOn){
+  c.beginPath(); c.arc(X(0),Ymid,Rm*mm,0,7);
+  c.fillStyle="#d9dde2"; c.fill(); c.strokeStyle="#8b939c"; c.lineWidth=1.4; c.stroke();
+  const a=S.phi*Math.PI/180;
+  c.strokeStyle="#d81010"; c.lineWidth=3; c.beginPath();
+  c.moveTo(X(0)-Math.cos(a)*Rm*mm*0.8, Ymid+Math.sin(a)*Rm*mm*0.8);
+  c.lineTo(X(0)+Math.cos(a)*Rm*mm*0.8, Ymid-Math.sin(a)*Rm*mm*0.8); c.stroke();
+  c.beginPath();
+  c.moveTo(X(0)+Math.cos(a)*Rm*mm*0.8, Ymid-Math.sin(a)*Rm*mm*0.8);
+  c.lineTo(X(0)+Math.cos(a)*Rm*mm*0.45-Math.sin(a)*4, Ymid-Math.sin(a)*Rm*mm*0.45-Math.cos(a)*4);
+  c.lineTo(X(0)+Math.cos(a)*Rm*mm*0.45+Math.sin(a)*4, Ymid-Math.sin(a)*Rm*mm*0.45+Math.cos(a)*4);
+  c.closePath(); c.fillStyle="#d81010"; c.fill();
+  c.fillStyle="#5b6b7c"; c.textAlign="center";
+  c.fillText("magnet", X(0), Ymid+Rm*mm+14);
+  }
+
+  /* Hall probe: the chip sits X_OFFSET behind the tip */
+  const tip=X(xh-X_OFFSET*1e3);
+  c.fillStyle="#e9edf1"; c.strokeStyle="#7d8794"; c.lineWidth=1.2;
+  c.fillRect(X(xh)-3,Ymid-26,26,52); c.strokeRect(X(xh)-3,Ymid-26,26,52);
+  c.fillStyle="#ffd24d"; c.fillRect(X(xh)-3,Ymid-7,5,14);
+  c.strokeStyle="#8b939c"; c.beginPath();
+  c.moveTo(tip,Ymid-20); c.lineTo(tip,Ymid+20); c.stroke();
+  if(S.magOn){
+    c.setLineDash([3,3]); c.strokeStyle="#b0bcc8";
+    c.beginPath(); c.moveTo(X(0),Ymid); c.lineTo(X(xh),Ymid); c.stroke(); c.setLineDash([]);
+  }
+  c.fillStyle="#5b6b7c";
+  c.fillText("Hall element", X(xh)+11, Ymid-32);
+  c.fillStyle="#2c6f9b";
+  c.fillText(`x = ${xh.toFixed(1)} mm`, X(xh)+11, Ymid+42);
+}
+
+/* ── A2 : cross-section of the trap, and the top view ── */
+function drawFront(){
+  const [c,w,h]=fit($("cvFront"),0.5); grid(c,w,h);
+  const mm=w/26, X=v=>w/2+v*mm, Y=v=>h*0.74-v*mm;
+  const Rm=R*1e3, Am=A_PDL*1e3, y0=B.y0*1e3;
+
+  for(const sgn of [-1,1]){
+    c.beginPath(); c.arc(X(sgn*Am),Y(0),Rm*mm,0,7);
+    c.fillStyle="#d9dde2"; c.fill(); c.strokeStyle="#8b939c"; c.lineWidth=1.4; c.stroke();
+    c.strokeStyle="#d81010"; c.lineWidth=2.4;
+    c.beginPath(); c.moveTo(X(sgn*Am)-Rm*mm*0.75,Y(0)); c.lineTo(X(sgn*Am)+Rm*mm*0.75,Y(0)); c.stroke();
+  }
+  /* the graphite rod, end-on */
+  if(S.placed){
+    const d=ROD_D[S.rodKey]*1e3;
+    c.beginPath(); c.arc(X(0),Y(y0),Math.max(d*mm/2,2.2),0,7);
+    c.fillStyle="#2b2f36"; c.fill();
+  }
+  /* the insert ruler, pressed onto the magnets */
+  if(S.insRuler){
+    c.save();
+    c.fillStyle="rgba(255,255,255,.82)";
+    c.fillRect(X(-1.4),Y(Rm+9),  (2.8)*mm, (Rm+9)*mm);
+    c.strokeStyle="#c0392b"; c.fillStyle="#8b939c";
+    c.font="8.5px ui-monospace,monospace"; c.textAlign="left";
+    for(let v=0;v<=9;v+=0.5){
+      const big=Number.isInteger(v);
+      c.lineWidth=big?1:0.5; c.strokeStyle=big?"#c0392b":"#d8b0aa";
+      c.beginPath(); c.moveTo(X(0.2),Y(v)); c.lineTo(X(0.2+(big?1.1:0.6)),Y(v)); c.stroke();
+      if(big){ c.fillText(v,X(1.5),Y(v)+3); }
+    }
+    c.restore();
+  }
+  c.fillStyle="#5b6b7c"; c.font="10px ui-monospace,monospace"; c.textAlign="center";
+  c.fillText("magnet",X(-Am),Y(0)+Rm*mm+16);
+  c.fillText("magnet",X( Am),Y(0)+Rm*mm+16);
+  c.textAlign="left";
+  c.fillText(`gap gM = 1.5 mm   ·   R = 3.2 mm`, 12, h-10);
+}
+
+function zNow(){
+  if(!S.placed || S.oscT0===null) return 0;
+  const t=S.simT-S.oscT0, tau=benchTau(ROD_D[S.rodKey],S.rodLen*1e-3);
+  return S.amp*Math.exp(-t/tau)*Math.cos(B.omega*t);
+}
+function drawTop(cvId,zVal,label){
+  const [c,w,h]=fit($(cvId),0.30); grid(c,w,h);
+  const mm=w/40, X=v=>w/2+v*mm, ymid=h*0.42;
+  const Lm=LMAG*1e3;
+  c.fillStyle="#e4e8ec"; c.strokeStyle="#8b939c"; c.lineWidth=1.2;
+  c.fillRect(X(-Lm/2),ymid-24,Lm*mm,48); c.strokeRect(X(-Lm/2),ymid-24,Lm*mm,48);
+  c.strokeStyle="#c8d4e0"; c.fillStyle="#8fa2b4";
+  c.font="9px ui-monospace,monospace"; c.textAlign="center";
+  for(let v=-15;v<=15;v++){
+    const big=v%5===0; c.lineWidth=big?1:0.6;
+    c.beginPath(); c.moveTo(X(v),ymid+30); c.lineTo(X(v),ymid+30+(big?9:5)); c.stroke();
+    if(big) c.fillText(v,X(v),ymid+52);
+  }
+  if(S.placed){
+    const l=S.rodLen, d=Math.max(ROD_D[S.rodKey]*1e3,0.5);
+    c.fillStyle="#2b2f36";
+    c.fillRect(X(zVal-l/2),ymid-Math.max(d*mm,3)/2,l*mm,Math.max(d*mm,3));
+  }
+  c.fillStyle="#5b6b7c"; c.textAlign="left";
+  c.fillText(label+"  z (mm)",10,h-8);
+}
+
+/* ── B : the plank on its two screws ── */
+function drawTilt(){
+  const [c,w,h]=fit($("cvTilt"),0.34); grid(c,w,h);
+  const th=S.turns*B.S/B.D*TILT_EXAG;
+  const x0=w*0.10, x1=w*0.90, ybase=h*0.72;
+  c.fillStyle="#dfe4ea"; c.fillRect(0,ybase+26,w,10);
+  c.save(); c.translate(x0,ybase); c.rotate(-th);
+  c.fillStyle="#cfd6dd"; c.strokeStyle="#8b939c"; c.lineWidth=1.2;
+  c.fillRect(0,-10,x1-x0,14); c.strokeRect(0,-10,x1-x0,14);
+  /* the trap sits in the middle of the plank */
+  const cx=(x1-x0)*0.46;
+  c.fillStyle="#d9dde2"; c.strokeStyle="#8b939c";
+  c.fillRect(cx-26,-34,52,24); c.strokeRect(cx-26,-34,52,24);
+  c.fillStyle="#2b2f36";
+  const dz=-GRAV*Math.sin(S.turns*B.S/B.D)/(B.omega*B.omega)*1e3;
+  c.fillRect(cx-12+dz*4,-26,24,5);
+  c.restore();
+  c.fillStyle="#7d8794"; c.fillRect(x0-5,ybase,10,26);
+  c.fillRect(x1-5,ybase-(x1-x0)*Math.sin(th),10,26+(x1-x0)*Math.sin(th));
+  c.fillStyle="#5b6b7c"; c.font="10px ui-monospace,monospace"; c.textAlign="center";
+  c.fillText("fixed",x0,h-6); c.fillText("screw",x1,h-6);
+  c.fillText("D = 22.0 cm",(x0+x1)/2,h-6);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   4.  TABLES
+   ══════════════════════════════════════════════════════════════ */
+function renderA1(){
+  const d=T[lang];
+  $("tblA1").innerHTML =
+    `<tr><th>${d.thN}</th><th>${d.thRuler}</th><th>${d.thX}</th><th>${d.thB}</th></tr>`+
+    S.rows.map((r,i)=>`<tr><td>${i+1}</td><td>${r.ruler.toFixed(1)}</td>`+
+      `<td>${r.x.toFixed(1)}</td><td>${(r.b*1e3).toFixed(3)}</td></tr>`).join("");
+}
+function renderLaps(){
+  const d=T[lang];
+  $("tblLap").innerHTML =
+    `<tr><th>${d.lapN}</th><th>${d.lapT}</th><th>${d.lapD}</th></tr>`+
+    S.laps.map((v,i)=>`<tr><td>${i+1}</td><td>${v.toFixed(2)}</td>`+
+      `<td>${(v-(i?S.laps[i-1]:0)).toFixed(2)}</td></tr>`).join("");
+}
+function renderB(){
+  const d=T[lang];
+  $("tblB").innerHTML =
+    `<tr><th>${d.thTurn}</th><th>${d.thDz}</th></tr>`+
+    S.rowsB.map(r=>`<tr><td>${r.n.toFixed(3)}</td><td>${r.dz.toFixed(2)}</td></tr>`).join("");
+}
+
+/* ══════════════════════════════════════════════════════════════
+   5.  CONTROLS
+   ══════════════════════════════════════════════════════════════ */
+$("meterOn").onchange=e=>{S.meterOn=e.target.checked;};
+$("magOn").onchange=e=>{S.magOn=e.target.checked;};
+$("ruler").oninput=e=>{S.ruler=parseFloat(e.target.value);};
+$("phi").oninput=e=>{S.phi=parseFloat(e.target.value);};
+function readNow(){
+  /* with the magnet off the rail only the offset and the drift are left —
+     that is exactly what A.1 asks you to record */
+  S.reading = S.magOn
+    ? teslaTrue((S.ruler+X_OFFSET*1e3)*1e-3, S.phi) + norm(0,0.15e-3)
+    : B.B0 + B.drift + norm(0,0.15e-3);
+  return S.reading;
+}
+$("btnZero").onclick=()=>{
+  if(!S.meterOn) return;
+  S.zeroRec = readNow();
+  $("zeroRead").textContent = `B₀ = ${(S.zeroRec*1e3).toFixed(3)} mT`;
+};
+$("btnRec").onclick=()=>{
+  if(!S.meterOn || !S.magOn) return;
+  S.rows.push({ruler:S.ruler, x:S.ruler+X_OFFSET*1e3, b:readNow()}); renderA1();
+};
+$("btnDel").onclick=()=>{S.rows.pop(); renderA1();};
+$("btnCsv").onclick=()=>{
+  const csv="ruler_mm,x_mm,B_raw_T\n"+S.rows.map(r=>
+    `${r.ruler.toFixed(1)},${r.x.toFixed(1)},${r.b.toExponential(6)}`).join("\n");
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  a.download="E2_A1_field.csv"; a.click();
+};
+
+function buildRodSeg(){
+  const box=$("rodSeg"); box.innerHTML="";
+  Object.keys(ROD_D).forEach(k=>{
+    const b=document.createElement("button");
+    b.textContent=k.replace("HB/","");
+    if(k===S.rodKey) b.className="on";
+    b.onclick=()=>{S.rodKey=k; S.oscT0=null; buildRodSeg();};
+    box.appendChild(b);
+  });
+}
+$("rodLen").oninput=e=>{S.rodLen=parseFloat(e.target.value); S.oscT0=null; applyLang();};
+$("btnPlace").onclick=()=>{S.placed=true; S.oscT0=null; $("btnPush").disabled=false;};
+$("btnRemove").onclick=()=>{S.placed=false; S.oscT0=null; $("btnPush").disabled=true;};
+$("insRuler").onchange=e=>{S.insRuler=e.target.checked;};
+$("amp").oninput=e=>{S.amp=parseFloat(e.target.value); applyLang();};
+$("btnPush").onclick=()=>{ if(S.placed) S.oscT0=S.simT; };
+
+$("btnSw").onclick=()=>{
+  if(S.swRun){ S.swRun=false; }
+  else { S.swRun=true; S.swT0=S.simT-S.swVal; }
+  applyLang();
+};
+$("btnLap").onclick=()=>{
+  if(!S.swRun) return;
+  S.laps.push(S.swVal+norm(0,0.12));   /* the student's reaction time */
+  renderLaps();
+};
+$("btnSwReset").onclick=()=>{S.swRun=false;S.swVal=0;S.laps=[];renderLaps();applyLang();};
+
+$("turns").oninput=e=>{S.turns=parseFloat(e.target.value); applyLang();};
+$("btnLevel").onclick=()=>{S.turns=0;$("turns").value=0;applyLang();};
+$("btnRecB").onclick=()=>{
+  const dz=-GRAV*Math.sin(S.turns*B.S/B.D)/(B.omega*B.omega)*1e3;
+  S.rowsB.push({n:S.turns, dz:dz+norm(0,0.03)}); renderB();
+};
+$("btnDelB").onclick=()=>{S.rowsB.pop(); renderB();};
+
+/* tabs */
+function setTab(t){
+  S.tab=t;
+  $("view-a1").style.display = t==="a1"?"flex":"none";
+  $("view-a2").style.display = t==="a2"?"flex":"none";
+  $("view-b" ).style.display = t==="b" ?"flex":"none";
+  ["a1","a2","b"].forEach(k=>$("tab-"+k).className = k===t?"on":"");
+}
+$("tab-a1").onclick=()=>setTab("a1");
+$("tab-a2").onclick=()=>setTab("a2");
+$("tab-b" ).onclick=()=>setTab("b");
+
+/* ══════════════════════════════════════════════════════════════
+   6.  LANGUAGE
+   ══════════════════════════════════════════════════════════════ */
+function applyLang(){
+  const d=T[lang];
+  document.documentElement.lang=lang;
+  $("t-title").textContent=d.title; $("t-sub").textContent=d.sub;
+  $("tab-a1").textContent=d.tabA1; $("tab-a2").textContent=d.tabA2; $("tab-b").textContent=d.tabB;
+
+  $("t-h-meter").textContent=d.hMeter; $("t-meteron").textContent=d.meterOn;
+  $("t-field").textContent=d.field;    $("btnZero").textContent=d.zero;
+  if(S.zeroRec===null) $("zeroRead").textContent=d.zeroNone;
+  $("t-h-probe").textContent=d.hProbe;  $("t-magon").textContent=d.magon;
+  $("t-ruler").textContent=`${d.ruler} — ${S.ruler.toFixed(1)}`;
+  $("t-phi").textContent=`${d.phi} — ${S.phi.toFixed(0)}°`;
+  $("t-warn").textContent=d.warn;
+  $("t-h-rec").textContent=d.hRec; $("btnRec").textContent=d.rec;
+  $("btnDel").textContent=d.del;   $("btnCsv").textContent=d.csv;
+  $("t-note1").textContent=d.note1;
+  $("t-cap1").textContent=d.cap1;  $("t-cap1b").textContent=d.cap1b;
+
+  $("t-h-rod").textContent=d.hRod;
+  $("t-len").textContent=`${d.len} — ${S.rodLen}`;
+  $("btnPlace").textContent=d.place; $("btnRemove").textContent=d.remove;
+  $("t-h-ruler").textContent=d.hRuler; $("t-insruler").textContent=d.insruler;
+  $("t-rulerhint").textContent=d.rulerhint;
+  $("t-h-osc").textContent=d.hOsc;
+  $("t-amp").textContent=`${d.amp} — ${S.amp.toFixed(1)}`;
+  $("btnPush").textContent=d.push;
+  $("t-h-sw").textContent=d.hSw; $("t-sw").textContent=d.sw;
+  $("btnSw").textContent = S.swRun ? d.swStop : d.swStart;
+  $("btnLap").textContent=d.lap; $("btnSwReset").textContent=d.swReset;
+  $("t-note2").textContent=d.note2;
+  $("t-cap2").textContent=d.cap2; $("t-cap3").textContent=d.cap3;
+
+  $("t-h-tilt").textContent=d.hTilt; $("t-tiltsetup").textContent=d.tiltsetup;
+  $("t-turn").textContent=`${d.turn} — ${S.turns.toFixed(3)}`;
+  $("btnLevel").textContent=d.level;
+  $("t-h-read").textContent=d.hRead; $("t-dz").textContent=d.dz;
+  $("btnRecB").textContent=d.recB; $("btnDelB").textContent=d.delB;
+  $("t-note3").textContent=d.note3;
+  $("t-cap4").textContent=d.cap4; $("t-cap5").textContent=d.cap5;
+
+  $("lang-ko").className = lang==="ko"?"on":"";
+  $("lang-en").className = lang==="en"?"on":"";
+  buildRodSeg(); renderA1(); renderLaps(); renderB();
+}
+$("lang-ko").onclick=()=>{lang="ko";applyLang();};
+$("lang-en").onclick=()=>{lang="en";applyLang();};
+
+/* ══════════════════════════════════════════════════════════════
+   7.  MAIN LOOP
+   ══════════════════════════════════════════════════════════════ */
+let last=performance.now();
+function loop(now){
+  const dt=(now-last)/1000; last=now;
+  S.simT+=dt;
+
+  if(S.tab==="a1"){
+    if(S.meterOn){
+      readNow();
+      const sat = Math.abs(S.reading)>=METER_FS;
+      $("dispB").className="disp";
+      $("dispB").innerHTML=`<small>${T[lang].field}</small>`+
+        (sat?"OL":`${(S.reading*1e3).toFixed(3)} mT`);
+    }else{
+      $("dispB").className="disp off";
+      $("dispB").innerHTML=`<small>${T[lang].field}</small>-- . --- mT`;
+    }
+    drawA1();
+  }
+
+  if(S.tab==="a2"){
+    if(S.swRun) S.swVal=S.simT-S.swT0;
+    $("swDisp").innerHTML=`<small>${T[lang].sw}</small>${S.swVal.toFixed(2)} s`;
+    drawFront(); drawTop("cvTop",zNow(),"");
+  }
+
+  if(S.tab==="b"){
+    const dz=-GRAV*Math.sin(S.turns*B.S/B.D)/(B.omega*B.omega)*1e3;
+    $("dzDisp").innerHTML=`<small>${T[lang].dz}</small>${dz.toFixed(2)} mm`;
+    drawTilt(); drawTop("cvTopB",dz,"Δz");
+  }
+  requestAnimationFrame(loop);
+}
+
+addEventListener("resize",()=>{});
+setTab("a1"); applyLang(); requestAnimationFrame(loop);
+</script>
+</body>
+</html>
