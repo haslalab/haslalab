@@ -220,19 +220,34 @@ section{padding:58px 0}
 .phead .meta dd{margin:2px 0 0;font-family:var(--mono);font-size:15px;font-weight:500}
 
 /* ═══════ year grid ═══════ */
-.years{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:12px}
+.years{display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:12px}
 .yr{background:#fff;border:1px solid var(--grid-bold);border-radius:9px;padding:15px 16px 13px;
     cursor:pointer;transition:.15s;position:relative;display:block}
 .yr:hover{border-color:var(--rail);transform:translateY(-2px);
           box-shadow:0 12px 26px -20px rgba(22,33,46,.55)}
-.yr .y{font-family:var(--mono);font-size:1.62rem;font-weight:600;letter-spacing:-.02em;line-height:1}
+.yr .y{font-family:var(--mono);font-size:1.72rem;font-weight:600;letter-spacing:-.02em;line-height:1}
 .yr .host{font-size:12px;color:var(--graphite);margin-top:6px;min-height:1.6em}
+.flag{width:20px;height:15px;border-radius:2px;flex:none;object-fit:cover;
+  box-shadow:0 0 0 .5px rgba(22,33,46,.22)}
+.flag.big{width:28px;height:21px;border-radius:2.5px}
+.flag.card{width:42px;height:31.5px;border-radius:3px;
+  box-shadow:0 0 0 .5px rgba(22,33,46,.2),0 2px 5px -3px rgba(22,33,46,.5)}
+.orgbadge{display:inline-flex;align-items:center;justify-content:center;
+  background:var(--rail);color:#fff;font-family:var(--mono);font-weight:600;
+  letter-spacing:.06em;font-size:10.5px;box-shadow:0 0 0 .5px rgba(22,33,46,.2),
+  0 2px 5px -3px rgba(22,33,46,.5)}
+.flag.big.orgbadge{font-size:8.5px;letter-spacing:.04em}
+.noflag{display:inline-block;background:repeating-linear-gradient(45deg,
+  #eef2f6 0 5px,#e3e9ef 5px 10px);border-radius:3px}
+.yrow{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.yr .host{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.subflag{display:flex;align-items:center;gap:9px}
 .yr .cnt{font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;
          color:var(--graphite);margin-top:10px;padding-top:9px;border-top:1px dashed var(--grid-bold)}
 .yr.none{cursor:default;border-style:dashed;opacity:.55;background:transparent}
 .yr.none:hover{transform:none;box-shadow:none;border-color:var(--grid-bold)}
-.yr .dot{position:absolute;top:15px;right:15px;width:7px;height:7px;border-radius:50%;
-         background:var(--laser);box-shadow:0 0 0 3px rgba(224,36,36,.16)}
+.yr .dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px;
+  vertical-align:1px;background:var(--laser);box-shadow:0 0 0 2.5px rgba(224,36,36,.16)}
 
 /* ═══════ problem cards ═══════ */
 .probs{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
@@ -466,16 +481,18 @@ const DATA={
   full:{ko:"국제물리올림피아드",en:"International Physics Olympiad"},
   scope:{ko:"국제",en:"International"},
   years:[
-   {y:2026,host:{ko:"콜롬비아",en:"Colombia"},problems:wip("Ideal Gas, Vapor Pressure, and Heat Conduction")},
-   {y:2025,host:{ko:"프랑스",en:"France"},problems:wip("Earth's magnetic field measurement","Sand craters and dunes")},
-   {y:2024,host:{ko:"이란",en:"Iran"},problems:wip("Heat Conduction in a Copper Rod","Diffraction from Phase Steps")},
-   {y:2023,host:{ko:"일본",en:"Japan"},problems:wip("Mass Measurement","Birefringence")},
-   {y:2022,host:{ko:"스위스",en:"Switzerland"},problems:wip("Planet","Cylindrical Diode")},
-   {y:2021,host:{ko:"리투아니아",en:"Lithuania"},problems:wip("Non-ideal Capacitors","LEDs")},
-   {y:2020,host:{ko:"IdPhO · 온라인",en:"IdPhO · online"},problems:wip("Crystallography")},
-   {y:2019,host:{ko:"이스라엘",en:"Israel"},problems:wip("Optical Measurements","Wiedemann–Franz Law")},
-   {y:2018,host:{ko:"포르투갈",en:"Portugal"},problems:wip("Paper Transistor","Viscoelasticity of a Polymer Thread")},
-   {y:2017,host:{ko:"인도네시아",en:"Indonesia"},
+   {y:2026,host:{ko:"콜롬비아 · 부카라망가",en:"Bucaramanga, Colombia"},cc:"co",problems:wip("Ideal Gas, Vapor Pressure, and Heat Conduction")},
+   {y:2025,host:{ko:"프랑스 · 파리",en:"Paris, France"},cc:"fr",problems:wip("Earth's magnetic field measurement","Sand craters and dunes")},
+   {y:2024,host:{ko:"이란 · 이스파한",en:"Isfahan, Iran"},cc:"ir",problems:wip("Heat Conduction in a Copper Rod","Diffraction from Phase Steps")},
+   {y:2023,host:{ko:"일본 · 도쿄",en:"Tokyo, Japan"},cc:"jp",problems:wip("Mass Measurement","Birefringence")},
+   {y:2022,host:{ko:"스위스 · 온라인",en:"Switzerland, online"},cc:"ch",problems:wip("Planet","Cylindrical Diode")},
+   {y:2021,host:{ko:"리투아니아 · 빌뉴스, 온라인",en:"Vilnius, Lithuania, online"},cc:"lt",problems:wip("Non-ideal Capacitors","LEDs")},
+   {y:2020,host:{ko:"IdPhO · MIPT 주관, 온라인",en:"IdPhO · organised by MIPT, online"},
+    org:{abbr:"MIPT",name:"Moscow Institute of Physics and Technology"},
+    problems:wip("Crystallography")},
+   {y:2019,host:{ko:"이스라엘 · 텔아비브",en:"Tel Aviv, Israel"},cc:"il",problems:wip("Optical Measurements","Wiedemann–Franz Law")},
+   {y:2018,host:{ko:"포르투갈 · 리스본",en:"Lisbon, Portugal"},cc:"pt",problems:wip("Paper Transistor","Viscoelasticity of a Polymer Thread")},
+   {y:2017,host:{ko:"인도네시아 · 욕야카르타",en:"Yogyakarta, Indonesia"},cc:"id",
     general:{ko:"pdf/IPhO_2017_G0_KO.pdf"},
     problems:[
      {id:"E1",
@@ -503,71 +520,71 @@ const DATA={
         pdf:{ko:"pdf/IPhO_2017_E2_KO.pdf", en:"pdf/IPhO_2017_E2_EN.pdf"},
         sol:"pdf/IPhO_2017_S2.pdf"
       }}]},
-   {y:2016,host:{ko:"스위스",en:"Switzerland"},problems:wip("Electrical Conductivity in 2D","Jumping Beads")},
-   {y:2015,host:{ko:"인도",en:"India"},problems:wip("Diffraction due to Helical Structure","Diffraction due to Surface Tension")},
-   {y:2014,host:{ko:"카자흐스탄",en:"Kazakhstan"},problems:wip("To see invisible!")},
-   {y:2013,host:{ko:"덴마크",en:"Denmark"},problems:wip("Speed of Light","Solar Cells")},
-   {y:2012,host:{ko:"에스토니아",en:"Estonia"},problems:wip("The Magnetic Permeability of Water","Nonlinear Black Box")},
-   {y:2011,host:{ko:"태국",en:"Thailand"},problems:wip("Blackbox: Capacitive Displacement Sensor","Mechanical Blackbox: A Cylinder with a Ball Inside")},
-   {y:2010,host:{ko:"크로아티아",en:"Croatia"},problems:wip("Elasticity of Sheets","Forces between Magnets")},
-   {y:2009,host:{ko:"멕시코",en:"Mexico"},problems:wip("Wavelength of a Diode Laser","Birefringence of Mica")},
-   {y:2008,host:{ko:"베트남",en:"Vietnam"},problems:wip("Differential Thermometric Method")},
-   {y:2007,host:{ko:"이란",en:"Iran"},problems:wip("Band Gap of Semiconductor Thin Films")},
-   {y:2006,host:{ko:"싱가포르",en:"Singapore"},problems:wip("Interference, Reflection and Diffraction")},
-   {y:2005,host:{ko:"스페인",en:"Spain"},problems:wip("Planck's Constant in an Incandescent Lamp")},
-   {y:2004,host:{ko:"대한민국",en:"South Korea"},problems:wip('Mechanical "Black Box"')},
-   {y:2003,host:{ko:"대만",en:"Taiwan"},problems:wip("Optical Properties of Laser Diode")},
-   {y:2002,host:{ko:"인도네시아",en:"Indonesia"},problems:wip("Physical Constants with Electrolysis","Optical Black Box")},
-   {y:2001,host:{ko:"튀르키예",en:"Turkey"},problems:wip("Rotating Liquid")},
-   {y:2000,host:{ko:"영국",en:"United Kingdom"},problems:wip("CD-ROM Spectrometer","The Magnetic Puck")}
+   {y:2016,host:{ko:"스위스 · 취리히",en:"Zurich, Switzerland"},cc:"ch",problems:wip("Electrical Conductivity in 2D","Jumping Beads")},
+   {y:2015,host:{ko:"인도 · 뭄바이",en:"Mumbai, India"},cc:"in",problems:wip("Diffraction due to Helical Structure","Diffraction due to Surface Tension")},
+   {y:2014,host:{ko:"카자흐스탄 · 아스타나",en:"Astana, Kazakhstan"},cc:"kz",problems:wip("To see invisible!")},
+   {y:2013,host:{ko:"덴마크 · 코펜하겐",en:"Copenhagen, Denmark"},cc:"dk",problems:wip("Speed of Light","Solar Cells")},
+   {y:2012,host:{ko:"에스토니아 · 타르투, 탈린",en:"Tartu and Tallinn, Estonia"},cc:"ee",problems:wip("The Magnetic Permeability of Water","Nonlinear Black Box")},
+   {y:2011,host:{ko:"태국 · 방콕",en:"Bangkok, Thailand"},cc:"th",problems:wip("Blackbox: Capacitive Displacement Sensor","Mechanical Blackbox: A Cylinder with a Ball Inside")},
+   {y:2010,host:{ko:"크로아티아 · 자그레브",en:"Zagreb, Croatia"},cc:"hr",problems:wip("Elasticity of Sheets","Forces between Magnets")},
+   {y:2009,host:{ko:"멕시코 · 메리다",en:"Mérida, Mexico"},cc:"mx",problems:wip("Wavelength of a Diode Laser","Birefringence of Mica")},
+   {y:2008,host:{ko:"베트남 · 하노이",en:"Hanoi, Vietnam"},cc:"vn",problems:wip("Differential Thermometric Method")},
+   {y:2007,host:{ko:"이란 · 이스파한",en:"Isfahan, Iran"},cc:"ir",problems:wip("Band Gap of Semiconductor Thin Films")},
+   {y:2006,host:{ko:"싱가포르",en:"Singapore"},cc:"sg",problems:wip("Interference, Reflection and Diffraction")},
+   {y:2005,host:{ko:"스페인 · 살라망카",en:"Salamanca, Spain"},cc:"es",problems:wip("Planck's Constant in an Incandescent Lamp")},
+   {y:2004,host:{ko:"대한민국 · 포항",en:"Pohang, South Korea"},cc:"kr",problems:wip('Mechanical "Black Box"')},
+   {y:2003,host:{ko:"대만 · 타이베이",en:"Taipei, Taiwan"},cc:"tw",problems:wip("Optical Properties of Laser Diode")},
+   {y:2002,host:{ko:"인도네시아 · 발리",en:"Bali, Indonesia"},cc:"id",problems:wip("Physical Constants with Electrolysis","Optical Black Box")},
+   {y:2001,host:{ko:"튀르키예 · 안탈리아",en:"Antalya, Turkey"},cc:"tr",problems:wip("Rotating Liquid")},
+   {y:2000,host:{ko:"영국 · 레스터",en:"Leicester, United Kingdom"},cc:"gb",problems:wip("CD-ROM Spectrometer","The Magnetic Puck")}
   ]},
  apho:{
   abbr:"APhO", since:2000,
   full:{ko:"아시아물리올림피아드",en:"Asian Physics Olympiad"},
   scope:{ko:"아시아",en:"Asia"},
   years:[
-   {y:2026,host:{ko:"대한민국",en:"South Korea"},problems:wip("Water Clock Experiment","Estimation of Unknown Resistance")},
-   {y:2025,host:{ko:"사우디아라비아",en:"Saudi Arabia"},problems:wip("Physics of Induction Cooking")},
-   {y:2024,host:{ko:"말레이시아",en:"Malaysia"},problems:wip("Gyroscope")},
-   {y:2023,host:{ko:"몽골",en:"Mongolia"},problems:wip("Hertzian Contact Stress","Interference from a Thermally Deformed Surface")},
-   {y:2022,host:{ko:"인도",en:"India"},problems:wip("Magnetic Black Box","Acoustic Black Box")},
-   {y:2021,host:{ko:"대만",en:"Taiwan"},problems:wip("Elasticity of Cantilever","Exploring the Spatial Structure of the Sample with Optical Methods")},
-   {y:2019,host:{ko:"호주",en:"Australia"},problems:wip("Static Response of a Magnetically Active Fluid","Wave Pulses in a Magnetically Active Fluid")},
-   {y:2018,host:{ko:"베트남",en:"Vietnam"},problems:wip("Giant Magnetoresistance (GMR)")},
-   {y:2017,host:{ko:"러시아",en:"Russia"},problems:wip("Photonic Crystal")},
-   {y:2016,host:{ko:"홍콩",en:"Hong Kong"},problems:wip("Reflected Optical Diffraction Patterns from One-Dimensional Structures","Reflection Phase Shift of Metal")},
-   {y:2015,host:{ko:"중국",en:"China"},problems:wip("The Piezoelectric Effect and Its Applications")},
-   {y:2014,host:{ko:"싱가포르",en:"Singapore"},problems:wip("Speed of Ultrasonic Sound in Solution")},
-   {y:2013,host:{ko:"인도네시아",en:"Indonesia"},problems:wip("Wind Power and Its Metrologies")},
-   {y:2012,host:{ko:"인도",en:"India"},problems:wip("Friction","Electromagnetic Induction")},
-   {y:2011,host:{ko:"이스라엘",en:"Israel"},problems:wip("Levitation of Conductors in an Oscillating Magnetic Field",'An Optical "Black Box"')},
-   {y:2010,host:{ko:"대만",en:"Taiwan"},problems:wip("Magnetic Force Probe","Understanding Semiconductor Lasers")},
-   {y:2009,host:{ko:"태국",en:"Thailand"},problems:wip("The Earth's Horizontal Magnetic Field","Oscillation of a Water-Filled Vessel")},
-   {y:2008,host:{ko:"몽골",en:"Mongolia"},problems:wip("The Physics of Sound Waves")},
-   {y:2007,host:{ko:"중국",en:"China"},problems:wip("Interference Method for the Thermal Expansion and Refractive Index of Glass","Measurement of Liquid Electric Conductivity")},
-   {y:2006,host:{ko:"카자흐스탄",en:"Kazakhstan"},problems:wip("Specific Heat of Aluminium and Latent Heat of Evaporation")},
-   {y:2005,host:{ko:"인도네시아",en:"Indonesia"},problems:wip("Determination of Shapes by Reflection","Magnetic Braking on an Inclined Plane")},
-   {y:2004,host:{ko:"베트남",en:"Vietnam"},problems:wip("Hall Effect and Magnetoresistivity Effect","Black Box")},
-   {y:2003,host:{ko:"태국",en:"Thailand"},problems:wip("Determination of Capacitance","Cylindrical Bore")},
-   {y:2002,host:{ko:"싱가포르",en:"Singapore"},problems:wip("Measurement of Reflectance and Determination of Refractive Index","Frequency of Vibration of a Tuning Fork")},
-   {y:2001,host:{ko:"대만",en:"Taiwan"},problems:wip("Basic Characteristics of Solar Cells")},
-   {y:2000,host:{ko:"인도네시아",en:"Indonesia"},problems:wip("Determination of the Density of Oil","Determination of the Stefan–Boltzmann Constant")}
+   {y:2026,host:{ko:"대한민국 · 부산",en:"Busan, South Korea"},cc:"kr",problems:wip("Water Clock Experiment","Estimation of Unknown Resistance")},
+   {y:2025,host:{ko:"사우디아라비아 · 다란",en:"Dhahran, Saudi Arabia"},cc:"sa",problems:wip("Physics of Induction Cooking")},
+   {y:2024,host:{ko:"말레이시아 · 캄파르",en:"Kampar, Malaysia"},cc:"my",problems:wip("Gyroscope")},
+   {y:2023,host:{ko:"몽골 · 울란바토르",en:"Ulaanbaatar, Mongolia"},cc:"mn",problems:wip("Hertzian Contact Stress","Interference from a Thermally Deformed Surface")},
+   {y:2022,host:{ko:"인도 · 데라둔, 온라인",en:"Dehradun, India, online"},cc:"in",problems:wip("Magnetic Black Box","Acoustic Black Box")},
+   {y:2021,host:{ko:"대만 · 타이베이, 온라인",en:"Taipei, Taiwan, online"},cc:"tw",problems:wip("Elasticity of Cantilever","Exploring the Spatial Structure of the Sample with Optical Methods")},
+   {y:2019,host:{ko:"호주 · 애들레이드",en:"Adelaide, Australia"},cc:"au",problems:wip("Static Response of a Magnetically Active Fluid","Wave Pulses in a Magnetically Active Fluid")},
+   {y:2018,host:{ko:"베트남 · 하노이",en:"Hanoi, Vietnam"},cc:"vn",problems:wip("Giant Magnetoresistance (GMR)")},
+   {y:2017,host:{ko:"러시아 · 야쿠츠크",en:"Yakutsk, Russia"},cc:"ru",problems:wip("Photonic Crystal")},
+   {y:2016,host:{ko:"홍콩",en:"Hong Kong"},cc:"hk",problems:wip("Reflected Optical Diffraction Patterns from One-Dimensional Structures","Reflection Phase Shift of Metal")},
+   {y:2015,host:{ko:"중국 · 항저우",en:"Hangzhou, China"},cc:"cn",problems:wip("The Piezoelectric Effect and Its Applications")},
+   {y:2014,host:{ko:"싱가포르",en:"Singapore"},cc:"sg",problems:wip("Speed of Ultrasonic Sound in Solution")},
+   {y:2013,host:{ko:"인도네시아 · 보고르",en:"Bogor, Indonesia"},cc:"id",problems:wip("Wind Power and Its Metrologies")},
+   {y:2012,host:{ko:"인도 · 뉴델리",en:"New Delhi, India"},cc:"in",problems:wip("Friction","Electromagnetic Induction")},
+   {y:2011,host:{ko:"이스라엘 · 텔아비브",en:"Tel Aviv, Israel"},cc:"il",problems:wip("Levitation of Conductors in an Oscillating Magnetic Field",'An Optical "Black Box"')},
+   {y:2010,host:{ko:"대만 · 타이베이",en:"Taipei, Taiwan"},cc:"tw",problems:wip("Magnetic Force Probe","Understanding Semiconductor Lasers")},
+   {y:2009,host:{ko:"태국 · 방콕",en:"Bangkok, Thailand"},cc:"th",problems:wip("The Earth's Horizontal Magnetic Field","Oscillation of a Water-Filled Vessel")},
+   {y:2008,host:{ko:"몽골 · 울란바토르",en:"Ulaanbaatar, Mongolia"},cc:"mn",problems:wip("The Physics of Sound Waves")},
+   {y:2007,host:{ko:"중국 · 상하이",en:"Shanghai, China"},cc:"cn",problems:wip("Interference Method for the Thermal Expansion and Refractive Index of Glass","Measurement of Liquid Electric Conductivity")},
+   {y:2006,host:{ko:"카자흐스탄 · 알마티",en:"Almaty, Kazakhstan"},cc:"kz",problems:wip("Specific Heat of Aluminium and Latent Heat of Evaporation")},
+   {y:2005,host:{ko:"인도네시아 · 프칸바루",en:"Pekanbaru, Indonesia"},cc:"id",problems:wip("Determination of Shapes by Reflection","Magnetic Braking on an Inclined Plane")},
+   {y:2004,host:{ko:"베트남 · 하노이",en:"Hanoi, Vietnam"},cc:"vn",problems:wip("Hall Effect and Magnetoresistivity Effect","Black Box")},
+   {y:2003,host:{ko:"태국 · 방콕",en:"Bangkok, Thailand"},cc:"th",problems:wip("Determination of Capacitance","Cylindrical Bore")},
+   {y:2002,host:{ko:"싱가포르",en:"Singapore"},cc:"sg",problems:wip("Measurement of Reflectance and Determination of Refractive Index","Frequency of Vibration of a Tuning Fork")},
+   {y:2001,host:{ko:"대만 · 타이베이",en:"Taipei, Taiwan"},cc:"tw",problems:wip("Basic Characteristics of Solar Cells")},
+   {y:2000,host:{ko:"인도네시아 · 카라와치",en:"Karawaci, Indonesia"},cc:"id",problems:wip("Determination of the Density of Oil","Determination of the Stefan–Boltzmann Constant")}
   ]},
  eupho:{
   abbr:"EuPhO", since:2017,
   full:{ko:"유럽물리올림피아드",en:"European Physics Olympiad"},
   scope:{ko:"유럽",en:"Europe"},
   years:[
-   {y:2026,host:{ko:"스웨덴",en:"Sweden"},problems:wip("Acoustic Levitation")},
-   {y:2025,host:{ko:"불가리아 · 소피아",en:"Sofia, Bulgaria"},problems:wip("Deep Learning","Hidden Pattern")},
-   {y:2024,host:{ko:"조지아 · 쿠타이시",en:"Kutaisi, Georgia"},problems:wip("Physics of Piezoelectricity")},
-   {y:2023,host:{ko:"독일 · 하노버",en:"Hannover, Germany"},problems:wip("Magnetic Pendulum","Optical Black-Box")},
-   {y:2022,host:{ko:"슬로베니아 · 류블랴나",en:"Ljubljana, Slovenia"},problems:wip("Physics of Illumination")},
-   {y:2021,host:{ko:"온라인 · 에스토니아 주관",en:"Online, hosted by Estonia"},problems:wip("Hidden Wire","Hot Cylinder")},
-   {y:2020,host:{ko:"온라인 · 에스토니아 주관",en:"Online, hosted by Estonia"},problems:wip("Hidden Charge","Black Box")},
-   {y:2019,host:{ko:"라트비아 · 리가",en:"Riga, Latvia"},problems:wip("Propagation of Radio Waves")},
-   {y:2018,host:{ko:"러시아 · 돌고프루드니",en:"Dolgoprudny, Russia"},problems:wip("Porous Membrane")},
-   {y:2017,host:{ko:"에스토니아 · 타르투",en:"Tartu, Estonia"},problems:wip("Light-Emitting Diode")}
+   {y:2026,host:{ko:"스웨덴 · 예테보리",en:"Gothenburg, Sweden"},cc:"se",problems:wip("Acoustic Levitation")},
+   {y:2025,host:{ko:"불가리아 · 소피아",en:"Sofia, Bulgaria"},cc:"bg",problems:wip("Deep Learning","Hidden Pattern")},
+   {y:2024,host:{ko:"조지아 · 쿠타이시",en:"Kutaisi, Georgia"},cc:"ge",problems:wip("Physics of Piezoelectricity")},
+   {y:2023,host:{ko:"독일 · 하노버",en:"Hannover, Germany"},cc:"de",problems:wip("Magnetic Pendulum","Optical Black-Box")},
+   {y:2022,host:{ko:"슬로베니아 · 류블랴나",en:"Ljubljana, Slovenia"},cc:"si",problems:wip("Physics of Illumination")},
+   {y:2021,host:{ko:"온라인 · 에스토니아 주관",en:"Online, hosted by Estonia"},cc:"ee",problems:wip("Hidden Wire","Hot Cylinder")},
+   {y:2020,host:{ko:"루마니아 · 사투마레, 온라인",en:"Satu Mare, Romania, online"},cc:"ro",problems:wip("Hidden Charge","Black Box")},
+   {y:2019,host:{ko:"라트비아 · 리가",en:"Riga, Latvia"},cc:"lv",problems:wip("Propagation of Radio Waves")},
+   {y:2018,host:{ko:"러시아 · 돌고프루드니",en:"Dolgoprudny, Russia"},cc:"ru",problems:wip("Porous Membrane")},
+   {y:2017,host:{ko:"에스토니아 · 타르투",en:"Tartu, Estonia"},cc:"ee",problems:wip("Light-Emitting Diode")}
   ]}
 };
 
@@ -593,6 +610,14 @@ function setLang(next){
 }
 document.getElementById("lang-ko").onclick=()=>setLang("ko");
 document.getElementById("lang-en").onclick=()=>setLang("en");
+
+/* a host country gets its flag; a year run by an institution gets its badge */
+const flagImg = (cc,cls="flag",org=null) =>
+  cc  ? `<img class="${cls}" loading="lazy" alt="" width="20" height="15"
+           src="https://flagcdn.com/w40/${cc}.png"
+           srcset="https://flagcdn.com/w80/${cc}.png 2x">`
+  : org ? `<span class="${cls} orgbadge" title="${esc(org.name||org.abbr)}">${esc(org.abbr)}</span>`
+  :       `<span class="${cls} noflag"></span>`;
 
 const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
@@ -735,10 +760,13 @@ function viewComp(key){
         const r=y.problems.filter(p=>p.files).length;
         const none=y.problems.length===0;
         const inner=`
-          ${r?'<span class="dot"></span>':""}
-          <div class="y">${y.y}</div>
+          <div class="yrow">
+            <div class="y">${y.y}</div>
+            ${flagImg(y.cc,"flag card",y.org)}
+          </div>
           <div class="host">${y.host?y.host[lang]:"—"}</div>
-          <div class="cnt">${none?d.noPapers:d.expN.replace("{n}",y.problems.length)+(r?` · ${r} ${d.cntReady}`:"")}</div>`;
+          <div class="cnt">${r?'<i class="dot"></i>':""}${none?d.noPapers:
+            d.expN.replace("{n}",y.problems.length)+(r?` · ${r} ${d.cntReady}`:"")}</div>`;
         return none ? `<div class="yr none">${inner}</div>`
                     : `<a class="yr" href="#/${key}/${y.y}">${inner}</a>`;
       }).join("")}
@@ -759,7 +787,7 @@ function viewYear(key,year){
     </div>
     <div class="phead">
       <h1>${c.abbr} ${yr.y}</h1>
-      <div class="sub">${yr.host?yr.host[lang]:"—"}</div>
+      <div class="sub subflag">${flagImg(yr.cc,"flag big",yr.org)}<span>${yr.host?yr.host[lang]:"—"}</span></div>
       <dl class="meta">
         <div><dt>${d.host}</dt><dd style="font-size:14px">${yr.host?yr.host[lang]:"—"}</dd></div>
         <div><dt>${d.problems}</dt><dd>${yr.problems.length}</dd></div>
