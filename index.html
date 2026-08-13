@@ -401,6 +401,10 @@ ko:{
   soonTitle:"준비 중", soonDesc:"문제지 정리와 물리 모델 보정을 진행하고 있습니다.",
   actRun:"브라우저에서 실행", actExe:"Windows 내려받기", actPdf:"문제지",
   actSol:"해설 · 채점기준", actSrc:"파이썬 소스",
+  offline:"오프라인용 내려받기",
+  exeNote:"브라우저 버전과 같은 실험입니다. 인터넷이 없는 곳에서 쓰세요. 서명하지 않은 "+
+          "프로그램이라 Windows가 «PC를 보호했습니다» 경고를 띄울 수 있는데, «추가 정보» → "+
+          "«실행»을 누르면 됩니다. 미덥지 않으면 옆의 파이썬 원본을 직접 읽고 돌려보세요.",
   actGeneral:"일반 지시사항 (G0)",
   cntReady:"공개", cntTotal:"문제",
   footL:"HaslaLab · MinGyuSong · HaslaEdu", footTop:"맨 위로 ↑"
@@ -444,6 +448,10 @@ en:{
   soonTitle:"In preparation", soonDesc:"Paper transcription and model calibration under way.",
   actRun:"Run in browser", actExe:"Download for Windows", actPdf:"Problem sheet",
   actSol:"Solution & marking scheme", actSrc:"Python source",
+  offline:"Offline downloads",
+  exeNote:"The same experiment as the browser version, for when you have no internet. The build "+
+          "is unsigned, so Windows may warn that it “protected your PC” — click “More info”, then "+
+          "“Run anyway”. If you would rather not, read and run the Python source beside it.",
   actGeneral:"General instructions (G0)",
   cntReady:"published", cntTotal:"problems",
   footL:"HaslaLab · MinGyuSong · HaslaEdu", footTop:"Back to top ↑"
@@ -777,11 +785,18 @@ function viewYear(key,year){
         const chip    = mode==="live" ? d.live : mode==="dl" ? d.dlOnly : d.wip;
         const b=[];
         if(f.sim) b.push(`<a class="btn" href="${f.sim}?lang=${lang}">${d.actRun}</a>`);
-        if(f.exe) b.push(`<a class="btn${f.sim?" ghost":""}" href="${pick(f.exe)}">${d.actExe}</a>`);
-        if(!f.sim && !f.exe) b.push(`<button class="btn ghost" disabled>${d.actRun}</button>`);
+        if(!f.sim) b.push(`<button class="btn ghost" disabled>${d.actRun}</button>`);
         if(f.pdf) b.push(`<a class="btn ghost" href="${pick(f.pdf)}" target="_blank" rel="noopener">${d.actPdf}</a>`);
         if(f.sol) b.push(`<a class="btn ghost" href="${pick(f.sol)}" target="_blank" rel="noopener">${d.actSol}</a>`);
-        if(f.src) b.push(`<a class="btn ghost" href="${pick(f.src)}">${d.actSrc}</a>`);
+        /* the Windows build and the source sit below, out of the way */
+        const off = (f.exe||f.src) ? `<div class="offline">
+            <div class="ohead">${d.offline}</div>
+            <div class="oacts">
+              ${f.exe?`<a href="${pick(f.exe)}">${d.actExe}</a>`:""}
+              ${f.src?`<a href="${pick(f.src)}">${d.actSrc}</a>`:""}
+            </div>
+            <p>${d.exeNote}</p>
+          </div>` : "";
         return `<article class="prob ${mode==="wip"?"soon":""}">
           <div class="top">
             <span class="code">${p.id}</span>
@@ -791,6 +806,7 @@ function viewYear(key,year){
           <p>${body}</p>
           <div class="tags">${tags.map((t,i)=>`<span class="tag${i===0?" exp":""}">${esc(t)}</span>`).join("")}</div>
           <div class="acts">${b.join("\n")}</div>
+          ${off}
         </article>`;}).join("")}
     </div>
   </div>`;
