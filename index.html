@@ -432,6 +432,7 @@ ko:{
   live:"브라우저 실행", dlOnly:"다운로드", wip:"준비 중", theoryTag:"이론 · 시뮬레이터 필요",
   soonTitle:"준비 중", soonDesc:"문제지 정리와 물리 모델 보정을 진행하고 있습니다.",
   actRun:"브라우저에서 실행", actExe:"Windows 내려받기", actPdf:"문제지",
+  langTag:{ko:"KO",en:"EN"},
   actSol:"해설 · 채점기준", actSrc:"파이썬 소스",
   exeNote:"Windows 빌드는 서명하지 않아서 «PC를 보호했습니다» 경고가 뜰 수 있습니다. "+
           "«추가 정보» → «실행»을 누르면 됩니다. 내용이 궁금하면 파이썬 원본을 열어 보세요.",
@@ -478,6 +479,7 @@ en:{
   soonTitle:"In preparation", soonDesc:"Paper transcription and model calibration under way.",
   actRun:"Run in browser", actExe:"Download for Windows", actPdf:"Problem sheet",
   actSol:"Solution & marking scheme", actSrc:"Python source",
+  langTag:{ko:"KO",en:"EN"},
   exeNote:"The Windows build is unsigned, so Windows may warn that it “protected your PC” — "+
           "click “More info”, then “Run anyway”. The Python source is there if you want to check it.",
   actGeneral:"General instructions (G0)",
@@ -577,6 +579,7 @@ const DATA={
             en:"Swing two pendulums into each other and read the contact time off a photogate and an oscilloscope to get the Hertz deformation parameters."},
       tags:["역학","충돌","오실로스코프"], tagsEn:["Mechanics","Collisions","Oscilloscope"],
       files:{
+        sim:"sim/Apho2023_E1_sim_web.html",
         exe:{ko:REL+"v1.1/APhO2023_E1_Sim_KO.exe", en:REL+"v1.1/APhO2023_E1_Sim_EN.exe"},
         src:{ko:"src/Apho2023_E1_sim_KO.py", en:"src/Apho2023_E1_sim_EN.py"},
         pdf:{en:"pdf/APhO_2023_E1_EN.pdf"},
@@ -588,6 +591,7 @@ const DATA={
             en:"Heat a metal surface with a laser and read the tiny bulge it raises from the interference fringes, giving the yield strength and the deformation height."},
       tags:["광학","간섭","열변형"], tagsEn:["Optics","Interference","Thermal deformation"],
       files:{
+        sim:"sim/Apho2023_E2_sim_web.html",
         exe:{ko:REL+"v1.1/APhO2023_E2_Sim_KO.exe", en:REL+"v1.1/APhO2023_E2_Sim_EN.exe"},
         src:{ko:"src/Apho2023_E2_sim_KO.py", en:"src/Apho2023_E2_sim_EN.py"},
         pdf:{en:"pdf/APhO_2023_E2_EN.pdf"},
@@ -925,7 +929,14 @@ function viewYear(key,year){
     <div class="probs">
       ${yr.problems.map(p=>{
         const f=p.files||{};
+        /* 요청한 언어가 없으면 있는 것을 주되, 어느 언어인지 밝힌다 */
         const pick=v=>typeof v==="string"?v:(v&&(v[lang]||v.ko||v.en));
+        const tag=v=>{
+          if(typeof v==="string"||!v) return "";
+          if(v[lang]) return "";
+          const other=v.ko?"ko":"en";
+          return ` <span class="lgtag">${d.langTag[other]}</span>`;
+        };
         const mode = f.sim ? "live" : (f.exe ? "dl" : "wip");
         const tags=(lang==="ko"?p.tags:p.tagsEn)||[];
         const heading = mode==="wip" ? ((lang==="ko"?p.ko:p.en)||p.en||d.soonTitle) : p.title[lang];
@@ -933,11 +944,11 @@ function viewYear(key,year){
         const chip    = mode==="live" ? d.live : mode==="dl" ? d.dlOnly : d.wip;
         const b=[];
         if(f.sim) b.push(`<a class="btn" href="${f.sim}?lang=${lang}">${d.actRun}</a>`);
-        if(f.exe) b.push(`<a class="btn${f.sim?" ghost":""}" href="${pick(f.exe)}">${d.actExe}</a>`);
+        if(f.exe) b.push(`<a class="btn${f.sim?" ghost":""}" href="${pick(f.exe)}">${d.actExe}${tag(f.exe)}</a>`);
         if(!f.sim && !f.exe) b.push(`<button class="btn ghost" disabled>${d.actRun}</button>`);
-        if(f.pdf) b.push(`<a class="btn ghost" href="${pick(f.pdf)}" target="_blank" rel="noopener">${d.actPdf}</a>`);
-        if(f.sol) b.push(`<a class="btn ghost" href="${pick(f.sol)}" target="_blank" rel="noopener">${d.actSol}</a>`);
-        if(f.src) b.push(`<a class="btn ghost" href="${pick(f.src)}">${d.actSrc}</a>`);
+        if(f.pdf) b.push(`<a class="btn ghost" href="${pick(f.pdf)}" target="_blank" rel="noopener">${d.actPdf}${tag(f.pdf)}</a>`);
+        if(f.sol) b.push(`<a class="btn ghost" href="${pick(f.sol)}" target="_blank" rel="noopener">${d.actSol}${tag(f.sol)}</a>`);
+        if(f.src) b.push(`<a class="btn ghost" href="${pick(f.src)}">${d.actSrc}${tag(f.src)}</a>`);
         /* a quiet footnote about the unsigned Windows build */
         const off = f.exe ? `<p class="exenote">${d.exeNote}</p>` : "";
         return `<article class="prob ${mode==="wip"?"soon":""}">
