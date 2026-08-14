@@ -44,7 +44,8 @@
   .disp small{display:block;font:400 10px/1.4 ui-monospace,monospace;
     color:#5d7f96;letter-spacing:.12em;text-transform:uppercase;text-align:left}
   .disp.off{color:#3a4a55}
-  .readout{font:12.5px ui-monospace,Consolas,monospace;color:var(--muted);
+  #cvHead{cursor:ns-resize}
+.readout{font:12.5px ui-monospace,Consolas,monospace;color:var(--muted);
     background:#f7f9fb;border:1px solid var(--line);border-radius:6px;padding:6px 8px;margin-top:8px}
   .chk{display:flex;align-items:center;gap:7px;margin:6px 0;cursor:pointer;font-size:13px}
   .chk input{accent-color:var(--accent);width:16px;height:16px}
@@ -53,6 +54,9 @@
     border-radius:6px;padding:6px 8px;margin-top:8px;line-height:1.55}
 
   .stage{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:14px}
+/* 원본 gridspec : Part B 위 칸은 측면도와 나사 머리를 나란히 (1.12 : 1.0) */
+.brow{display:grid;grid-template-columns:1.9fr 1fr;gap:14px;align-items:start}
+@media(max-width:760px){.brow{grid-template-columns:1fr}}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
   .card h3{margin:0 0 8px;font-size:13px;font-weight:600;color:var(--muted)}
   canvas{display:block;width:100%;height:auto;border-radius:6px;touch-action:none}
@@ -100,21 +104,23 @@
   <aside class="panel">
     <h2 id="t-h-meter"></h2>
     <label class="chk"><input type="checkbox" id="meterOn"><span id="t-meteron"></span></label>
-    <div class="disp off" id="dispB"><small id="t-field"></small>-- . --- mT</div>
+    <div class="disp off" id="dispB"><small id="t-field"></small>-- OFF --</div>
+    <div class="readout" id="meterState" style="min-height:1.7em"></div>
     <button id="btnZero"></button>
     <div class="readout" id="zeroRead">—</div>
 
     <h2 id="t-h-probe"></h2>
     <label class="chk"><input type="checkbox" id="magOn" checked><span id="t-magon"></span></label>
     <label class="row" id="t-ruler"></label>
-    <input type="range" id="ruler" min="0" max="26" step="0.5" value="6">
+    <input type="range" id="ruler" min="0" max="40" step="0.1" value="8">
     <label class="row" id="t-phi"></label>
-    <input type="range" id="phi" min="-60" max="60" step="1" value="0">
+    <input type="range" id="phi" min="-90" max="90" step="1" value="25">
     <div class="warn" id="t-warn"></div>
 
     <h2 id="t-h-rec"></h2>
     <button id="btnRec" class="primary"></button>
     <button id="btnDel"></button>
+    <button id="btnNew"></button>
     <button id="btnCsv"></button>
     <p class="note" id="t-note1"></p>
   </aside>
@@ -142,7 +148,7 @@
 
     <h2 id="t-h-osc"></h2>
     <label class="row" id="t-amp"></label>
-    <input type="range" id="amp" min="0.5" max="4" step="0.1" value="3">
+    <input type="range" id="amp" min="0.2" max="4" step="0.1" value="3">
     <button id="btnPush" disabled></button>
 
     <h2 id="t-h-sw"></h2>
@@ -162,21 +168,23 @@
 <!-- ═══════════════ B : tiltmeter ═══════════════ -->
 <div class="wrap" id="view-b" style="display:none">
   <aside class="panel">
-    <h2 id="t-h-tilt"></h2>
-    <div class="readout" id="t-tiltsetup"></div>
-    <label class="row" id="t-turn"></label>
-    <input type="range" id="turns" min="0" max="3" step="0.125" value="0">
-    <button id="btnLevel"></button>
+    <h2 id="t-h-rodB"></h2>
+    <div class="readout" id="t-rodB"></div>
+    <button id="btnPlaceB"></button>
 
-    <h2 id="t-h-read"></h2>
-    <div class="disp" id="dzDisp"><small id="t-dz"></small>-- . -- mm</div>
-    <button id="btnRecB" class="primary"></button>
-    <button id="btnDelB"></button>
-    <div class="tablewrap"><table class="data" id="tblB"></table></div>
-    <p class="note" id="t-note3"></p>
+    <h2 id="t-h-screw"></h2>
+    <div class="readout" id="t-jognote"></div>
+    <div class="readout" id="stateB">—</div>
+
+    <h2 id="t-h-rulerB"></h2>
+    <label class="chk"><input type="checkbox" id="rulerB" checked><span id="t-rulerB"></span></label>
+    <p class="note" id="t-noteB"></p>
   </aside>
   <div class="stage">
-    <div class="card"><h3 id="t-cap4"></h3><canvas id="cvTilt"></canvas></div>
+    <div class="brow">
+      <div class="card"><h3 id="t-cap4"></h3><canvas id="cvTilt"></canvas></div>
+      <div class="card"><h3 id="t-caphead"></h3><canvas id="cvHead"></canvas></div>
+    </div>
     <div class="card"><h3 id="t-cap5"></h3><canvas id="cvTopB"></canvas></div>
   </div>
 </div>
@@ -191,75 +199,84 @@ const T={
 ko:{
  title:"IPhO 2017 E2 — 평행 쌍극자선(PDL) 자기 트랩",
  sub:"가상 실험대 · 테슬라미터와 자, 스톱워치만 제공됩니다",
- tabA1:"[1] 자화 M", tabA2:"[2][3][4] 부양 · 진동", tabB:"[6] 경사계",
+ tabA1:"Part A1 · 자화 (A.1–A.4)", tabA2:"Part A2 · 부양과 진동 (A.5–A.12)", tabB:"Part B · 경사계 (B.1–B.5)",
 
- hMeter:"테슬라미터", meterOn:"전원 켜기", field:"자기장",
- magon:"자석을 레일에 올림", zero:"영점 오프셋 B₀ 기록  (A.1)", zeroNone:"B₀ 미기록",
- hProbe:"프로브와 자석", ruler:"자석 표면부터의 자 눈금 (mm)",
- phi:"자석 회전 (자화 방향)",
- warn:"홀 소자는 자석 끝보다 4.0 mm 뒤에 있습니다. 자 눈금 0 mm(= x 4 mm)에서는 "+
-      "센서가 포화되고 프로브가 휘므로 쓰지 마세요.",
- hRec:"측정 기록", rec:"현재 값 기록", del:"마지막 줄 삭제", csv:"CSV로 저장",
- note1:"x는 자석 중심에서 홀 소자까지의 거리입니다. 기록된 값에서 B₀를 빼는 것, "+
-       "ln B – ln x 그래프, 지수 p와 자화 M은 모두 직접 하셔야 합니다.",
- cap1:"자석과 홀 프로브 (위에서 본 모습)", cap1b:"측정 표",
+ hMeter:"Teslameter", meterOn:"전원 켜기", field:"자기장",
+ magnet:"magnet", hallLbl:"Hall sensor\non the board",
+ rulerLbl:"ruler (mm), zero on the magnet surface", graphite:"graphite",
+ dyLbl:"Δy (mm)", refLbl:"reference", headLbl:"screw head", capHead:"나사 머리 (위에서 본 모습)", centre:"centre", cm:"cm",
+ magon:"자석을 레일에 올림", zero:"record the zero offset  B0   (A.1)", zeroNone:"B0 not recorded", settling:"settling ...", overRange:"over range",
+ hProbe:"Probe and magnet", ruler:"자석 표면부터의 자 눈금 (mm)",
+ phi:"자석 회전 (그림 6a) — 읽는 값이 최대가 될 때까지 돌린다",
+ warn:"",
+ hRec:"공책", rec:"적어 둔다", del:"지운다", newpage:"새 쪽", csv:"이 쪽을 CSV 로 내보낸다",
+ note1:"",
+ cap1:"실험 배치 단면 (그림 5a, 6)", cap1b:"측정 표",
  thN:"i", thRuler:"자 눈금 (mm)", thX:"x (mm)", thB:"B_raw (mT)",
 
- hRod:"흑연 막대", len:"길이 (mm)",
- place:"트랩 가운데에 막대를 놓는다", remove:"막대를 꺼낸다",
+ hRod:"Graphite rod", len:"길이 (mm)",
+ place:"트랩에 막대를 떨어뜨린다", remove:"막대를 꺼낸다",
  hRuler:"삽입 자", insruler:"삽입 자를 자석 위에 누른다",
- rulerhint:"자석 표면(0)에서 위로 mm 눈금. 막대 위치를 읽으세요.",
- hOsc:"진동", amp:"이쑤시개로 밀어낼 거리 (mm)", push:"살짝 밀고 놓는다",
- hSw:"스톱워치", sw:"경과", swStart:"시작", swStop:"정지",
+ rulerhint:"",
+ hOsc:"이쑤시개", amp:"z 방향으로 밀어낼 거리 (mm)", push:"밀었다가 놓는다",
+ hSw:"Stopwatch", sw:"경과", swStart:"시작", swStop:"정지",
  lap:"랩 기록", swReset:"초기화",
- note2:"부양 높이 y₀, 진동 주기, 감쇠 시간상수는 전부 눈금과 스톱워치로 직접 재야 합니다. "+
-       "자화율도 계산해 주지 않습니다.",
- cap2:"트랩 단면 (그림 7a)", cap3:"위에서 본 모습 — 낙타등 퍼텐셜 방향(z)",
+ note2:"",
+ cap2:"트랩 정면 (단면)", cap3:"트랩을 위에서 본 모습 (눈금 mm)",
 
+ hRodB:"흑연 막대", rodB:"HB/0.5,  l = 8 mm", placeB:"가운데에 막대를 떨어뜨린다",
+ hScrew:"수평 조절 나사", out:"← 풀기", inw:"조이기 →",
+ jognote:"",
+ ringing:"막대가 아직 흔들립니다 — 기다리세요", endIn:"나사가 끝까지 조여졌습니다 — 더 들어가지 않습니다.", endOut:"나사가 끝까지 풀렸습니다 — 더 나오지 않습니다.", hRulerB:"자", rulerB:"플랫폼 옆에 자를 놓는다",
+ noteB:"",
  hTilt:"경사 조절 나사",
  tiltsetup:"두 나사 사이 거리 D = 22.0 cm  ·  샤프심 HB/0.5, 길이 8 mm",
  turn:"나사 회전수 N (turn)", level:"수평으로 되돌린다",
  hRead:"막대 위치", dz:"변위 Δz", recB:"현재 값 기록", delB:"마지막 줄 삭제",
- note3:"나사산 크기 S와 이상적인 Q 인자는 직접 구하세요. 여기서는 회전수와 변위만 읽힙니다.",
- cap4:"경사계 구성 (그림 9, 기울기는 과장해 그림)", cap5:"트랩 위에서 본 막대 위치",
+ note3:"",
+ cap4:"플랫폼 측면 (기울기는 20배로 그림)", cap5:"트랩을 위에서 본 모습 (플랫폼에 인쇄된 눈금, mm)",
  thTurn:"N (turn)", thDz:"Δz (mm)",
  lapN:"n", lapT:"t (s)", lapD:"Δt (s)"
 },
 en:{
  title:"IPhO 2017 E2 — Parallel Dipole Line Magnetic Trap",
  sub:"virtual bench · you get a Teslameter, a ruler and a stopwatch, nothing else",
- tabA1:"[1] magnetisation M", tabA2:"[2][3][4] levitation & oscillation", tabB:"[6] tiltmeter",
+ tabA1:"Part A1 · magnetization (A.1–A.4)", tabA2:"Part A2 · levitation and oscillation (A.5–A.12)", tabB:"Part B · tiltmeter (B.1–B.5)",
 
  hMeter:"Teslameter", meterOn:"power on", field:"field",
- magon:"magnet on the rail", zero:"record the zero offset B₀  (A.1)", zeroNone:"B₀ not recorded",
- hProbe:"probe and magnet", ruler:"ruler reading from the magnet surface (mm)",
- phi:"rotation of the magnet (magnetisation)",
- warn:"The Hall element sits 4.0 mm behind the tip. Do not use a ruler reading of 0 mm "+
-      "(x = 4 mm): the sensor saturates and the probe flexes.",
- hRec:"measurements", rec:"record this reading", del:"delete last row", csv:"save as CSV",
- note1:"x is the distance from the centre of the magnet to the Hall element. Subtracting B₀, "+
-       "the ln B – ln x plot, the exponent p and the magnetisation M are all your work.",
- cap1:"magnet and Hall probe (top view)", cap1b:"data table",
+ magnet:"magnet", hallLbl:"Hall sensor\non the board",
+ rulerLbl:"ruler (mm), zero on the magnet surface", graphite:"graphite",
+ dyLbl:"Δy (mm)", refLbl:"reference", headLbl:"screw head", capHead:"screw head (from above)", centre:"centre", cm:"cm",
+ magon:"magnet on the rail", zero:"record the zero offset  B0   (A.1)", zeroNone:"B0 not recorded", settling:"settling ...", overRange:"over range",
+ hProbe:"Probe and magnet", ruler:"ruler reading from the magnet surface (mm)",
+ phi:"magnet rotation (Fig. 6a) — rotate until the reading is a maximum",
+ warn:"",
+ hRec:"Note book", rec:"write down", del:"erase", newpage:"new page", csv:"export the page as CSV",
+ note1:"",
+ cap1:"cross section of the set-up (Fig. 5a, 6)", cap1b:"data table",
  thN:"i", thRuler:"ruler (mm)", thX:"x (mm)", thB:"B_raw (mT)",
 
- hRod:"graphite rod", len:"length (mm)",
- place:"place the rod in the centre of the trap", remove:"take the rod out",
+ hRod:"Graphite rod", len:"length (mm)",
+ place:"drop the rod into the trap", remove:"take the rod out",
  hRuler:"insert ruler", insruler:"press the insert ruler onto the magnets",
- rulerhint:"millimetre scale upwards from the magnet surface (0). Read off the rod.",
- hOsc:"oscillation", amp:"displacement with the toothpick (mm)", push:"displace and release",
+ rulerhint:"",
+ hOsc:"Toothpick", amp:"displacement along z (mm)", push:"displace and release",
  hSw:"stopwatch", sw:"elapsed", swStart:"start", swStop:"stop",
  lap:"lap", swReset:"reset",
- note2:"The levitation height y₀, the period and the damping time constant are all yours to "+
-       "measure. No susceptibility is computed for you.",
- cap2:"cross-section of the trap (Fig. 7a)", cap3:"top view — camelback direction (z)",
+ note2:"",
+ cap2:"front view of the trap (cross section)", cap3:"top view of the trap (scale in mm)",
 
+ hRodB:"Graphite rod", rodB:"HB/0.5,  l = 8 mm", placeB:"drop the rod in at the centre",
+ hScrew:"Levelling screw", out:"← out", inw:"in →",
+ jognote:"",
+ ringing:"the rod is still swinging — wait", endIn:"the screw is all the way in — it will not go further.", endOut:"the screw is all the way out — it will not go further.", hRulerB:"Ruler", rulerB:"lay the ruler beside the platform",
+ noteB:"",
  hTilt:"adjustment screw",
  tiltsetup:"distance between the screws D = 22.0 cm  ·  HB/0.5 lead, 8 mm long",
  turn:"screw turns N", level:"return to level",
  hRead:"rod position", dz:"displacement Δz", recB:"record this reading", delB:"delete last row",
- note3:"The thread size S and the ideal Q factor are yours to work out. This bench only shows "+
-       "turns and displacement.",
- cap4:"tiltmeter set-up (Fig. 9, tilt drawn exaggerated)", cap5:"rod position, seen from above",
+ note3:"",
+ cap4:"side view of the platform (tilt drawn 20x)", cap5:"top view of the trap (scale printed on the platform, mm)",
  thTurn:"N (turn)", thDz:"Δz (mm)",
  lapN:"n", lapT:"t (s)", lapD:"Δt (s)"
 }};
@@ -315,8 +332,8 @@ const teslaTrue=(x,phiDeg)=>bMagnet(x,B.M)*Math.cos(2*phiDeg*Math.PI/180)+B.B0+B
    2.  STATE
    ══════════════════════════════════════════════════════════════ */
 const S={
-  tab:"a1",
-  meterOn:false, magOn:true, ruler:6.0, phi:0, zeroRec:null, rows:[], reading:0,
+  tab:"a1", rulerB:true, zB:0, vzB:0, jit:0, ringing:false, limitMsg:false,
+  meterOn:false, magOn:true, shown:0, settling:false, ruler:8.0, phi:25, zeroRec:null, rows:[], reading:0,
   rodKey:"HB/0.5", rodLen:8, placed:false, insRuler:false,
   amp:3.0, oscT0:null, simT:0,
   swRun:false, swT0:0, swVal:0, laps:[],
@@ -336,147 +353,288 @@ function fit(cv,ratio){
 }
 function grid(c,w,h){ c.fillStyle="#fbfcfd"; c.fillRect(0,0,w,h); }
 
-/* ── A1 : magnet seen from above, with the probe on its rail ── */
+/* ── A1 : 자석 축에 수직인 단면.  원본 좌표계 그대로:
+       xlim (-9, 47),  ylim (-15.5, 10.5),  등축,  축·눈금 없음
+       자 눈금의 0 은 자석 표면 (x = R = 3.2 mm)                     ── */
 function drawA1(){
-  const [c,w,h]=fit($("cvA1"),0.42); grid(c,w,h);
-  const mm = w/46;                       // px per mm, window -8 … 38 mm
-  const X = v=>(v+8)*mm, Ymid=h*0.44;
-  const Rm=R*1e3, xh=S.ruler+X_OFFSET*1e3;
+  const cv=$("cvA1"), dpr=Math.min(devicePixelRatio||1,2);
+  const w=cv.clientWidth||760;
+  const X0=-9, X1=47, Y0=-15.5, Y1=10.5;
+  const sc=w/(X1-X0), h=Math.round((Y1-Y0)*sc);
+  cv.width=Math.round(w*dpr); cv.height=Math.round(h*dpr); cv.style.height=h+"px";
+  const c=cv.getContext("2d"); c.setTransform(dpr,0,0,dpr,0,0);
+  c.fillStyle="#fff"; c.fillRect(0,0,w,h);
+  const X=v=>(v-X0)*sc, Y=v=>(Y1-v)*sc;
 
-  /* rail scale in mm */
-  c.strokeStyle="#c8d4e0"; c.fillStyle="#8fa2b4";
-  c.font="9px ui-monospace,monospace"; c.textAlign="center";
-  for(let v=0;v<=36;v++){
-    const big=v%5===0; c.lineWidth=big?1:0.6;
-    c.beginPath(); c.moveTo(X(v),h-26); c.lineTo(X(v),h-26+(big?9:5)); c.stroke();
-    if(big) c.fillText(v,X(v),h-6);
-  }
-  c.fillStyle="#5b6b7c"; c.textAlign="left";
-  c.fillText("x (mm) — from magnet centre", X(0), h-34);
 
-  /* magnet */
+  const Rm=R*1e3, xm=(S.ruler+X_OFFSET*1e3)+Rm;   /* 홀 소자의 x, 자석 중심 기준 */
+  const phi=S.phi*Math.PI/180;
+
   if(S.magOn){
-  c.beginPath(); c.arc(X(0),Ymid,Rm*mm,0,7);
-  c.fillStyle="#d9dde2"; c.fill(); c.strokeStyle="#8b939c"; c.lineWidth=1.4; c.stroke();
-  const a=S.phi*Math.PI/180;
-  c.strokeStyle="#d81010"; c.lineWidth=3; c.beginPath();
-  c.moveTo(X(0)-Math.cos(a)*Rm*mm*0.8, Ymid+Math.sin(a)*Rm*mm*0.8);
-  c.lineTo(X(0)+Math.cos(a)*Rm*mm*0.8, Ymid-Math.sin(a)*Rm*mm*0.8); c.stroke();
-  c.beginPath();
-  c.moveTo(X(0)+Math.cos(a)*Rm*mm*0.8, Ymid-Math.sin(a)*Rm*mm*0.8);
-  c.lineTo(X(0)+Math.cos(a)*Rm*mm*0.45-Math.sin(a)*4, Ymid-Math.sin(a)*Rm*mm*0.45-Math.cos(a)*4);
-  c.lineTo(X(0)+Math.cos(a)*Rm*mm*0.45+Math.sin(a)*4, Ymid-Math.sin(a)*Rm*mm*0.45+Math.cos(a)*4);
-  c.closePath(); c.fillStyle="#d81010"; c.fill();
-  c.fillStyle="#5b6b7c"; c.textAlign="center";
-  c.fillText("magnet", X(0), Ymid+Rm*mm+14);
+    c.beginPath(); c.arc(X(0),Y(0),Rm*sc,0,7);
+    c.fillStyle="#c9ccd1"; c.fill(); c.strokeStyle="#555"; c.lineWidth=1; c.stroke();
+    /* 자화 화살표 : 길이 5.6 mm, 각 phi */
+    const ax=5.6*Math.cos(phi), ay=5.6*Math.sin(phi);
+    c.strokeStyle="#cc0000"; c.lineWidth=2.4; c.beginPath();
+    c.moveTo(X(0),Y(0)); c.lineTo(X(ax),Y(ay)); c.stroke();
+    c.fillStyle="#cc0000"; c.beginPath();
+    const hx=X(ax), hy=Y(ay), ux=Math.cos(phi), uy=-Math.sin(phi);
+    c.moveTo(hx,hy); c.lineTo(hx-8*ux+4*uy, hy-8*uy-4*ux);
+    c.lineTo(hx-8*ux-4*uy, hy-8*uy+4*ux); c.closePath(); c.fill();
+    c.fillStyle="#000"; c.font="8.5px 'DejaVu Sans',sans-serif";
+    c.fillText(T[lang].magnet, X(0), Y(-Rm-2.6));
   }
+  /* 홀 프로브 : 보드 1.7 x 14, 노란 소자 1.5 x 3.4 */
+  c.fillStyle="#2f4f6f"; c.strokeStyle="#222"; c.lineWidth=0.8;
+  c.fillRect(X(xm), Y(7.0), 1.7*sc, 14.0*sc); c.strokeRect(X(xm),Y(7.0),1.7*sc,14.0*sc);
+  c.fillStyle="#ffcc00";
+  c.fillRect(X(xm-1.5), Y(1.7), 1.5*sc, 3.4*sc); c.strokeRect(X(xm-1.5),Y(1.7),1.5*sc,3.4*sc);
+  c.fillStyle="#000"; c.textAlign="left"; c.font="8.5px 'DejaVu Sans',sans-serif";
+  T[lang].hallLbl.split("\n").forEach((ln,i)=>c.fillText(ln, X(xm+3.2), Y(6.4)+11*i+8));
 
-  /* Hall probe: the chip sits X_OFFSET behind the tip */
-  const tip=X(xh-X_OFFSET*1e3);
-  c.fillStyle="#e9edf1"; c.strokeStyle="#7d8794"; c.lineWidth=1.2;
-  c.fillRect(X(xh)-3,Ymid-26,26,52); c.strokeRect(X(xh)-3,Ymid-26,26,52);
-  c.fillStyle="#ffd24d"; c.fillRect(X(xh)-3,Ymid-7,5,14);
-  c.strokeStyle="#8b939c"; c.beginPath();
-  c.moveTo(tip,Ymid-20); c.lineTo(tip,Ymid+20); c.stroke();
-  if(S.magOn){
-    c.setLineDash([3,3]); c.strokeStyle="#b0bcc8";
-    c.beginPath(); c.moveTo(X(0),Ymid); c.lineTo(X(xh),Ymid); c.stroke(); c.setLineDash([]);
+  /* 자 : 0 이 자석 표면에 오도록 */
+  const xs=Rm;
+  c.strokeStyle="#444";
+  for(let t=0;t<=40;t++){
+    const hgt=(t%5)?1.2:2.2; c.lineWidth=0.7;
+    c.beginPath(); c.moveTo(X(xs+t),Y(-9.5)); c.lineTo(X(xs+t),Y(-9.5+hgt)); c.stroke();
+    if(t%5===0){ c.fillStyle="#000"; c.font="7.5px 'DejaVu Sans',sans-serif";
+      c.textAlign="center"; c.fillText(t, X(xs+t), Y(-12.2)+4); }
   }
-  c.fillStyle="#5b6b7c";
-  c.fillText("Hall element", X(xh)+11, Ymid-32);
-  c.fillStyle="#2c6f9b";
-  c.fillText(`x = ${xh.toFixed(1)} mm`, X(xh)+11, Ymid+42);
+  c.lineWidth=1; c.beginPath(); c.moveTo(X(xs-2),Y(-9.5)); c.lineTo(X(xs+41),Y(-9.5)); c.stroke();
+  const tip=xm-X_OFFSET*1e3;
+  c.strokeStyle="rgba(192,0,0,.8)"; c.lineWidth=0.9;
+  c.beginPath(); c.moveTo(X(tip),Y(-9.5)); c.lineTo(X(tip),Y(-1.8)); c.stroke();
+  c.fillStyle="#555"; c.font="7.5px 'DejaVu Sans',sans-serif"; c.textAlign="center";
+  c.fillText(T[lang].rulerLbl, X(24), Y(-14.0)+4);
 }
 
-/* ── A2 : cross-section of the trap, and the top view ── */
+/* ── A2 정면도 : 원본 xlim (-9, 13), ylim (-5.5, 8.2), 등축 ── */
 function drawFront(){
-  const [c,w,h]=fit($("cvFront"),0.5); grid(c,w,h);
-  const mm=w/26, X=v=>w/2+v*mm, Y=v=>h*0.74-v*mm;
-  const Rm=R*1e3, Am=A_PDL*1e3, y0=B.y0*1e3;
+  const cv=$("cvFront"),dpr=Math.min(devicePixelRatio||1,2);
+  const w=cv.clientWidth||700;
+  const X0=-9,X1=13,Y0=-5.5,Y1=8.2;
+  const sc=w/(X1-X0), h=Math.round((Y1-Y0)*sc);
+  cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);cv.style.height=h+"px";
+  const c=cv.getContext("2d");c.setTransform(dpr,0,0,dpr,0,0);
+  c.fillStyle="#fff";c.fillRect(0,0,w,h);
+  const X=v=>(v-X0)*sc, Y=v=>(Y1-v)*sc;
 
-  for(const sgn of [-1,1]){
-    c.beginPath(); c.arc(X(sgn*Am),Y(0),Rm*mm,0,7);
-    c.fillStyle="#d9dde2"; c.fill(); c.strokeStyle="#8b939c"; c.lineWidth=1.4; c.stroke();
-    c.strokeStyle="#d81010"; c.lineWidth=2.4;
-    c.beginPath(); c.moveTo(X(sgn*Am)-Rm*mm*0.75,Y(0)); c.lineTo(X(sgn*Am)+Rm*mm*0.75,Y(0)); c.stroke();
+  const Rm=R*1e3, Am=A_PDL*1e3, y0=B.y0*1e3, d=ROD_D[S.rodKey]*1e3;
+  for(const sx of [-Am,Am]){
+    c.beginPath();c.arc(X(sx),Y(0),Rm*sc,0,7);
+    c.fillStyle="#c9ccd1";c.fill();c.strokeStyle="#555";c.lineWidth=1;c.stroke();
+    c.strokeStyle="#cc0000";c.lineWidth=1.8;
+    c.beginPath();c.moveTo(X(sx-0.4),Y(0));c.lineTo(X(sx+2.2),Y(0));c.stroke();
+    c.fillStyle="#cc0000";c.beginPath();
+    c.moveTo(X(sx+2.2),Y(0));c.lineTo(X(sx+1.4),Y(0)-4);c.lineTo(X(sx+1.4),Y(0)+4);
+    c.closePath();c.fill();
   }
-  /* the graphite rod, end-on */
+  c.fillStyle="#000";c.font="8px 'DejaVu Sans',sans-serif";c.textAlign="center";
+  c.fillText(T[lang].magnet,X(-Am),Y(-Rm-1.7)+3);
   if(S.placed){
-    const d=ROD_D[S.rodKey]*1e3;
-    c.beginPath(); c.arc(X(0),Y(y0),Math.max(d*mm/2,2.2),0,7);
-    c.fillStyle="#2b2f36"; c.fill();
+    c.beginPath();c.arc(X(0),Y(y0),Math.max(d/2*sc,2.2),0,7);
+    c.fillStyle="#202020";c.fill();c.strokeStyle="#000";c.lineWidth=0.6;c.stroke();
+    c.strokeStyle="#666";c.lineWidth=0.7;
+    c.beginPath();c.moveTo(X(0.4),Y(y0+0.25));c.lineTo(X(2.2),Y(6.4));c.stroke();
+    c.fillStyle="#000";c.textAlign="left";
+    c.fillText(T[lang].graphite,X(2.3),Y(6.4));
   }
-  /* the insert ruler, pressed onto the magnets */
   if(S.insRuler){
-    c.save();
-    c.fillStyle="rgba(255,255,255,.82)";
-    c.fillRect(X(-1.4),Y(Rm+9),  (2.8)*mm, (Rm+9)*mm);
-    c.strokeStyle="#c0392b"; c.fillStyle="#8b939c";
-    c.font="8.5px ui-monospace,monospace"; c.textAlign="left";
-    for(let v=0;v<=9;v+=0.5){
-      const big=Number.isInteger(v);
-      c.lineWidth=big?1:0.5; c.strokeStyle=big?"#c0392b":"#d8b0aa";
-      c.beginPath(); c.moveTo(X(0.2),Y(v)); c.lineTo(X(0.2+(big?1.1:0.6)),Y(v)); c.stroke();
-      if(big){ c.fillText(v,X(1.5),Y(v)+3); }
+    const xr=8.8;
+    c.strokeStyle="#444";c.lineWidth=1.3;
+    c.beginPath();c.moveTo(X(xr),Y(Rm-5.2));c.lineTo(X(xr),Y(Rm+1.6));c.stroke();
+    for(let k=-1.0;k<=5.001;k+=0.5){
+      const isInt=Math.abs(k-Math.round(k))<1e-6, wdt=isInt?1.7:0.9;
+      c.lineWidth=0.7;
+      c.beginPath();c.moveTo(X(xr),Y(Rm-k));c.lineTo(X(xr-wdt),Y(Rm-k));c.stroke();
+      if(isInt){c.fillStyle="#000";c.font="7px 'DejaVu Sans',sans-serif";
+        c.textAlign="left";c.fillText(k.toFixed(0),X(xr+0.35),Y(Rm-k)+2.5);}
     }
-    c.restore();
+    c.font="7px 'DejaVu Sans',sans-serif";c.textAlign="center";
+    c.fillText(T[lang].dyLbl,X(xr-0.2),Y(Rm+2.2));
+    if(S.placed){
+      c.strokeStyle="#c00000";c.setLineDash([2,2]);c.lineWidth=0.9;
+      c.beginPath();c.moveTo(X(0.4),Y(y0));c.lineTo(X(xr-1.8),Y(y0));c.stroke();
+      c.setLineDash([]);
+    }
   }
-  c.fillStyle="#5b6b7c"; c.font="10px ui-monospace,monospace"; c.textAlign="center";
-  c.fillText("magnet",X(-Am),Y(0)+Rm*mm+16);
-  c.fillText("magnet",X( Am),Y(0)+Rm*mm+16);
-  c.textAlign="left";
-  c.fillText(`gap gM = 1.5 mm   ·   R = 3.2 mm`, 12, h-10);
+  c.strokeStyle="#bbb";c.setLineDash([4,3]);c.lineWidth=0.7;
+  c.beginPath();c.moveTo(X(-Am-Rm-1),Y(0));c.lineTo(X(Am+Rm+1),Y(0));c.stroke();
+  c.setLineDash([]);
 }
-
+/* ── 위에서 본 모습 : 원본 xlim (-16, 16), ylim (-8.4, 10.2), 등축 ── */
 function zNow(){
-  if(!S.placed || S.oscT0===null) return 0;
+  if(!S.placed||S.oscT0===null) return 0;
   const t=S.simT-S.oscT0, tau=benchTau(ROD_D[S.rodKey],S.rodLen*1e-3);
   return S.amp*Math.exp(-t/tau)*Math.cos(B.omega*t);
 }
-function drawTop(cvId,zVal,label){
-  const [c,w,h]=fit($(cvId),0.30); grid(c,w,h);
-  const mm=w/40, X=v=>w/2+v*mm, ymid=h*0.42;
-  const Lm=LMAG*1e3;
-  c.fillStyle="#e4e8ec"; c.strokeStyle="#8b939c"; c.lineWidth=1.2;
-  c.fillRect(X(-Lm/2),ymid-24,Lm*mm,48); c.strokeRect(X(-Lm/2),ymid-24,Lm*mm,48);
-  c.strokeStyle="#c8d4e0"; c.fillStyle="#8fa2b4";
-  c.font="9px ui-monospace,monospace"; c.textAlign="center";
-  for(let v=-15;v<=15;v++){
-    const big=v%5===0; c.lineWidth=big?1:0.6;
-    c.beginPath(); c.moveTo(X(v),ymid+30); c.lineTo(X(v),ymid+30+(big?9:5)); c.stroke();
-    if(big) c.fillText(v,X(v),ymid+52);
+function drawTop(cvId,zVal,titleKey){
+  const cv=$(cvId),dpr=Math.min(devicePixelRatio||1,2);
+  const w=cv.clientWidth||700;
+  const X0=-16,X1=16,Y0=-8.4,Y1=10.2;
+  const sc=w/(X1-X0), h=Math.round((Y1-Y0)*sc);
+  cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);cv.style.height=h+"px";
+  const c=cv.getContext("2d");c.setTransform(dpr,0,0,dpr,0,0);
+  c.fillStyle="#fff";c.fillRect(0,0,w,h);
+  const X=v=>(v-X0)*sc, Y=v=>(Y1-v)*sc;
+  const Rm=R*1e3, Am=A_PDL*1e3, Lm=LMAG*1e3;
+  for(const sx of [-Am,Am]){
+    c.fillStyle="#dcdee2";c.strokeStyle="#888";c.lineWidth=0.8;
+    c.fillRect(X(-Lm/2),Y(sx+Rm),Lm*sc,2*Rm*sc);
+    c.strokeRect(X(-Lm/2),Y(sx+Rm),Lm*sc,2*Rm*sc);
   }
+  c.strokeStyle="#444";
+  for(let k=-10;k<=10;k++){
+    const hgt=(k%5)?1.0:1.9; c.lineWidth=0.8;
+    c.beginPath();c.moveTo(X(k),Y(7.8));c.lineTo(X(k),Y(7.8-hgt));c.stroke();
+    if(k%5===0){c.fillStyle="#000";c.font="7.5px 'DejaVu Sans',sans-serif";
+      c.textAlign="center";c.fillText(k,X(k),Y(8.3)-1);}
+  }
+  c.lineWidth=1;c.beginPath();c.moveTo(X(-10.5),Y(7.8));c.lineTo(X(10.5),Y(7.8));c.stroke();
   if(S.placed){
-    const l=S.rodLen, d=Math.max(ROD_D[S.rodKey]*1e3,0.5);
-    c.fillStyle="#2b2f36";
-    c.fillRect(X(zVal-l/2),ymid-Math.max(d*mm,3)/2,l*mm,Math.max(d*mm,3));
+    const l=S.rodLen;
+    c.strokeStyle="#101010";c.lineWidth=6;c.lineCap="butt";
+    c.beginPath();c.moveTo(X(zVal-l/2),Y(0));c.lineTo(X(zVal+l/2),Y(0));c.stroke();
   }
-  c.fillStyle="#5b6b7c"; c.textAlign="left";
-  c.fillText(label+"  z (mm)",10,h-8);
 }
 
-/* ── B : the plank on its two screws ── */
-function drawTilt(){
-  const [c,w,h]=fit($("cvTilt"),0.34); grid(c,w,h);
-  const th=S.turns*B.S/B.D*TILT_EXAG;
-  const x0=w*0.10, x1=w*0.90, ybase=h*0.72;
-  c.fillStyle="#dfe4ea"; c.fillRect(0,ybase+26,w,10);
-  c.save(); c.translate(x0,ybase); c.rotate(-th);
-  c.fillStyle="#cfd6dd"; c.strokeStyle="#8b939c"; c.lineWidth=1.2;
-  c.fillRect(0,-10,x1-x0,14); c.strokeRect(0,-10,x1-x0,14);
-  /* the trap sits in the middle of the plank */
-  const cx=(x1-x0)*0.46;
-  c.fillStyle="#d9dde2"; c.strokeStyle="#8b939c";
-  c.fillRect(cx-26,-34,52,24); c.strokeRect(cx-26,-34,52,24);
-  c.fillStyle="#2b2f36";
-  const dz=-GRAV*Math.sin(S.turns*B.S/B.D)/(B.omega*B.omega)*1e3;
-  c.fillRect(cx-12+dz*4,-26,24,5);
-  c.restore();
-  c.fillStyle="#7d8794"; c.fillRect(x0-5,ybase,10,26);
-  c.fillRect(x1-5,ybase-(x1-x0)*Math.sin(th),10,26+(x1-x0)*Math.sin(th));
-  c.fillStyle="#5b6b7c"; c.font="10px ui-monospace,monospace"; c.textAlign="center";
-  c.fillText("fixed",x0,h-6); c.fillText("screw",x1,h-6);
-  c.fillText("D = 22.0 cm",(x0+x1)/2,h-6);
+/* ── B : 플랫폼 측면.  원본 py 의 도면을 그대로 옮겼다.
+       xlim (-52, D+56), ylim (-40, 116), 등축, TILT_EXAG = 20
+       아래판 / 왼쪽 나사에 경첩된 위판 / 두 개의 조절 나사 /
+       트랩 프레임 / 중심선 / Δz 화살표 / D 치수선 / 눕힌 자      ── */
+function drawTilt(zmm){
+  const cv=$("cvTilt"),dpr=Math.min(devicePixelRatio||1,2);
+  const Dmm=B.D*1e3;
+  const X0=-52, X1=Dmm+56, Y0=-40, Y1=116;
+  const w=cv.clientWidth||700, sc=w/(X1-X0), h=Math.round((Y1-Y0)*sc);
+  cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);cv.style.height=h+"px";
+  const c=cv.getContext("2d");c.setTransform(dpr,0,0,dpr,0,0);
+  c.fillStyle="#fff";c.fillRect(0,0,w,h);
+  const X=v=>(v-X0)*sc, Y=v=>(Y1-v)*sc;
+  const P=(p)=>[X(p[0]),Y(p[1])];
+
+  const theta=S.turns*B.S/B.D, ang=theta*TILT_EXAG;
+  const ca=Math.cos(ang), sa=Math.sin(ang), PT=5.0, x0=0, x1=Dmm;
+  const lift=Dmm*Math.tan(ang);
+  const onTop=(px,py)=>[x0+(px-x0)*ca-py*sa, 14.0+(px-x0)*sa+py*ca];
+  const poly=(pts,fill,stroke,lw)=>{
+    c.beginPath(); pts.forEach((p,i)=>{const q=P(p); i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1]);});
+    c.closePath(); if(fill){c.fillStyle=fill;c.fill();}
+    if(stroke){c.strokeStyle=stroke;c.lineWidth=lw||1;c.stroke();}
+  };
+  const line=(p,q,col,lw,dash)=>{
+    c.strokeStyle=col;c.lineWidth=lw||1; if(dash)c.setLineDash(dash);
+    const A=P(p),Bq=P(q); c.beginPath();c.moveTo(A[0],A[1]);c.lineTo(Bq[0],Bq[1]);c.stroke();
+    c.setLineDash([]);
+  };
+  const arrow=(from,to,col,lw)=>{
+    const A=P(from),Bq=P(to);
+    c.strokeStyle=col;c.lineWidth=lw||1;
+    c.beginPath();c.moveTo(A[0],A[1]);c.lineTo(Bq[0],Bq[1]);c.stroke();
+    const an=Math.atan2(Bq[1]-A[1],Bq[0]-A[0]);
+    c.fillStyle=col;c.beginPath();c.moveTo(Bq[0],Bq[1]);
+    c.lineTo(Bq[0]-7*Math.cos(an-0.4),Bq[1]-7*Math.sin(an-0.4));
+    c.lineTo(Bq[0]-7*Math.cos(an+0.4),Bq[1]-7*Math.sin(an+0.4));
+    c.closePath();c.fill();
+  };
+  const txt=(p,t,size,align,col)=>{
+    c.fillStyle=col||"#000"; c.font=(size||9)+"px 'DejaVu Sans',sans-serif";
+    c.textAlign=align||"center"; c.textBaseline="middle";
+    const q=P(p); c.fillText(t,q[0],q[1]);
+  };
+
+  /* 아래판 */
+  poly([[-40,-PT],[Dmm+40,-PT],[Dmm+40,0],[-40,0]],"#d5d8dc","#333",1.0);
+  /* 위판 */
+  poly([onTop(-34,0),onTop(Dmm+34,0),onTop(Dmm+34,PT),onTop(-34,PT)],"#e9ecef","#333",1.1);
+  /* 두 나사 : 몸통, 뾰족한 끝, 머리 */
+  for(const [xs,ext] of [[x0,0.0],[x1,lift]]){
+    const top=onTop(xs,PT);
+    line(top,[xs,0.0],"#5d6369",2.6);
+    poly([[xs-1.8,1.6],[xs+1.8,1.6],[xs,-0.4]],"#8d939a","#444",0.7);
+    poly([[top[0]-5.0,top[1]+0.6],[top[0]+5.0,top[1]+0.6],
+          [top[0]+5.0,top[1]+3.2],[top[0]-5.0,top[1]+3.2]],"#9aa0a6","#444",0.8);
+  }
+  /* θ : 들린 쪽 끝에 (그림 9) */
+  if(Math.abs(lift)>0.6){
+    const xe=Dmm+22, pe=onTop(xe,0.0);
+    arrow([pe[0],0.0],pe,"#222",0.9); arrow(pe,[pe[0],0.0],"#222",0.9);
+    txt([pe[0]-3,(pe[1]+0.0)/2],"\u03b8",12,"right");
+  }
+  /* 트랩 프레임 */
+  const cxp=Dmm/2, HW=30.0, HT=62.0;
+  for(const dzf of [-HW, HW-3.0]){
+    poly([onTop(cxp+dzf,PT),onTop(cxp+dzf,PT+HT),
+          onTop(cxp+dzf+3.0,PT+HT),onTop(cxp+dzf+3.0,PT)],"#e4e7ea","#333",1.1);
+  }
+  for(const hy of [PT+12.0, PT+52.0]) line(onTop(cxp-HW,hy),onTop(cxp+HW,hy),"#333",1.4);
+  const pm=onTop(cxp+14.0,PT+23.0), pml=onTop(cxp+HW+30.0,PT+HT-14.0);
+  line(pml,pm,"#333",0.8); txt([pml[0]+2,pml[1]],T[lang].magnet,9,"left");
+  /* 중심선과 Δz */
+  const pc0=onTop(cxp,PT+4.0), pc1=onTop(cxp,PT+HT+3.0);
+  line(pc0,pc1,"#333",0.9,[6,3,2,3]);
+  txt([pc1[0],pc1[1]+5.0],T[lang].centre,9);
+  const dzmm=(zmm===undefined)?0:zmm;
+  const pz0=onTop(cxp,PT+33.0), pz1=onTop(cxp-17.0,PT+33.0);
+  arrow(pz0,pz1,"#333",1.0);
+  txt(onTop(cxp-8.5,PT+38.0),"\u0394z",10);
+  /* 흑연 막대 (옆에서 본 모습) */
+  if(S.placed){
+    const rl=8.0/2;
+    const q0=onTop(cxp+dzmm-rl,PT+22.0), q1=onTop(cxp+dzmm+rl,PT+22.0);
+    c.strokeStyle="#303030";c.lineWidth=6;c.lineCap="butt";
+    const A=P(q0),Bq=P(q1); c.beginPath();c.moveTo(A[0],A[1]);c.lineTo(Bq[0],Bq[1]);c.stroke();
+    const pgl=onTop(cxp-HW-30.0,PT+HT-14.0);
+    line(pgl,onTop(cxp-11.0,PT+22.0),"#333",0.8);
+    txt([pgl[0]-2,pgl[1]],T[lang].graphite,9,"right");
+  }
+  /* D 치수선 */
+  const pd0=onTop(x0,PT+9.0), pd1=onTop(x1,PT+9.0);
+  arrow(pd1,pd0,"#222",1.1); arrow(pd0,pd1,"#222",1.1);
+  const pdl=onTop(cxp-HW-26.0,PT+17.0);
+  c.fillStyle="#000";c.font="italic 15px 'DejaVu Sans',sans-serif";
+  c.textAlign="center";c.textBaseline="alphabetic";
+  const dq=P(pdl); c.fillText("D",dq[0],dq[1]);
+  c.textBaseline="middle";
+  /* 눕힌 자 */
+  if(S.rulerB){
+    const yr=-16.0;
+    line([-14,yr],[Dmm+18,yr],"#444",1.1);
+    for(let k=-10;k<=Dmm+17.1;k+=10){
+      const big=Math.abs(k%50)<1e-6;
+      line([k,yr],[k,yr-(big?4.6:2.4)],"#444",0.8);
+      if(big) txt([k,yr-10.5],(k/10).toFixed(0),7.5);
+    }
+    txt([Dmm/2,yr-18.5],T[lang].cm,8);
+    for(const xs of [x0,x1]) line([xs,-PT],[xs,yr],"#888",0.7,[2,2]);
+  }
+}
+
+/* ── 나사 머리 (위에서 본 모습) : 회전수만큼 지표가 돈다 ── */
+function drawHead(){
+  const cv=$("cvHead"); if(!cv) return;
+  const dpr=Math.min(devicePixelRatio||1,2), w=cv.clientWidth||160;
+  const sc=w/3.0, h=Math.round(3.1*sc);
+  cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);cv.style.height=h+"px";
+  const c=cv.getContext("2d");c.setTransform(dpr,0,0,dpr,0,0);
+  c.fillStyle="#fff";c.fillRect(0,0,w,h);
+  const X=v=>(v+1.5)*sc, Y=v=>(1.6-v)*sc;
+  c.beginPath();c.arc(X(0),Y(0),1.0*sc,0,7);
+  c.fillStyle="#d8dce0";c.fill();c.strokeStyle="#444";c.lineWidth=1.4;c.stroke();
+  c.strokeStyle="#8b9096";c.lineWidth=1;
+  for(let k=0;k<24;k++){const b0=2*Math.PI*k/24;
+    c.beginPath();c.moveTo(X(0.92*Math.cos(b0)),Y(0.92*Math.sin(b0)));
+    c.lineTo(X(1.0*Math.cos(b0)),Y(1.0*Math.sin(b0)));c.stroke();}
+  const ph=2*Math.PI*(-S.turns);
+  c.strokeStyle="#b03030";c.lineWidth=3;c.lineCap="round";
+  c.beginPath();c.moveTo(X(0),Y(0));
+  c.lineTo(X(0.78*Math.sin(ph)),Y(0.78*Math.cos(ph)));c.stroke();
+  c.beginPath();c.arc(X(0),Y(0),0.12*sc,0,7);c.fillStyle="#444";c.fill();
+  c.strokeStyle="#222";c.lineWidth=1.6;
+  c.beginPath();c.moveTo(X(0),Y(1.06));c.lineTo(X(0),Y(1.26));c.stroke();
+  c.fillStyle="#000";c.font="7.5px 'DejaVu Sans',sans-serif";
+  c.fillText(T[lang].refLbl,X(0),Y(1.34));
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -510,14 +668,21 @@ $("meterOn").onchange=e=>{S.meterOn=e.target.checked;};
 $("magOn").onchange=e=>{S.magOn=e.target.checked;};
 $("ruler").oninput=e=>{S.ruler=parseFloat(e.target.value);};
 $("phi").oninput=e=>{S.phi=parseFloat(e.target.value);};
-function readNow(){
-  /* with the magnet off the rail only the offset and the drift are left —
-     that is exactly what A.1 asks you to record */
-  S.reading = S.magOn
-    ? teslaTrue((S.ruler+X_OFFSET*1e3)*1e-3, S.phi) + norm(0,0.15e-3)
-    : B.B0 + B.drift + norm(0,0.15e-3);
+/* 원본 PartA1._tick 그대로 : 바늘이 시정수 0.6 s 로 목표값을 따라간다.
+   표시값 = 따라가는 값 + 잡음.  목표와 0.3 mT 넘게 벌어지면 "settling ..." */
+function meterTarget(){
+  return S.magOn ? teslaTrue((S.ruler+X_OFFSET*1e3)*1e-3, S.phi)
+                 : B.B0 + B.drift;
+}
+function meterStep(dt){
+  const target=meterTarget();
+  S.shown += (target-S.shown)*(1-Math.exp(-dt/0.6));
+  S.reading = S.shown + norm(0,0.15e-3);
+  S.settling = Math.abs(target-S.shown) >= 3e-4;
   return S.reading;
 }
+/* 기록은 지금 바늘이 가리키는 값을 그대로 적는다 (안정 전에 적으면 그 값이 남는다) */
+function readNow(){ return S.reading; }
 $("btnZero").onclick=()=>{
   if(!S.meterOn) return;
   S.zeroRec = readNow();
@@ -528,6 +693,7 @@ $("btnRec").onclick=()=>{
   S.rows.push({ruler:S.ruler, x:S.ruler+X_OFFSET*1e3, b:readNow()}); renderA1();
 };
 $("btnDel").onclick=()=>{S.rows.pop(); renderA1();};
+$("btnNew").onclick=()=>{S.rows=[]; renderA1();};
 $("btnCsv").onclick=()=>{
   const csv="ruler_mm,x_mm,B_raw_T\n"+S.rows.map(r=>
     `${r.ruler.toFixed(1)},${r.x.toFixed(1)},${r.b.toExponential(6)}`).join("\n");
@@ -548,6 +714,8 @@ function buildRodSeg(){
 }
 $("rodLen").oninput=e=>{S.rodLen=parseFloat(e.target.value); S.oscT0=null; applyLang();};
 $("btnPlace").onclick=()=>{S.placed=true; S.oscT0=null; $("btnPush").disabled=false;};
+$("btnPlaceB").onclick=()=>{S.placed=true; S.turns=0; S.zB=0; S.vzB=0; S.jit=0;};
+$("rulerB").onchange=e=>{S.rulerB=e.target.checked;};
 $("btnRemove").onclick=()=>{S.placed=false; S.oscT0=null; $("btnPush").disabled=true;};
 $("insRuler").onchange=e=>{S.insRuler=e.target.checked;};
 $("amp").oninput=e=>{S.amp=parseFloat(e.target.value); applyLang();};
@@ -565,13 +733,30 @@ $("btnLap").onclick=()=>{
 };
 $("btnSwReset").onclick=()=>{S.swRun=false;S.swVal=0;S.laps=[];renderLaps();applyLang();};
 
-$("turns").oninput=e=>{S.turns=parseFloat(e.target.value); applyLang();};
-$("btnLevel").onclick=()=>{S.turns=0;$("turns").value=0;applyLang();};
-$("btnRecB").onclick=()=>{
-  const dz=-GRAV*Math.sin(S.turns*B.S/B.D)/(B.omega*B.omega)*1e3;
-  S.rowsB.push({n:S.turns, dz:dz+norm(0,0.03)}); renderB();
-};
-$("btnDelB").onclick=()=>{S.rowsB.pop(); renderB();};
+/* 조그 슬라이더 : 쓸어 넘기면 그만큼 돌고 손을 떼면 가운데로 돌아온다 (원본과 같음) */
+/* 나사의 행정 한계.
+   수평일 때 위판은 아래판 위 14 mm 에 떠 있고, 나사를 풀면 내려온다.
+   −0.5 바퀴에서 위판 오른끝이 아래판에 닿아 더 내려가지 않고,
+   +2.0 바퀴에서 나사가 끝까지 나와 더 올라가지 않는다.
+   원본은 조그 슬라이더 한 번 쓸기가 0.75 바퀴라 실제로도 이 근처에서 쓴다.
+   이 범위에서 판은 최대 8.3° (20 배 과장) 기울고 Δz 는 +0.7 ~ −2.7 mm 로,
+   트랩의 ±10 mm 눈금 안에서 B.4 의 기울기를 넉넉히 잡을 수 있다.        */
+const TURN_MIN=-0.5, TURN_MAX=2.0;
+function addTurns(d){
+  const before=S.turns;
+  S.turns=Math.min(TURN_MAX,Math.max(TURN_MIN,S.turns+d));
+  const hit = (S.turns!==before+d);
+  S.limitMsg = hit;
+  if(hit) $("stateB").textContent = (S.turns>=TURN_MAX ? T[lang].endIn : T[lang].endOut);
+}
+/* 나사 머리 위에서 휠을 굴려도 돌아간다 */
+function wheelTurn(e){
+  e.preventDefault();
+  const step=e.shiftKey?0.005:0.025;       /* Shift 를 누르면 미세 조정 */
+  addTurns((e.deltaY>0?-1:1)*step);
+}
+
+
 
 /* tabs */
 function setTab(t){
@@ -600,37 +785,37 @@ function applyLang(){
   $("t-h-probe").textContent=d.hProbe;  $("t-magon").textContent=d.magon;
   $("t-ruler").textContent=`${d.ruler} — ${S.ruler.toFixed(1)}`;
   $("t-phi").textContent=`${d.phi} — ${S.phi.toFixed(0)}°`;
-  $("t-warn").textContent=d.warn;
+  $("t-warn").textContent=d.warn; $("t-warn").style.display=d.warn?"":"none";
   $("t-h-rec").textContent=d.hRec; $("btnRec").textContent=d.rec;
-  $("btnDel").textContent=d.del;   $("btnCsv").textContent=d.csv;
-  $("t-note1").textContent=d.note1;
+  $("btnDel").textContent=d.del; $("btnNew").textContent=d.newpage;   $("btnCsv").textContent=d.csv;
+  $("t-note1").textContent=d.note1; $("t-note1").style.display=d.note1?"":"none";
   $("t-cap1").textContent=d.cap1;  $("t-cap1b").textContent=d.cap1b;
 
   $("t-h-rod").textContent=d.hRod;
   $("t-len").textContent=`${d.len} — ${S.rodLen}`;
   $("btnPlace").textContent=d.place; $("btnRemove").textContent=d.remove;
   $("t-h-ruler").textContent=d.hRuler; $("t-insruler").textContent=d.insruler;
-  $("t-rulerhint").textContent=d.rulerhint;
+  $("t-rulerhint").textContent=d.rulerhint; $("t-rulerhint").style.display=d.rulerhint?"":"none";
   $("t-h-osc").textContent=d.hOsc;
   $("t-amp").textContent=`${d.amp} — ${S.amp.toFixed(1)}`;
   $("btnPush").textContent=d.push;
   $("t-h-sw").textContent=d.hSw; $("t-sw").textContent=d.sw;
   $("btnSw").textContent = S.swRun ? d.swStop : d.swStart;
   $("btnLap").textContent=d.lap; $("btnSwReset").textContent=d.swReset;
-  $("t-note2").textContent=d.note2;
+  $("t-note2").textContent=d.note2; $("t-note2").style.display=d.note2?"":"none";
   $("t-cap2").textContent=d.cap2; $("t-cap3").textContent=d.cap3;
 
-  $("t-h-tilt").textContent=d.hTilt; $("t-tiltsetup").textContent=d.tiltsetup;
-  $("t-turn").textContent=`${d.turn} — ${S.turns.toFixed(3)}`;
-  $("btnLevel").textContent=d.level;
-  $("t-h-read").textContent=d.hRead; $("t-dz").textContent=d.dz;
-  $("btnRecB").textContent=d.recB; $("btnDelB").textContent=d.delB;
-  $("t-note3").textContent=d.note3;
+  $("t-h-rodB").textContent=d.hRodB;   $("t-rodB").textContent=d.rodB;
+  $("btnPlaceB").textContent=d.placeB; $("t-h-screw").textContent=d.hScrew;
+  $("t-jognote").textContent=d.jognote;
+  $("t-h-rulerB").textContent=d.hRulerB;$("t-rulerB").textContent=d.rulerB;
+  $("t-noteB").textContent=d.noteB; $("t-noteB").style.display=d.noteB?"":"none";
   $("t-cap4").textContent=d.cap4; $("t-cap5").textContent=d.cap5;
+  $("t-caphead").textContent=d.capHead;
 
   $("lang-ko").className = lang==="ko"?"on":"";
   $("lang-en").className = lang==="en"?"on":"";
-  buildRodSeg(); renderA1(); renderLaps(); renderB();
+  buildRodSeg(); renderA1(); renderLaps();
 }
 $("lang-ko").onclick=()=>{lang="ko";applyLang();};
 $("lang-en").onclick=()=>{lang="en";applyLang();};
@@ -644,15 +829,21 @@ function loop(now){
   S.simT+=dt;
 
   if(S.tab==="a1"){
-    if(S.meterOn){
-      readNow();
+    S.mAcc=(S.mAcc||0)+dt;
+    const due = S.mAcc>=0.120;
+    if(S.meterOn && due){
+      meterStep(S.mAcc); S.mAcc=0;
       const sat = Math.abs(S.reading)>=METER_FS;
       $("dispB").className="disp";
       $("dispB").innerHTML=`<small>${T[lang].field}</small>`+
-        (sat?"OL":`${(S.reading*1e3).toFixed(3)} mT`);
-    }else{
+        (sat?"  O L  ":`${(S.reading*1e3).toFixed(1)} mT`);
+      $("meterState").textContent = sat ? T[lang].overRange
+                                        : (S.settling?T[lang].settling:"");
+    }else if(!S.meterOn){
+      S.mAcc=0;
       $("dispB").className="disp off";
-      $("dispB").innerHTML=`<small>${T[lang].field}</small>-- . --- mT`;
+      $("dispB").innerHTML=`<small>${T[lang].field}</small>-- OFF --`;
+      $("meterState").textContent=""; S.shown=meterTarget();
     }
     drawA1();
   }
@@ -660,17 +851,38 @@ function loop(now){
   if(S.tab==="a2"){
     if(S.swRun) S.swVal=S.simT-S.swT0;
     $("swDisp").innerHTML=`<small>${T[lang].sw}</small>${S.swVal.toFixed(2)} s`;
-    drawFront(); drawTop("cvTop",zNow(),"");
+    drawFront(); drawTop("cvTop",zNow(),"cap3");
   }
 
   if(S.tab==="b"){
-    const dz=-GRAV*Math.sin(S.turns*B.S/B.D)/(B.omega*B.omega)*1e3;
-    $("dzDisp").innerHTML=`<small>${T[lang].dz}</small>${dz.toFixed(2)} mm`;
-    drawTilt(); drawTop("cvTopB",dz,"Δz");
+    /* 원본 PartB._tick : 감쇠 진동을 실제로 적분한다.
+         v' = -w²(z - z_eq) - 2γ v,   γ = 1/τ
+       나사를 돌리면 막대가 곧바로 옮겨가지 않고 새 평형으로 흔들리며 수렴한다.  */
+    if(S.placed && dt>0){
+      const w=B.omega, gam=1.0/benchTau(ROD_D["HB/0.5"],8.0e-3);
+      const zeq=-GRAV*Math.sin(S.turns*B.S/B.D)/(w*w);
+      const nstep=Math.max(1,Math.floor(dt/0.004)+1), hs=Math.min(dt,0.25)/nstep;
+      for(let i=0;i<nstep;i++){
+        S.vzB += (-w*w*(S.zB-zeq) - 2*gam*S.vzB)*hs;
+        S.zB  += S.vzB*hs;
+      }
+      S.jit += (-S.jit/2.0)*dt + norm(0,1.2e-5)*Math.sqrt(Math.max(dt,1e-4));
+      const wasRinging=S.ringing;
+      S.ringing = Math.abs(S.vzB)>3e-5 || Math.abs(S.zB-zeq)>3e-5;
+      if(S.ringing) $("stateB").textContent=T[lang].ringing;
+      else if(wasRinging && !S.limitMsg) $("stateB").textContent="\u2014";
+    }
+    const zmm=S.placed?(S.zB+S.jit)*1e3:0;
+    drawTilt(zmm); drawHead(); drawTop("cvTopB",zmm,"cap5");
   }
   requestAnimationFrame(loop);
 }
 
+/* 나사 머리 위에서 휠 */
+(function(){
+  const h=$("cvHead");
+  if(h) h.addEventListener("wheel",wheelTurn,{passive:false});
+})();
 addEventListener("resize",()=>{});
 setTab("a1"); applyLang(); requestAnimationFrame(loop);
 </script>
