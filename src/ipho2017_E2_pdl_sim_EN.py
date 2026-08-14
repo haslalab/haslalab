@@ -141,12 +141,12 @@ _KO = {
     "HB/0.5,  l = 8 mm": "HB/0.5,  l = 8 mm",
     "drop the rod in at the centre": "막대를 가운데에 넣는다",
     "Levelling screw": "수평 조정 나사",
-    "← out": "← 풀기",
-    "in →": "조이기 →",
-    "Sweep the slider to turn the screw; it springs back so you can keep going.  "
-    "Turn it slowly and count the turns off the head yourself.":
-        "슬라이더를 쓸면 나사가 돌아갑니다. 손을 떼면 가운데로 돌아오니 계속 쓸 수 "
-        "있습니다. 천천히 돌리고, 나사 머리를 보며 몇 바퀴인지 직접 세세요.",
+    "Put the mouse over the screw head and roll the wheel: one notch is an "
+    "eighth of a turn.  Hold Shift for a fortieth.  Turn it slowly and count "
+    "the turns off the head yourself.":
+        "나사 머리 위에 마우스를 올리고 휠을 굴리세요. 한 칸에 8분의 1바퀴, "
+        "Shift를 누른 채로는 40분의 1바퀴입니다. 천천히 돌리고, 나사 머리를 "
+        "보며 몇 바퀴인지 직접 세세요.",
     "unscrew back to level": "다시 풀어 수평으로",
     "the rod is still swinging - wait": "막대가 아직 흔들립니다 - 기다리세요",
     "lay the ruler beside the platform": "플랫폼 옆에 자를 놓는다",
@@ -161,7 +161,7 @@ _KO = {
     "centre": "중심",
     "side view of the platform  (tilt drawn %.0fx)":
         "플랫폼 측면도  (기울기는 %.0f배로 그림)",
-    "screw head": "나사 머리",
+    "screw head\n(roll the wheel here)": "나사 머리\n(여기서 휠을 굴리세요)",
     "reference": "기준선",
     "top view of the trap  (scale printed on the platform, mm)":
         "트랩 상면도  (플랫폼에 인쇄된 눈금, mm)",
@@ -227,7 +227,8 @@ TAU_A, TAU_B = 3.15, 29.40      # s, s/mm2
 D_TILT  = 0.220        # m, distance between the two screws (student measures it)
 S_TRUE  = 0.80e-3      # m per turn, thread size (marking scheme: 0.8 +- 0.1)
 TILT_EXAG = 20.0       # the tilt is drawn this much larger, or it is invisible
-JOG_TURNS = 0.75       # turns of the screw per full sweep of the jog slider
+WHEEL_TURN = 0.125     # turns of the screw per notch of the mouse wheel
+WHEEL_FINE = 0.025     # ... with Shift held down
 
 
 # ═══════════════════════════ physics ═══════════════════════════
@@ -846,7 +847,6 @@ class PartB(ttk.Frame):
         self.z = 0.0             # m, rod position along the trap axis
         self.vz = 0.0            # m/s
         self._jit = 0.0
-        self._jog_prev = 0.0     # last position of the jog slider
         self._last = time.perf_counter()
 
         self._controls()
@@ -891,21 +891,10 @@ class PartB(ttk.Frame):
         ttk.Label(c, text=T("Levelling screw"), font=("", 10, "bold")).grid(
             row=r, column=0, sticky="w")
         r += 1
-        self.var_jog = tk.DoubleVar(value=0.0)
-        self.sc_jog = ttk.Scale(c, from_=-1.0, to=1.0, variable=self.var_jog,
-                                length=252, orient="horizontal",
-                                command=self._jog_move)
-        self.sc_jog.grid(row=r, column=0, sticky="ew", pady=(3, 0))
-        self.sc_jog.bind("<ButtonRelease-1>", self._jog_up)
-        r += 1
-        row = ttk.Frame(c)
-        row.grid(row=r, column=0, sticky="ew")
-        ttk.Label(row, text=T("\u2190 out"), foreground="#666").pack(side="left")
-        ttk.Label(row, text=T("in \u2192"), foreground="#666").pack(side="right")
-        r += 1
         ttk.Label(c, wraplength=252, foreground="#555",
-                  text=(T("Sweep the slider to turn the screw; it springs back "
-                        "so you can keep going.  Turn it slowly and count "
+                  text=(T("Put the mouse over the screw head and roll the "
+                        "wheel: one notch is an eighth of a turn.  Hold "
+                        "Shift for a fortieth.  Turn it slowly and count "
                         "the turns off the head yourself."))
                   ).grid(row=r, column=0, sticky="w", pady=(3, 4))
         r += 1
@@ -941,21 +930,17 @@ class PartB(ttk.Frame):
 
     def relevel(self):
         self.turns = 0.0
-        self._jog_up()
         self._static()
 
-    # -- the jog slider ---------------------------------------------
-    def _jog_move(self, *_):
-        v = float(self.var_jog.get())
-        d = v - self._jog_prev
-        self._jog_prev = v
-        if d:
-            self.turns += d * JOG_TURNS
-            self._static()
-
-    def _jog_up(self, *_):
-        self._jog_prev = 0.0
-        self.var_jog.set(0.0)
+    # -- the wheel over the screw head ------------------------------
+    def _scroll(self, ev):
+        """Roll the wheel over the head to drive the screw in or out."""
+        if ev.inaxes is not self.axh:
+            return
+        fine = bool(getattr(ev, "guiEvent", None)) and \
+            (getattr(ev.guiEvent, "state", 0) & 0x0001)      # Shift held
+        self.turns += ev.step * (WHEEL_FINE if fine else WHEEL_TURN)
+        self._static()
 
     # ------------------------------------------------ figure
     def _figure(self):
@@ -970,6 +955,7 @@ class PartB(ttk.Frame):
         self.canvas.get_tk_widget().grid(row=0, column=1, sticky="nsew")
         self.background = None
         self.canvas.mpl_connect("draw_event", self._on_draw)
+        self.canvas.mpl_connect("scroll_event", self._scroll)
 
     def _on_draw(self, event):
         self.background = self.canvas.copy_from_bbox(self.fig.bbox)
@@ -1097,7 +1083,7 @@ class PartB(ttk.Frame):
         # ---------- the screw head, seen from above ----------
         h = self.axh
         h.clear()
-        h.set_title(T("screw head"), fontsize=9)
+        h.set_title(T("screw head\n(roll the wheel here)"), fontsize=9)
         h.add_patch(Circle((0, 0), 1.0, facecolor="#d8dce0",
                            edgecolor="#444", lw=1.4, zorder=2))
         for k in range(24):                     # knurling
