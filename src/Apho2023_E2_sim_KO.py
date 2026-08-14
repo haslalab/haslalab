@@ -217,22 +217,29 @@ class ThermoModel:
 
 def png_photo(rgb):
     """
-    numpy uint8 (h, w, 3)  ->  tk.PhotoImage, with no image library at all.
-    Tk 8.6 reads PNG natively, so a minimal encoder is enough: IHDR, one
-    IDAT with filter byte 0 in front of every scan line, IEND.
+    numpy uint8 (h, w, 3) or (h, w, 4)  ->  tk.PhotoImage, with no image
+    library at all.  Tk 8.6 reads PNG natively, including the alpha of a
+    colour-type-6 image, so a minimal encoder is enough: IHDR, one IDAT
+    with filter byte 0 in front of every scan line, IEND.
+
+    Compression level 1 rather than 6: this is a throw-away buffer handed
+    straight to Tk, never a file, and on a 490 x 490 pattern level 6 cost
+    more time than computing the pattern did.
     """
     h, w = rgb.shape[:2]
+    nc = rgb.shape[2] if rgb.ndim == 3 else 1
+    ctype = {1: 0, 3: 2, 4: 6}[nc]
 
     def chunk(tag, payload):
         return (struct.pack(">I", len(payload)) + tag + payload
                 + struct.pack(">I", zlib.crc32(tag + payload) & 0xffffffff))
 
     raw = np.concatenate(
-        [np.zeros((h, 1), dtype=np.uint8), rgb.reshape(h, w * 3)],
+        [np.zeros((h, 1), dtype=np.uint8), rgb.reshape(h, w * nc)],
         axis=1).tobytes()
     png = (b"\x89PNG\r\n\x1a\n"
-           + chunk(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, 2, 0, 0, 0))
-           + chunk(b"IDAT", zlib.compress(raw, 6))
+           + chunk(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, ctype, 0, 0, 0))
+           + chunk(b"IDAT", zlib.compress(raw, 1))
            + chunk(b"IEND", b""))
     return tk.PhotoImage(data=base64.b64encode(png))
 
@@ -242,16 +249,32 @@ LASER_STOPS = ((0.00, (0, 0, 0)), (0.18, (42, 0, 0)), (0.40, (139, 0, 8)),
                (1.00, (255, 233, 230)))
 
 
-def laser_rgb(img, vmax=1.35):
-    """Map the intensity array to the deep red of a 650 nm diode pattern."""
-    x = np.clip(img / vmax, 0.0, 1.0)
-    out = np.zeros(x.shape + (3,), dtype=np.float32)
+def _build_lut(n=2048):
+    """The colour ramp, sampled once into a table."""
+    x = np.linspace(0.0, 1.0, n)
+    out = np.zeros((n, 3), dtype=np.float32)
     for (a, ca), (b, cb) in zip(LASER_STOPS[:-1], LASER_STOPS[1:]):
         m = (x >= a) & (x <= b)
         f = (x[m] - a) / (b - a)
         for c in range(3):
-            out[..., c][m] = ca[c] + f * (cb[c] - ca[c])
+            out[m, c] = ca[c] + f * (cb[c] - ca[c])
     return out.astype(np.uint8)
+
+
+LASER_LUT = _build_lut()
+
+
+def laser_rgb(img, vmax=1.35):
+    """
+    Map the intensity array to the deep red of a 650 nm diode pattern.
+
+    One table lookup per pixel instead of five masked passes over the
+    whole array; the table is sampled finely enough that the result is
+    the same 8 bit colour.
+    """
+    n = LASER_LUT.shape[0]
+    idx = np.clip(img * ((n - 1) / vmax), 0, n - 1).astype(np.int32)
+    return LASER_LUT[idx]
 
 
 # ==========================================================================
@@ -527,6 +550,94 @@ class ControlCanvas(tk.Canvas):
 # ==========================================================================
 #  THE SCREEN
 # ==========================================================================
+class Ruler:
+    """
+    The 30 cm clear plastic ruler from the apparatus list.
+
+    It is an object lying on the screen, not a read-out: drag it where
+    you want it, roll the wheel over it to swing it round, and read the
+    fringe positions off its own millimetre scale with your own eyes.
+    Nothing anywhere prints a radius for you.
+    """
+    LEN = 30.0          # cm, the printed scale runs 0 .. 30
+    WID = 3.0           # cm across
+    TRANS = 0.86        # two air/acrylic surfaces, about 8% lost at each
+
+    def __init__(self):
+        self.x = 0.0            # cm, centre of the ruler on the screen
+        self.y = 13.0
+        self.ang = 0.0          # radians, 0 = lying along x
+
+    def local(self, X, Y):
+        """Screen cm -> ruler cm (u along the scale, v across it)."""
+        ca, sa = math.cos(-self.ang), math.sin(-self.ang)
+        dx, dy = X - self.x, Y - self.y
+        return dx * ca - dy * sa, dx * sa + dy * ca
+
+    def contains(self, X, Y):
+        u, v = self.local(X, Y)
+        return abs(u) <= self.LEN / 2 and abs(v) <= self.WID / 2
+
+    def bbox(self):
+        """Screen-cm bounding box of the rotated ruler."""
+        hu, hv = self.LEN / 2, self.WID / 2
+        ca, sa = math.cos(self.ang), math.sin(self.ang)
+        xs, ys = [], []
+        for su in (-1, 1):
+            for sv in (-1, 1):
+                xs.append(self.x + su * hu * ca - sv * hv * sa)
+                ys.append(self.y + su * hu * sa + sv * hv * ca)
+        return min(xs), min(ys), max(xs), max(ys)
+
+    def render(self, u, v, I):
+        """
+        What the ruler looks like lying on the screen, as colour.
+
+        Clear acrylic transmits most of the light and reflects the rest,
+        so the fringes stay visible through it but dimmed - that part is
+        still the laser's own deep red.  What the ruler itself shows is
+        not: the two bevelled edges pipe light along their length and the
+        engraved graduations scatter it, and both come back neutral, the
+        way they do on the bench.  So the plastic is composited as colour
+        rather than as intensity, and a fringe under the scale can still
+        be lined up against a millimetre mark.
+        """
+        rgb = laser_rgb(np.clip(I * self.TRANS, 0.0, 1.6)).astype(np.float32)
+
+        # a faint grey veil over the whole body
+        rgb += np.array([11.0, 13.0, 17.0], dtype=np.float32)
+
+        # the lit edges
+        edge = np.exp(-((np.abs(v) - self.WID / 2) / 0.085) ** 2)
+        rgb += edge[..., None] * np.array([54.0, 62.0, 72.0],
+                                          dtype=np.float32)
+
+        return np.clip(rgb, 0, 255).astype(np.uint8)
+
+    def ticks(self):
+        """
+        The engraved millimetre scale, as line segments in screen cm.
+
+        These are drawn rather than sampled into the image: a millimetre
+        is only about 1.2 screen pixels wide, so putting the marks into
+        the pixel grid turned them into an aliased hash instead of a
+        scale you could read against.
+        """
+        ca, sa = math.cos(self.ang), math.sin(self.ang)
+        half = self.WID / 2
+        out = []
+        for k in range(0, 301):
+            u = k * 0.1 - self.LEN / 2
+            tl = 0.66 if k % 10 == 0 else (0.42 if k % 5 == 0 else 0.22)
+            v0, v1 = half, half - tl
+            out.append((self.x + u * ca - v0 * sa,
+                        self.y + u * sa + v0 * ca,
+                        self.x + u * ca - v1 * sa,
+                        self.y + u * sa + v1 * ca,
+                        k % 10 == 0, k % 5 == 0))
+        return out
+
+
 class ScreenCanvas(tk.Canvas):
     W, H = 560, 560
     HALF = 20.0                     # cm shown from the centre
@@ -536,10 +647,26 @@ class ScreenCanvas(tk.Canvas):
                          highlightthickness=0, **kw)
         self.app = app
         self.img = None
-        self.mark = None
-        self.bind("<Motion>", self._hover)
-        self.bind("<Button-1>", self._click)
+        self.rul = Ruler()
+        self._drag = None
+        self._geo_key = None
+        self._pat_key = None
+        self._I = None
+        self.bind("<Button-1>", self._press)
+        self.bind("<B1-Motion>", self._motion)
+        self.bind("<ButtonRelease-1>", lambda e: setattr(self, "_drag", None))
+        self.bind("<MouseWheel>", lambda e: self._spin(1 if e.delta > 0
+                                                       else -1))
+        self.bind("<Button-4>", lambda e: self._spin(+1))
+        self.bind("<Button-5>", lambda e: self._spin(-1))
         self.redraw()
+
+    # The image spans exactly the pixels the geometry does.  The desktop
+    # program used to blow a 420 point grid up with PhotoImage.zoom(2),
+    # which put the pattern on the glass at 21 px/cm while every length
+    # in the model was 12.25 px/cm, so anything measured off it came out
+    # 1.714 times too small.  NPIX is that span, and there is no zoom.
+    NPIX = 490
 
     def _px(self, cm):
         return self.W / 2 + cm * (self.W - 70) / (2 * self.HALF)
@@ -547,48 +674,154 @@ class ScreenCanvas(tk.Canvas):
     def _cm(self, px):
         return (px - self.W / 2) * 2 * self.HALF / (self.W - 70)
 
-    def _hover(self, ev):
-        r = math.hypot(self._cm(ev.x), self._cm(ev.y))
-        self.app.set_cursor(r)
+    # ---------------- mouse ----------------
+    def _press(self, ev):
+        X, Y = self._cm(ev.x), self._cm(ev.y)
+        if self.rul.contains(X, Y):
+            self._drag = (X - self.rul.x, Y - self.rul.y)
 
-    def _click(self, ev):
-        self.mark = math.hypot(self._cm(ev.x), self._cm(ev.y))
-        self.app.set_cursor(self.mark, held=True)
+    def _motion(self, ev):
+        if self._drag is None:
+            return
+        X, Y = self._cm(ev.x), self._cm(ev.y)
+        self.rul.x = X - self._drag[0]
+        self.rul.y = Y - self._drag[1]
         self.redraw()
 
+    def _spin(self, s):
+        """Swing the ruler round, so it can be laid across a diameter."""
+        self.rul.ang += s * math.radians(2.0)
+        self.redraw()
+
+    # ---------------- the pattern ----------------
+    def _geometry(self):
+        """
+        Everything that depends only on the grid and on the plate's own
+        tilt and ellipticity, worked out once and kept.
+        """
+        m = self.app.model
+        key = (m.tilt, m.ellipticity, m.dirty, self.NPIX)
+        if self._geo_key == key:
+            return
+        n = self.NPIX
+        ax = np.linspace(-self.HALF, self.HALF, n, dtype=np.float32)
+        X, Y = np.meshgrid(ax, ax)
+        ca, sa = math.cos(m.tilt), math.sin(m.tilt)
+        Xr = X * ca + Y * sa
+        Yr = -X * sa + Y * ca
+        self._X, self._Y = X, Y
+        self._Rr = np.sqrt((Xr / m.ellipticity) ** 2
+                           + (Yr * m.ellipticity) ** 2).astype(np.float32)
+        # the four-fold ripple from surface contamination
+        self._theta = (1.0 + 0.05 * m.dirty
+                       * np.cos(4.0 * np.arctan2(Yr, Xr))).astype(np.float32) \
+            if m.dirty > 0.25 else None
+        # the speckle is drawn from a fixed seed, so it is the same array
+        # every time: there is no reason to draw it again on every frame
+        rg = np.random.default_rng(7)
+        self._sp1 = rg.random((n, n), dtype=np.float32) - 0.5
+        self._sp2 = rg.random((n, n), dtype=np.float32)
+        self._geo_key = key
+
+    def _intensity(self):
+        """The pattern on the screen, cached against everything it uses."""
+        m, app = self.app.model, self.app
+        live = app.lit and app.cur > 2.0
+        key = (round(app.cur, 3), round(app.L(), 4), m.spot_key, live,
+               m.melted, round(m.m_frozen, 6), round(m.R_base_lam, 6))
+        if self._pat_key == key and self._I is not None:
+            return self._I
+        self._geometry()
+        n = self.NPIX
+        if not live:
+            self._I = np.zeros((n, n), dtype=np.float32)
+            self._rgb0 = laser_rgb(self._I)
+            self._pat_key = key
+            return self._I
+        mmax = m.m_max(app.cur)          # this is where the plate can melt
+        P = m.power_true(app.cur)
+        L = app.L()
+        # sin(arctan2(r, L)) is r / hypot(r, L): the same number without
+        # a transcendental pair over a quarter of a million points
+        R = self._Rr
+        nu = (m.R_base_lam * R / np.sqrt(R * R + L * L)).astype(np.float32)
+        if mmax > 0.4:
+            img = m.intensity(nu, mmax)
+        else:
+            img = 1.35 * np.exp(-(nu / 1.55) ** 2)
+        img = img * min(max(P / 300.0, 0.0), 1.6)
+        if self._theta is not None:
+            img = img * self._theta
+        img = img + 0.030 * np.sqrt(np.clip(img, 0.0, None)) * self._sp1 \
+            + 0.0015 * self._sp2
+        self._I = np.clip(img, 0.0, 1.6).astype(np.float32)
+        self._rgb0 = laser_rgb(self._I)
+        self._pat_key = key
+        return self._I
+
+    # ---------------- painting ----------------
     def redraw(self):
         self.delete("all")
-        n = 420
-        ax = np.linspace(-self.HALF, self.HALF, n)
-        X, Y = np.meshgrid(ax, ax)
-        if self.app.lit and self.app.cur > 2.0:
-            img = self.app.model.pattern(self.app.cur, self.app.L(), X, Y)
-        else:
-            img = np.zeros_like(X)
-        self.img = png_photo(laser_rgb(img))
-        s = self._px(self.HALF) - self._px(-self.HALF)
-        self.img = self.img.zoom(max(int(s / n) + 1, 1))
+        I = self._intensity()
+        n = self.NPIX
+        # the clean pattern is coloured once and kept; dragging the ruler
+        # only repaints the pixels the ruler actually covers
+        rgb = self._rgb0.copy()
+
+        # ---- the ruler, composited into the pixels it covers ----------
+        r = self.rul
+        x0c, y0c, x1c, y1c = r.bbox()
+        i0 = max(int((x0c + self.HALF) / (2 * self.HALF) * (n - 1)) - 1, 0)
+        i1 = min(int((x1c + self.HALF) / (2 * self.HALF) * (n - 1)) + 2, n)
+        j0 = max(int((y0c + self.HALF) / (2 * self.HALF) * (n - 1)) - 1, 0)
+        j1 = min(int((y1c + self.HALF) / (2 * self.HALF) * (n - 1)) + 2, n)
+        if i1 > i0 and j1 > j0:
+            Xs = self._X[j0:j1, i0:i1]
+            Ys = self._Y[j0:j1, i0:i1]
+            u, v = r.local(Xs, Ys)
+            inside = (np.abs(u) <= r.LEN / 2) & (np.abs(v) <= r.WID / 2)
+            if inside.any():
+                patch = r.render(u, v, I[j0:j1, i0:i1])
+                tgt = rgb[j0:j1, i0:i1]
+                rgb[j0:j1, i0:i1] = np.where(inside[..., None], patch, tgt)
+
+        self.img = png_photo(rgb)
         self.create_image(self.W / 2, self.H / 2, image=self.img)
 
         # the hole the incoming beam goes through
         self.create_oval(self.W / 2 - 5, self.H / 2 - 5, self.W / 2 + 5,
                          self.H / 2 + 5, outline="#8090a0", dash=(2, 2))
-        # ruler along the bottom edge, this is how you measure a fringe
-        y = self.H - 22
-        self.create_line(self._px(-self.HALF), y, self._px(self.HALF), y,
-                         fill="#d8d8d0")
-        for cm in range(-int(self.HALF), int(self.HALF) + 1):
-            x = self._px(cm)
-            big = (cm % 5 == 0)
-            self.create_line(x, y, x, y - (9 if big else 5), fill="#d8d8d0")
-            if big:
-                self.create_text(x, y + 9, text="%d" % abs(cm),
-                                 fill="#d8d8d0", font=("TkDefaultFont", 7))
-        if self.mark is not None:
-            rp = self._px(self.mark) - self._px(0.0)
-            self.create_oval(self.W / 2 - rp, self.H / 2 - rp,
-                             self.W / 2 + rp, self.H / 2 + rp,
-                             outline="#40e0ff", dash=(4, 3))
+
+        # the printed scale, drawn crisp on top of the plastic
+        for (x0, y0, x1, y1, iscm, is5) in r.ticks():
+            if max(abs(x0), abs(y0)) > self.HALF:
+                continue
+            self.create_line(self._px(x0), self._px(y0),
+                             self._px(x1), self._px(y1),
+                             fill="#eef3f8" if iscm else
+                                  ("#d6dee6" if is5 else "#9fadb8"),
+                             width=1)
+
+        # the numbers printed on the ruler
+        ca, sa = math.cos(r.ang), math.sin(r.ang)
+        for cmv in range(0, 31, 5):
+            uu = cmv - r.LEN / 2
+            vv = r.WID / 2 - 1.02
+            X = r.x + uu * ca - vv * sa
+            Y = r.y + uu * sa + vv * ca
+            if abs(X) > self.HALF or abs(Y) > self.HALF:
+                continue
+            self.create_text(self._px(X), self._px(Y), text=str(cmv),
+                             fill="#dfe6ec", font=("TkDefaultFont", 7),
+                             angle=-math.degrees(r.ang))
+        # and the maker's mark at the far end, so which way is up is clear
+        uu, vv = r.LEN / 2 - 2.6, -r.WID / 2 + 0.75
+        X = r.x + uu * ca - vv * sa
+        Y = r.y + uu * sa + vv * ca
+        if abs(X) <= self.HALF and abs(Y) <= self.HALF:
+            self.create_text(self._px(X), self._px(Y), text="cm",
+                             fill="#b9c4cd", font=("TkDefaultFont", 7),
+                             angle=-math.degrees(r.ang))
 
 
 # ==========================================================================
@@ -863,6 +1096,7 @@ class App(tk.Tk):
         self.reading = (0.0, 0.0)
         self.x_target = 0.0
         self.x_screen = 49.2
+        self._screen_job = None
 
         top = ttk.Frame(self)
         top.pack(fill="x")
@@ -913,8 +1147,11 @@ class App(tk.Tk):
         self.screen = ScreenCanvas(right, self)
         self.screen.pack(padx=6, pady=6)
         self.lbl_cur = ttk.Label(
-            right, font=("Consolas", 11), anchor="w", justify="left",
-            text="자:  화면을 클릭하면 반지름을 읽고, 끌면 표시가 남습니다")
+            right, anchor="w", justify="left", wraplength=540,
+            text="30 cm 플라스틱 자를 끌어서 무늬 위에 놓고, 자의 눈금으로 "
+                 "직접 재세요.  자 위에서 마우스 휠을 굴리면 자가 회전하므로 "
+                 "지름을 가로질러 놓을 수 있습니다.  자를 통해서도 무늬는 "
+                 "보이지만 조금 어두워집니다.")
         self.lbl_cur.pack(anchor="w", padx=10, pady=(4, 2))
 
         self.read_meters()
@@ -959,12 +1196,10 @@ class App(tk.Tk):
         plate, which may or may not have been melted before."""
         k = self.model.spot_key
         self.model.goto_spot((k[0] + dx, k[1] + dy))
-        self.screen.mark = None
         self.refresh()
 
     def fresh_spot(self):
         self.model.fresh_spot()
-        self.screen.mark = None
         self.refresh()
 
     def _spot_label(self):
@@ -973,19 +1208,31 @@ class App(tk.Tk):
         self.lbl_seed.config(text="PMMA 판 %d" % self.seed)
 
     def refresh(self):
+        """
+        The cheap panels go now; the screen is the expensive one, so it
+        is scheduled.  A wheel spin on the current knob delivers a burst
+        of events and rendering the whole pattern for every one of them
+        was what made the knob feel like treacle.
+        """
         if hasattr(self, "wiring"):
             self.wiring.redraw()
         self.ctrl.redraw()
-        self.screen.redraw()          # this is where the plate can melt
         self._spot_label()
         self.bench.redraw()
+        if self._screen_job is not None:
+            try:
+                self.after_cancel(self._screen_job)
+            except Exception:
+                pass
+        self._screen_job = self.after(16, self._paint_screen)
 
-    def set_cursor(self, r, held=False):
-        # only what a ruler laid on the screen would tell you: the angle
-        # is for the student to work out from R and L
-        self.lbl_cur.config(
-            text="자:  R = %6.2f cm    D = %6.2f cm%s"
-                 % (r, 2 * r, "   [표시함]" if held else ""))
+    def _paint_screen(self):
+        self._screen_job = None
+        self.screen.redraw()          # this is where the plate can melt
+
+    # There is deliberately no radius read-out.  The apparatus gives you
+    # a ruler and a screen; where the fringe falls on the millimetre
+    # scale is for you to see and write down.
 
 
 
