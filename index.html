@@ -1000,7 +1000,7 @@ function mmss(s){return String(Math.floor(s/60)).padStart(2,"0")+":"+String(Math
 
 /* ── IPhO 2017 E1 · laser deflectogram on millimetre paper ────── */
 const SIG_I17E1={
-  sim:"sim/ipho2017_E1_web.html", tag:"IPhO 2017 E1", span:2100,
+  sim:"sim/ipho2017_E1_web.html", tag:"IPhO 2017 E1", span:2100, rate:260,
   capL:{ko:"모눈종이 30 × 30 cm · 편향도",en:"Millimetre paper 30 × 30 cm · deflectogram"},
   capR:{ko:"경과",en:"elapsed"},
   read:t=>mmss(Math.min(t,1800)),
@@ -1038,7 +1038,7 @@ const SIG_I17E1={
 
 /* ── IPhO 2017 E2 · levitating graphite rod, damped vertical ring ─ */
 const SIG_I17E2={
-  sim:"sim/ipho2017_E2_web.html", tag:"IPhO 2017 E2", span:26,
+  sim:"sim/ipho2017_E2_web.html", tag:"IPhO 2017 E2", span:26, rate:1.6,
   capL:{ko:"반자성 흑연봉 · 수직 변위",en:"Diamagnetic rod · vertical displacement"},
   capR:{ko:"경과",en:"elapsed"},
   read:t=>t.toFixed(1)+" s",
@@ -1073,64 +1073,79 @@ const SIG_I17E2={
     c.arc(F.X(tt,0,TMAX),F.Y(zN,-.5,.5),3.2,0,7); c.fill();
   }};
 
-/* ── APhO 2023 E1 · the contact gate on the oscilloscope ──────── */
+/* ── APhO 2023 E1 · the photogate, pendulum swinging through ──── */
 const SIG_A23E1={
-  sim:"sim/apho2023_E1_web.html", tag:"APhO 2023 E1", span:12,
-  capL:{ko:"오실로스코프 · 접촉 게이트 CH2",en:"Oscilloscope · contact gate CH2"},
-  capR:{ko:"시간축",en:"timebase"},
-  read:()=>"50 \u00B5s/div",
+  sim:"sim/apho2023_E1_web.html", tag:"APhO 2023 E1", span:96, rate:6,
+  capL:{ko:"오실로스코프 · 광게이트 CH1 · 접촉 CH2",en:"Oscilloscope · photogate CH1 · contact CH2"},
+  capR:{ko:"경과",en:"elapsed"},
+  read:t=>mmss(t),
   paint(c,w,h,t){
-    /* the two steel balls of the official kit, and the Hertz contact time
-       the bench itself uses:  tau = 2.755 (mu^2 / R* E'^2 v)^(1/5)      */
+    /* the bench's own pendulum, and its own balls */
+    const G_UB=9.804, L_PEND=0.315405;
+    const T=2*Math.PI*Math.sqrt(L_PEND/G_UB), OM=2*Math.PI/T;
+    const TH0=0.30, TH_DECAY=110, TH_FLAG=0.0159;   /* flag half-angle */
     const m1=131.48e-3, m2=67.55e-3, R1=31.75e-3/2, R2=25.42e-3/2;
     const E_RED=1/(2*(1-0.30*0.30)/200e9), E_C=E_RED*1.1220;
     const mu=m1*m2/(m1+m2), Rs=R1*R2/(R1+R2);
-    /* successive collisions are slower, so each contact lasts a little
-       longer — the swing decays over the span */
-    const v=0.42*Math.exp(-(t%this.span)/9)+0.06;
-    const tau=2.755*Math.pow(mu*mu/(Rs*E_C*E_C*v),0.2);
-    const NX=14, NY=8, V_LOW=-0.1, VHI=4.0, TDIV=50e-6;
-    const WIN=NX*TDIV, rise=2e-6, a=WIN/2-tau/2, b=a+tau;
+    const th=x=>TH0*Math.exp(-x/TH_DECAY)*Math.cos(OM*x);
+    const NX=14, NY=8, V_LOW=-0.1, TDIV=100e-3, WIN=NX*TDIV;
+    const t1=t, t0=t1-WIN;                          /* roll mode: newest at the right */
     const pad=12, gw=w-2*pad, gh=h-2*pad;
+    const VPD=2.0;                    /* the two traces sit on separate rails */
+    const Yv =v=>h-pad-gh*((v/VPD)+0.9)/NY;   /* CH1 low on the screen */
+    const Yv2=v=>h-pad-gh*((v/VPD)+4.4)/NY;   /* CH2 above it */
     c.fillStyle="#101418"; c.fillRect(0,0,w,h);
     PEN(c,"#17331a",1); c.beginPath();
     for(let i=1;i<NX;i++){const x=pad+gw*i/NX;c.moveTo(x,pad);c.lineTo(x,h-pad);}
     for(let j=1;j<NY;j++){const y=pad+gh*j/NY;c.moveTo(pad,y);c.lineTo(w-pad,y);}
     c.stroke();
     PEN(c,"#245c2a",1.2); c.beginPath();
-    c.moveTo(pad+gw/2,pad); c.lineTo(pad+gw/2,h-pad);
-    c.moveTo(pad,pad+gh/2); c.lineTo(w-pad,pad+gh/2); c.stroke();
-    const N=1400, VPD=1.0, ZERO=1.6;      /* 1 V/div, ground 1.6 div up */
-    let sd=(Math.floor(t*3)%97)+7;
-    const rnd=()=>{sd=(sd*1103515245+12345)&0x7fffffff; return sd/0x7fffffff;};
-    PEN(c,"#e060b0",1.9); c.beginPath();
+    c.moveTo(pad,Yv(0)); c.lineTo(w-pad,Yv(0));
+    c.moveTo(pad,Yv2(0)); c.lineTo(w-pad,Yv2(0)); c.stroke();
+    /* CH2 — the contact itself.  Each swing brings the balls together a
+       little slower, so the gate lasts a little longer; at 100 ms/div it
+       is still only a hairline, which is the whole reason for zooming in. */
+    PEN(c,"#e060b0",1.6);
+    c.beginPath(); c.moveTo(pad,Yv2(-0.1)); c.lineTo(w-pad,Yv2(-0.1)); c.stroke();
+    const kA=Math.ceil((t0-T/4)/T), kB=Math.floor((t1-T/4)/T);
+    for(let k=kA;k<=kB;k++){
+      const tc=T/4+k*T; if(tc<0) continue;
+      const v=Math.abs(TH0*Math.exp(-tc/TH_DECAY)*OM)*L_PEND;
+      const tau=2.755*Math.pow(mu*mu/(Rs*E_C*E_C*Math.max(v,1e-3)),0.2);
+      const x=pad+gw*(tc-t0)/WIN, wpx=Math.max(gw*tau/WIN,1.3);
+      c.beginPath(); c.moveTo(x,Yv2(0)); c.lineTo(x,Yv2(4.0));
+      c.lineTo(x+wpx,Yv2(4.0)); c.lineTo(x+wpx,Yv2(0)); c.stroke();
+    }
+    /* CH1 — the flag cutting the beam, twice a period */
+    const N=1600;
+    PEN(c,"#e8c020",1.9); c.beginPath();
     for(let i=0;i<=N;i++){
-      const tt=WIN*i/N;
-      let v2=V_LOW;
-      if(tt>a-rise&&tt<b+rise){
-        const up=0.5*(1+Math.tanh((tt-a)/(0.35*rise)));
-        const dn=0.5*(1-Math.tanh((tt-b)/(0.35*rise)));
-        v2=V_LOW+(VHI-V_LOW)*up*dn;
+      const tt=t0+WIN*i/N;
+      let v=V_LOW;
+      if(tt>0){
+        const blocked=0.5*(1+Math.tanh((TH_FLAG-Math.abs(th(tt)))/(0.05*TH_FLAG)));
+        v=V_LOW+(5.0-V_LOW)*blocked;
       }
-      v2+=0.012*(rnd()-0.5);
-      const x=pad+gw*i/N, y=h-pad-gh*((v2/VPD)+ZERO)/NY;
+      const x=pad+gw*i/N, y=Yv(v);
       i?c.lineTo(x,y):c.moveTo(x,y);
     }
     c.stroke();
     c.fillStyle="#7d8a72"; c.font="10px ui-monospace,Consolas,monospace";
-    c.fillText("CH2  1.00V   50.0us",pad+6,h-pad-7);
+    c.fillText("CH1 2.00V   CH2 2.00V   100ms",pad+6,h-pad-7);
   }};
 
 /* ── APhO 2023 E2 · interference from the heated surface ───────── */
 const SIG_A23E2={
-  sim:"sim/apho2023_E2_web.html", tag:"APhO 2023 E2", span:14,
+  sim:"sim/apho2023_E2_web.html", tag:"APhO 2023 E2", span:16, rate:1,
   capL:{ko:"스크린 위 간섭무늬",en:"Interference pattern on the screen"},
   capR:{ko:"레이저 전류",en:"laser current"},
-  read(t){const mA=250+58*(0.5-0.5*Math.cos(2*Math.PI*t/this.span));
-          return mA.toFixed(1)+" mA";},
+  /* the knob is wound up from zero.  Nothing shows until about 80 mA,
+     where the surface first bulges; by 98 mA it has yielded. */
+  mAat(t){const u=Math.min(t/this.span,1); return 96*Math.pow(u,0.35);},
+  read(t){return this.mAat(t).toFixed(1)+" mA";},
   paint(c,w,h,t){
     const P_TH=287.0, SLOPE=0.4632, HIDDEN=2.0, R_BASE=167.82, L_CM=42.0;
-    const mA=250+58*(0.5-0.5*Math.cos(2*Math.PI*t/this.span));
+    const mA=this.mAat(t);
     const V=(mA<=1)?0:(0.35928+0.73823*Math.log(mA)), Pw=mA*V;
     const mmax=Math.max(SLOPE*(Pw-P_TH),0.0);
     const NW=190, NH=Math.max(1,Math.round(NW*h/w));
@@ -1179,16 +1194,16 @@ const SIG_A23E2={
 
 /* ── ISPhO 2025 T1 · the domain wall on the spin chain ─────────── */
 const SIG_S25T1={
-  sim:"sim/ispho2025_T1_web.html", tag:"ISPhO 2025 T1", span:20,
+  sim:"sim/ispho2025_T1_web.html", tag:"ISPhO 2025 T1", span:180, rate:12,
   capL:{ko:"스핀 사슬 200칸 · 자화 성분",en:"Spin chain, 200 cells · magnetisation"},
   capR:{ko:"시간",en:"time"},
   read:t=>"t = "+t.toFixed(1),
   paint(c,w,h,t){
-    /* beta = 100, K_easy = 1 -> the wall is sqrt(beta/K) cells wide, and
-       a field b drives it along the chain at a steady rate */
+    /* beta = 100, K_easy = 1 -> the wall is Delta = sqrt(beta/K) cells
+       wide, and the field b walks it along at v = Delta b / alpha */
     const N=200, BETA=100, ALPHA=0.5, B=0.04;
-    const wd=Math.sqrt(BETA), v=B/ALPHA*Math.sqrt(BETA)/(1+ALPHA*ALPHA);
-    const x0=40+v*t*0.55, pad=16;
+    const wd=Math.sqrt(BETA), v=wd*B/ALPHA;
+    const x0=30+v*t, pad=16;
     const F=frame(c,w,h,pad);
     PEN(c,"#DCE7F0",.5); c.beginPath();
     for(let k=0;k<=N;k+=25){c.moveTo(F.X(k,0,N),pad);c.lineTo(F.X(k,0,N),h-pad);}
@@ -1209,7 +1224,7 @@ const SIG_S25T1={
 
 /* ── ISPhO 2026 E1 · the grating's transmission spectrum ───────── */
 const SIG_S26E1={
-  sim:"sim/ispho2026_E1_web.html", tag:"ISPhO 2026 E1", span:24,
+  sim:"sim/ispho2026_E1_web.html", tag:"ISPhO 2026 E1", span:24, rate:1.5,
   capL:{ko:"투과 스펙트럼 · 광섬유 브래그 격자",en:"Transmission spectrum · fibre Bragg grating"},
   capR:{ko:"격자 온도",en:"grating"},
   read(t){return (25+85*(0.5-0.5*Math.cos(2*Math.PI*t/this.span))).toFixed(0)+" \u00B0C";},
@@ -1297,7 +1312,7 @@ function startHero(){
   const show=t=>{ sig.paint(ctx,cv.clientWidth,cv.clientWidth*.74,t);
                   if(clock) clock.textContent=sig.read(t); };
   if(matchMedia("(prefers-reduced-motion: reduce)").matches){ show(sig.span); return; }
-  const rate=(sig===SIG_I17E1)?260:1;
+  const rate=sig.rate||1;
   let t0=null;
   (function loop(now){
     if(t0===null)t0=now;
