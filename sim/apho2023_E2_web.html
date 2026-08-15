@@ -3,9 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="icon" type="image/png" href="data:image/png;base64,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">
-<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAArg0lEQVR42u19a5BdV3Xmt9Y+59zb93arX2q9bBkby8jC8ttGxGDAMEkqxAyUqwyZDM5kKlRIeYrJTBIqyY9gM6kiUFNQmWKGqjGhUkDM2OLHFINdxjWDZcdgGwdjjPADP2RJlqWW5O5W933fe/Ze82Ofxz6nb7f6ce+VLHyrutTq+zpnr7XX+ta3HpvQw8fevXvVrbfeCiLS8d8+85nPFH7zN3/zos2bN18zMjp6iQnDq8rDw+ePjY6WAUwy8/DIyEgJIgBRz65FREA9/LzuXwJgHV9Rr9erYRg2jDGnKpVKtVKpHCWiX3Q6nReOHj26/yc/+cmvPv/5z9ede6KHH35Y3XTTTTr69nU/qEeLrQAYIhIA+Pa3v711z549N5VKpQ+Wy+V3FYvFt3ueV/Y8b0lh9XBdB6YA6/2Opd6rtYbWutFqtY50dOcnM7Mzjz23/7mHPvaxj/0qfs2+ffu8XigCrXMBGIDEgn/66ad/a/PmzX8wMjLyO8PDwxNd9ovRWlP8vUQEEIjQ553affUBEZzJR6T44v5ORMLMnJdNrVZrVev1fbNvvPGt22677XtPPfVUPd58rsUdlAKQiHD8xc8888xHt2/f/qcbNmy4SSkFADDGGAAGAFtZE+EseYhIrIE42x6x9RMRiRTUsF1TFb9mZmbm2WPHjn3t8ssv/0cAjfxG7KsCiAgrpYwxBg899NCe3bsv//zU1Mbfjp/WWhsi4tUKnHrl1M4WfND7axaIGCYiWAuBubm5p48ePXrn7t27/89arYG3Wl8ffUHx1VcP/dXU1ORflsvlYmTawfahzvbF7Cr8s8AlnOaaCURKRCDWusr4+PjV4+Pj3zt48NA999zzv/6SiA6vVglotcK/7777dl199TX/uG3b1j0RYNFvBqGfiw9jjFFEADPPzs4eevzxx//DzTfffH8kK7MSo0qrEf63vnX3xz7ykQ/fNTY2NmWMCQEoerPZ0tMshLwJr11EQmb2KpUKnnnmmb+68cYbvxRhNDndLdEKPtwjovC+++779I033vg/NmzYoN7a9csu2BkBl8YYEwFwfuGFF76ya9euP1+JEtBKhP/ggw/+0Q3vec8/DJfLorWOw5SzCtj1/TpWKlgiwJi+KUEcvUgXvCIiwswGgHrhxRe+smvn6ZVgSRC4b98+j4jChx565N9ef/01/zBcLhtjDFYq/LPJnPaGMqOzwwIQQZZQMCIiY4wCoC99x6V/tn//fiKiP1sOGHYV5t69e9VNN90UPvDAAzded93V3xgeHjah1kREfLb6yTej717zfS6jYGyfUwD07t27//MTT/z4L4hIR2zt6RXgjjvu4E984hP6S1/60iV73rVn78jISEEbA8VM62WPBgHifi0wxumIJCIYYxiAvvyKq7704IMP/k6kBIvkndcKevjhh/nOO+9Ud/3Pu767ddvW3W8BvjdpVGPdAQpBgcdGxz60YXTDPe973/sqAPiRRx6Rrhsn9hU///nP/+LKK6/8r4AJRch7aznf1FyBVkqpAwcO3HvxxRf/Xh4PsCN8BmDuvvvuSy+++OI7ABit5a2df/bE+mu1BAqAftvb3vaJH/3oRx/N4wEv92J59dVD/2V4eHg4Mv381tKfNSZ9ze8zWpNSCjt37fq7z372sw8BqMbRMce7n5nND3/4wxu2bdtyC2xu/63df64oDzMbY/TGiYldn/yDT95GRBIDQtcF4JIdl/x5EARKay3nCMP71iMbKMn287f/p9tvv32YmTUAcMQUmXvuuefKjVMbfxc2r/zW7j/HQsuIwzHjY+OX3H77Zz4qIti3b5+XVJ5ce+21/25oaKhgbD7/1y5+XpJ0ObciAgCQLVum/j0A+sAHPmCYmfUf//EflyYmJz+yLrQxSFk6wpGVb4E3i6b288MVACoOFd+/d+/e3URkWETwh3/4hzeMjo7uiMw/n+2CZ7I/FP0u59R+7Z+iRgyhLpfK3uVXXv5bCQjcuvW89ypmGGP02bwnmACG4ERL8MSC4MF5waGmgHFWF/P0XS1oFeGjiEAATIxNvD/hAYrFYE/05FlV3xEXSDIJxACvN4Ff1QXTIUEIEAKOtwU3jwkmfIaBgPDrFb2cTu+7EEhMAIaGhq758pe/POHdfffd48PDw7sdpHhWCV4b4LW64MUa4Y0QECIoBkhs5qtuBKfagglfzmnxS48cBkdJvSAItuzefdVV3sjIyDW+7289GyIfEYAZIAg6GjhYB16sArMhgZngswAEGInwgLGXbIyxBejU/zs4W4pc1hUNACYIAnXRRdt3elNTU5f5vm87e5aoD+i7ZseCJ0EzBA5UBa9UCQuGQAQUYsFHQqZI0AJbOq+1gUUChN70Fa1vl1IXhaGVCWYwu9AYIWZ4gfcOb2pqajtbADhQ9s8VPAiotg1eqQAHaoSqJvhMCJT1YUayRlAkjQaS/2T2Zf+UQJb5e1wxoSUFpYnFIOu2upsS+4uynVIrA7TrKGMXEQKA8lB5hwdgJwAYEVIDUoBksUgw3xK8NA8cqAItIfiKUGCBwPp/d6HiyzPx/8XRJIn/MHgjHbuumgZ+WRec1BLppbVg8XUTpUoSg1iOkTkBJQguCwibfIKR0xZsrjuoqDcauzyl1AQc7R3MYgkWWoJfzgJH6oSmBnwFBGSFaYxdnK5AR5A6qkWljjRwKCMAiIFaKHhoXlAxBEWECJ5Eiu5ckePCYkWI/BkqBEy3BO8DcJ5HfVPjuH2PmSe90dHRSW0XkqjPa2eFb3BkQfD4cUJDWzNfVJEsBYCOFoVc5ier9LQk4LNxwKBBGgnwfA2Y14wSS9IQ6aolOcbKvfTYmjHb9zTB+GXLYKuirOL0+KGNYNOmTR0m4vPCMEzCg35xV/HOn64IHnmdoIVRVPHFdKF2TbpYIlk3QM7up9hU0ACI1CUeoTY42TYoRBFKYr6ja5Tc/Un0mgzoE4sdPAjqAJra9A2RiwgZYwBBkcvD5REd6oFYzrBj8LPjBCMEjk29u0hdCP7ExTtKkId7IjijsVkY+/zoh5EDfA5WJXFMWdylHP0pfo8YIDTp5/XcYhGgjQExj7Ax6/8GWcHzTAZHK4I3GkDAgA6jJ0z6InG62Si3cPFimMzC0JpLpXrp12LA6gI3g9S35xXYXjdAOeJKnHs20ecuAXZ6Al5EJLUy/QwBrZIJjlUFRghiUlPpChmOoDPa7yyiK28TMULkIICebI9VKr/A7tgYD4gT3rkKHAcrkr+njOvLdSmu85boNM96/febUa7OCGptAYQShYDQIhAvYv9uuWAnpKecO0CcCSQn5u5B/L9Si+IqrTFgMEgA7QDDTCST3JvdbG4Y7wavEvEFYiSyElhXKluWVQuB12/fSdGtGSMQsSZbbPdCeoN5YoQsr5+Rp/O7xJ1RQlnG5UwwgEYSwZrI/yMWvnPNmf/Gl+3ccyz4eBMkm6TP3Ayn2ix93P8J+kxUwjV/iQ2M/GKyepLbbeJ+HsVG9szUepCrc2QjGdfMdwGB1uJR6uJM5taj90lP6xtkGQsnAnjWvFLfGTRxwh2JFY4onSIkKWWabomcHsScQLRL4kVMlIQGmwcQioGrdF11x6CBOAtmqRuZxSlAFAdArueWaAmME0NMtmO6egCflvGd4mxjcfw/zGK/Dnd3SJfQ0FkwF0Sm7mawBFCiq7QYwLpLkglznfs0JgcMF8cE/QGzksAs12GtYzGW6SGhnJCTXevqjkkJkljrXeUQWRwSQvJuQdZuGteJc4xZYtdFEY9r9jM2HzkrFq0F0ToZzdOAWXKNjqzUziz3ocs+l368jePJWgKJF0hsBs0sDpUW+VVjX2eM/UiDnMKsCvysHwdklEDnY9ru+ziPEch5bRwirxP8r8h92XWQVYQ/y+xyWem2E0rAYLorKMMB5E1mhgWUVIDGRHmBVVDSPbUA4rgdicNdWqy8JmuxENHAeZdgTGoBaUC8tpddPulNjLxI2wSU+LooYRNvAwKIySFOLFGUhEqciwadsJByyRJBPu7uMwhMJGXvh8lhNCnPb2SHhySezsl80uqZnHWGMeIoQD+DgNhExwmeHPtFIpYBSxBqNvdvhWlXkTjJE8EDQS/xZQNhiMmCWiJAgSA6FTZF0ZUWSYMsWgz28hUMmbC4X8J3chBef2DR0rA59nHuqJN4ZK6A4kgo4dUp5g9Iovk4kjQF6CilRokXHnQUQNEtSBKWmoSTtIDFTU9ztAli0icOBROL5+ADgUsNorezh5zP8WQgJoAWc/qUWoI4hZYQKyIRK7a4ph1MyfsoyRXTGW/80dql+yS1Ws4KxMCVXTZQVuhpV3iDK5ViTDd5NKAJiXGyyXRJ61ploBQDxFqfmFNbIhUrhyT2N7YmsjjcGBAbmMnmGIuTDbIUbzd770CgbIVTTHV3C6F6DW4FA8IA7tW5iBjRjkbq+2NmUBJcgFT4SDN+5LJqeeCwykWhdd4SKMt1xLvd/eAkouFcnoByPl9c2nyJWLp32osBzf+xd2ji3Rv5SiJrzk1GtK5rcHbHIktl/QgDKCmCydlQiaTCtPKKJVmDQiT5f+MQPRRRv66QnRQHxdGN84UuF7B46PvqhX/6/Sx5ENhvW+kUdUg+SZRy5ZSAIsqm0CRPvNjPKbPBWCE2HDGQJBBbzWpqQVUTGhpoAQijHaog8BkoMjCsCEMMcNRpulIQnivuyd5UlLHMM9iZbGAKYVKsR91mAdLaLNMKXjDQCWBxps81b5KQ6pRU16QbnNKkCbIJdPYItQ5h54YQ5UAhFILHlhtsGsLxhuBkCFRCK/S4Sjc6pMQaF7ZoXRFQIsGEB2zyBKMeg9kp41qOCIoElczmVrniT0lLwGMGy+TqHBiLi2IG9RicAkguzs2n8o0VeFrZK6l1cHyinY4O1DqETV4LV2wkhGAUWNAIDQ7WCdNtQd0QmO0NEkX/JjtQIqMiCTCtGMK8AV7rEEaVwXafsDmw0cVSNfrxcy6P75JA4ma23QIXk6WujWSSnxl2cyAKsCIDs15qLWHJxDGzEkXvlG2SIUkb/+O4P/4zE2ptwaagifefJygGPgDg5argYJ3RFMDnqMdAsmQSOby7HZiSaoWiVFnmNGEmBMZaBjsKwGQQ5fFza2XpCclDnUxuIuO9ojo8YudJTm9ZEI/t6pWfX40FkGXQUY+DbJP0dsWAUCI5UEqimPR7xQiUxwiNoBWG2DXaxjVbCOWCh4UO4fkKYVYTfCIEEdkUxjAiBwITZTCLvErCVipryTFvGD+tG7wtFFwyhKThg7oIQJxMHtzQzl3KKMsHk6aQM8gzWxlyWv+/ZuFLQq/GCkCnZ43W6Zgk4p4TACiUFlBSGvq5XDnFkQIJGm3BsNfBu7d28PYJBSaFQzXGCzWGFkIQt5PpLOJ2FzeeH0CUBaLkGDgXuPtRadqBFjDTAa4sGwx7nCqB2+ETF/qzQ3vz4hS/kKRMkHF2fI4jyJirfiQFsiBQ+scDuImOeIckqU9J79OQXRxKwROxNRONtsEFw01cfx4wXvLRNoRnFxiH6oyAAY/TPsLYnLrFQW6dKRw6VsTp1cuHZJTm8YsgVAzw+AJwVdlgqmh7G1JSCmBJvyj566IOpiwDJo6wY68wkOKW2PQQ+l8Umkl8xB0xEVVG9kA5SMQRxIpADCgFtEKA0ca7t4V4xxTDVwqn2sAvFxRm24SC01kEB+W7HWWZXR75ceMGHsgi8gS1OzG5jrJmGoR/qQLXiGDLEDl5e9sPKAbQYqzVYkfxOBVqPhlExuEEHGKIkIsbV4MDlnHbyYlp5FiAQQ1Zylb8UJozj2xw4ppAqDQNtg638e4LDCZHPChiHK0TnpkjdIRsc4nJdt66TFxcbgjn/8K5tcklnbKsXZRVdFK5HEUPT1WBq8Vg2xAjFKDgETw2aIcKpSAycm40YNKyy9jVxDF/opGcswyy6v21yG130wPKsdirqwfogTEgSWN6ifrE4/4+xUDHEHQ7xFXb2rjyfEbR96FBeO4U4aUKQxHBp6iCCEmSMNktXXMbtDhEA8GmbznbuJm4CtCiJYkP6vCI8XRVQNDYUiCEAlwyGWK6yoB4IFisk2T7RCynQbneRpcfMM59iNMg22tX4Gg/JfUAMgDywUW5Jkvdx2Cv1haMFVu4YUeI8yd8KGI0NOGpNwjHGoySZ4MxLdmoi8W6DAMrjHhXczRPSEU3GPfxZ3y+yYGuKAXB7vUi281LECgBnq4w3kUaowp4+0YP1VYHT00rDHl22okIZSp+BbCdI5xV2kz3czfKG7Q+WS+RDaTEAvSh/ii7eQQU+Xg3Zw4ASqxvbTdD7NzcxrsuIpQKAXwiTNcJPzlBaIltu9YmBkvR4pKgEDB8Dzg2YzDqtTDEbRSjXR0KoQmFFvsg5aPgOcpOkkHdlJs7INSlUCMP2IXw03nGe8YERaXwzs0GJ6sNvLYwhHKR0NGSxqLGyQ/EnxcLXjv5Au6J7FdmkckhgtbF86wkVIy+xC3iZCbUW0AxaOFDl2pcvMkDs4Ii4JezwLNzDIYdDhW/LzSApwhBgRAa4OhxjWdfbuOqrW1cf6ltqfY9jlLFGh0dotpp4kRbYS4sgQIfHi3meMXhBii/G13Y4pRwsQg6QviXOWDPuAaTwo1vJ/z41RZePVVAuUDZ2r/YBeV7ITJVswMA5QkdLnFjyDoxQFwTTbQEOHGSQdEu7hig3tLYsamNG3YAo6UATISOAR6fJhyqUmJKtVjhKI9Q8IBmR/DaIY2DhzReft3gfTtDfOJ6Rr3lQSmOD06CQOAbwVDRYDIMcapZwYF6gLpXRsGPqouoywLFBFXu6RgQuiVtCsB8SPiXOcYNkwKlPNxwYQeNl1o4WS+iGAhCs7ie1tYCWkSetIVxzI52if97ZQ3ctus4HSxCPQIWyyeCOhogMGotgaIO3rujg6suVAA8+Ao4USc8fhSodKzwTbTYrAD2CToEXjuk8fKBEAsVQSFQuHAz45Y9BCMehgoKnkepAoht3AyNoK0UJjyNDcUQr1YqONoqoxB4EKOTiMQgcjEOfJb8muWMnQjgEzDTVvj5vMG144LA9/Cvdmr888stHJ4PUC7a4Q+UZ0OjEJEif0MDKAfPS8VbJ6m4Yv0QELaOabw43cG2cYP3X6qxZSyANjaef/YNws9OEJjs/ABjrOCVR2i1BUdf0zhyRKPVJAS+wuZxQrNDuHAqxNYxH4CC7zEUc1JbEFcOeQJ4mtHpMJgV3jHWQalaxYuNEgqBn6J2chjoeHfmLZrJs3t2zxZYcLBKYBFcO0kgeHjfxR08+koLhxcKKAUEI8ZuNpcXMBFgTHLHlBS9Yn0Z4dMKRcQpCOnnoAUmIDSEKy5gbJ8IsaFECLwgScc+cpjwypxVBBUhZKWAZhM4dljj+AkTCZ4xOmyVhNl+8HiZEHiAEYZiygw6iusKFQmIFBQxVKjRJuD8kRAsNbzYLEMFPkhMUkQiEU2dgDSk1UpJCXeCBO0fQgEKDLxSYXgsuGpCYMTDBy7R+OmhBp49XkCxoKywjTuPQdLP5m7kT4+RYGTdYlfjIVd70a+HIgYUYdMoIxRCoATHqwaPHVGYawFDfsrMzVeAmRnBqTmNsAP4HqEwTFbAEWRXbBesVLAm345kW4L1gFUaUgCRAjPQbAPbRwlADc/XyygWA4gYG+vH/lqje70eZTuWXFp3iAnPzdmxMddOMdqasOciwmixiSdf82E4QNGPciJx7oPJwQUpKB9IOjipx+tnJwXFVTiWQy8qg5dmgCdeZ3TEmvxWG6jVgFNzBtWa3RGBrzDkR37Sye6ByMb94ep2CBEiK+GBiNBoE84fBRTX8VyN4PmeNelONY/olCIwlOVM3PLt+PWhCIoM/GqO0TGCd20maK1w6VbC1EiIJw42cKzqoxB48LwobyCpLcgMwEQfLAHR4mSQrCIXlHDJq5I/JX38TIIfHyY8Mw34TDBtYLYqqFUFWhNYEcrFdEGZKUnYUMTrMluCx8B2FYm4yPn0g9VtoYjCUGAtwXkbgI6p4dlqGaWiB4l6FcnJKBmXMHMsAEXSN5JVjiEPOHCKUGkLbthKKCuFiWHCb+3SeOVEC7+c7mChGcDzFNiz8aVSDAVCaIxT+tonEBAJ3FvtYAhmXjNe6GjBfb8AXpkhBAJU2mKHRQEIfAYXnD6BqGXMrQgjosQSMFsSiUmy81hXGAYxEzwoFCMluGBUYEwNLzaG4fsKYgyErPIZt7gE+aLNSPhGIvNtv0ALUFDAG3XCgwcF124GLtzAaIOwcwvjgokQR0818eoscLKuoElBC6OpgUsnOygXFAz6V7JFi1rDVowhVi98LQKPBb94VfDiMcaQsqyeryzYyxo6cZTNxUOSYpVIMEpRtqhiteCUCR4xiuKhKcBF4x0YVPFctYxSwQPEQEcgj7pMgM5OqqVFdKEACBTQ1oRHjwiOjAKXbyRs8BlMPi6aMjh/vINGO0S93UGzAwQeY8uol+YO+wYGJJcM6mcyIEp0n6gIfI+gvAjwSNyeTAkjRpQSNHHbFVNaKRR3ETDZiIFj7LLGfm8mhqcIxQLQaAMXj3egTQ0v1YdRDBQgxgnRHPe5XEcPZTkyFSnrq6eAY1XBjjHCRaPAsM8IVBFFXzAypFO6kSyZxX1EgtLvvoDF9XOpg6Rodyez/pAt4ICixL/GE7UsdU7pGlGyVusOYVhFlsC3luCSyQ48quK5agmFIADDwHTr53fIm0zZd7fpXwIUPUAbwv6TwAuzwNZhxvYRwXggKPsKDMDzrKvThqMq6rVbARevLYWOvCxbIz30MXlzKEkJOMXlX25FhpOW5eh1bsYwRsYxOUP5Qo91k5kETykUA0GzLXj7RAifa3h2wUD7BZuPcNC/28gBZ2aBe/Muwx7XJxDZkFcL4cgC4dA8oMAYLQKjJaBVA7YOGVx2vk14rccIuGA9d0p4stYDIYLcOnm38obYKQvjtMSq6+DH/A6kRRHNCjOTSy8WM+CRwhABjQ7h/DFCOWhg/2yIii6h6NlS4sxwR5FFxA05Li0RhGMV4pyQzwKfAFaMuTbw9CsGh48ILtwI7NwqUJwrL+4lCxhdshcjwj7TABlFkGjRssWP9sLIQVBEsoRPcSaMrFQBV3ihCgwoYAiEpgBjZcK7vA5empvHa80SyAsQqPQakwJXh3RyO65dYo+iBTDReUdeQAg1cOyEwasHNVoNYLjAUAR0tMU4pxP+Wr1fl/kAA6gIijSM4fQDZmhItzJTuhAYLscvyLWV9kZRo2EPpBjFwEM7ZIgQ3rmxg831Kg4s+JhrD0GUh0BFIBSCMLJkoKWHFTHbVDYxodkSHDwS4vBhQbUmKHiE8hAnp6PEgzVByxSI2nMA1zTmV1wmUPqchE58v0umRCVJi2E1ZUqz01x8vOtzEw1WGv+v0kQyKMos2h3ZCgmTwxqjxRBzjQperyrMtX20EMAQY6TEtgjFTf1KGskYAVptwclTgukTBiePGzQaQCFgjJRsDYRiW1xKFCvAafBfD0z2QDBAKljJ+U9yqOJ4PkBa3CeZPEXaGC6R5TB9m2+KqGePkvyBUjab2GbGJl+wsRyi1mzgjUYdldDDU68U0YTC+DAlmUStgWbToNEEKlWD+XlBp23Du8AjjI0wPLbsp2Jr8gUEXzmg+XTjnteIEhMXkHxNv4cqJT0BlOG+45m/ssRVipNMSJQ0SmUuBRLXyY4uWmClFIgMFDM8rdDRBlopDFOI8pCBMQZ3/98Wjs8HKBWtktucQ5S5VPZklMBXGCrHwqboxx6koZjgKYI2gxt9K4PDAJKOhnXCp7QVNGYA47hVktm6xGk8YDIpTTgHRcqqBbt61jCqMyCGUgwjBkbZdrV6q43JMQ8aCioSJkf8hfIIKuIrmARKUfR8RGSxJYmYYlrbup50l/anMFAWg8B+qkLUACqxb3NquJ1hDgA7XcDprieQraDJuQA43bnSgyhAVnAfzLboQ6AgrEBao0Q+Sj7D9xhDAZLj8JgtwmJFdpcTQ7HlQShSAMURMxrdGQHw/CV8fy91QWQxBhBZFsSulwteNPLVtQ9Jfb8zpCEZvpibu05EKZF0RiaFp7hcMcMww/cI5QIh8O1aKqboMMyoH4AJHtmRukQSPWfNv8fxNBPKzjrL9wVw7430wOYDuDN+k+RtYgnSEemU6blzTDzlt4A9eILcKHGVdmzdls7p9Al8IAgIvpKEVIorl2I5cuIKKLECFDUycoQXBHEU0YUAkp7qcDYZRAM8N9D9lyg7bjU5AjpNuCf1BHEuIK6jSyaOgtZk0Ne7nuS0lVkQB/heLORUAZL1jUI8drqE4gkhYElmJlE/zghaQg5eNkwz/elKzXW8iHFGQzhhXjpaLcsAijvRw6UPZXHj7Zl6EAs8D/AiZiWqgEvrGEgSpUUs8CSx5Y7sl9xhFH3qDokLQtJF7OMK5mfhOskBI/EJIrY9nCV7helASHIIIZcOzs3hGNCoQHegBGDrGjyP4HvJQQwZDJBmhcRJcFHmrA53mEV6tgp1377rNNmZxpCsv+2jEgilp4VlmieBbI8yZQGQU4ZjohwBZzJBUVn1IHd8bst4TPCUQKm0cilxcZRGPeSuNmc7le3kktMff7vuswQGDwKtJpuo4BKShnNI0LwT/zsRfiLc/LSPpRpaBzko1ImalIpCPxJwnMURq6hCeTC7ONSiCJUR0hpIyaxDr7FgHAauog99vWvrjmGJx6rHuXyCJO3b7GTUKKWRnCEPEg2b4oQ4ojOMAQAn9It3eSTJfF1jN9wazwYURPwASZ8V2kZfvJo9vPbXSTL4LT0PyD1UUdKzc+JTM40gjgnSo2EiKyKOIqxJEXu3qu7ZfswO6s8av8y5AgRJogTX5ysGQiOYKBvbuyi0pqmlK4H/8crxygxFjxbL5A9Uck4NEcqE+7ZMjDKDdJIzBxP6eK1Ck95tomjVlVMLRs6AJ+oqIaeJNh5Tx0BoGB5rXHleuKZqIFmpGXbewL2eQiGn0c305GzKKEIS8uVGpaVHyMRnA0RzfqJBAwkjOOiwr8v9Zs/9S319/iST2BWaWHGI0egAjBY+eHETm0bYHrDdz9uKppx68/Pz86Nj46NmiSwU9UwtXJBnC+QMpeVglN8d0Vi3ZJxMTAhJ6lTgVAvLgEfFuyUMib4aQNxehi5MKGfmExHaITDktXDpZBOXbRNMDgcQ2PRzvwKbuOFGa13xwk7npFJq1LYy9E/nXM1PZvVI91F4aZhLyBhSJyVMbMvHFUtmtg4GfHikO3cQufnW+Qkj8RpoYbRDg6JqYdemFnZuMhgrKzB5ACkEnook0S8NSA7ZaHr1em3WYyAMJWnS6If0CcC2cYOnDsRt2JL4wGREXNKEkTkgwP5fAENxI6j9uzbAlhEDIpUdBDgga5AnbF38wu5cB4l8vDAaHUHZb+GKLS3smAoxNqQA8sHsoeAxPI9tFrGPvAaJCDHT3Mys8cIwPBb92cAOvFgx+bHShy2pYuw6L8T+w228fDzAhiKDlQvKUn7cmks31x8FhlELNROh0gA2j7bxzvMEHU3w+AyQAZTiFJUQXSZD1DAB2jAabUE5aGLnlmjHlxSECmBmBIptj2BSR9Df6zeAMDOJkRlv69bNTwH4aNyqvBxANmtc2liwnsf43WtC/HB/iNdnCzCGEEb+gJ2Bii5sIHLLwO1sGVaCd24zePcOg8Dzs4WlNJjDT7qpmcAOgo6vN9TWx5f8Jq7a1sI7NhlsKDGAAMwM31PwVDTXIB6XR/2/Zm0EytaDH/QOHzx88pJLhwER9n3PmWrYS0Boq2C0URgeEvzr60PMVGqoNgCJJ2ui2+SNXHNDxJ0PBcDkiAdP+bZok7PMsaxmA6/blwIeA9oYCHx4Cmh1BO2OYNhv4Z3n2R0/WlIABSBWCCJTr6LdTqDBGS6ynQ0egDDsPO+dnJl57oJWKywUC96iOLGHDyaGr+xUmnaHMFFWGB+W3Ey0rFik6+fEu0VBMUcNorwmia7bSkTjYZmB6y4M8c8vMqp1wsiQxuXbrOA3lBgiAZSyI2w8ZjBzmganPinnMhqgtaGmCVEoeM96hw8f/sV1111/jFhtN8YI9csBUdySbUGOMZKwekuLhhbNGwTscAgmjn5k8emLA3wwAR2tsGubwdhQE6fqBptHgXKBILGpVwxPKVBU9o0zecSdJda41Wp2nn76Zy8RABybnr5/06bNH9ZhqD1vZbHAmtZb0lAuG0evXIKxubRTQyid2EC9MftdK4Ox3HEKBloL2qGBEW0nmRqAyA63tkWh0ei6M3y2oWVTjelo8MKp2YOf/exfXO0BQK1ef5IJH26GWnzf61+PQDLYmZNpH4udH63aDPec4FmFqyBiMBv4nh3wIEbgqXiKCScFH30JQNYAxjuhMYHvcafT/sk3v/nNUwwARw4ffqjWaJqOFrVS4UvPl3kwKKgfxVbMdsZA4DEKvoLvK3hK9T2eX8uj1eqQGMH8/PyPIkxF+NSnPvVkdWHhpUIQULsTml5dNA3cwK3sO6mHn+VGKEzkxPIDoKJX+dDaiBFSlWqt8cILLzwAAGyMUS+//HKrUavuLQaMerMtONsfAzhXrf9lmQPeHESoN1umXCpKs1F76JZbbnlFRDipNH/6ySe/OT9fqRExdzq6J7tX+iG45U7DWA6s4dx+nM5iiQia7ZAAQ9PT0/8IAA8//DB7RGRERBHRK4cPH/7f52/f/slTCzU9vqGser7TiM7YZ9Bqv0PeXCojp9n9lVrDlMtDNDs789zXvva1B0SEiChMGpmJCM8//4svN+qNlhZQs9WRsw3ADOxhzDllGbQxqDbaUgo8mnnjjb+/66676ojbESINMcYY/u3fvvnn09PHvrVxtMynKjUj8uspf5xLik+EUwt1MzE6oqanT+z/whe+8J1o95tEAQDgzjvvhIjQD37wg7+dnZ2bGSoWeW6hJkSEX1tF6DEIG5xFTRtsa402tBFhaDzzzNOf+6d/+qfad7/73QT75YZHCROReeyxx/7o3e/+jX84PrsQjpQKXnmoADHm3NoZAw9cnK7nASgAEaMTapyYrYTnbRrz9u/f/+0rrrjiDyK8p+NXejktlegF33jppZc+uGPHjt8/cnwuVEp5xcCDyFoTwv1luN4sFmBw38UwRnB8ZsFMTY56x45NH/j617/+52JPBskAHO5iO4yI0De+8Y3/OD19/PktU+PeiZkF3e6EadbtLCM4zlo+4Qz4zthlT8/MS7k0JLrdrD7xxOOf/OpXv3rSPp3toOAuHyB33nknffGLX5zZt++hW+fnZmY2To6q4zPzphPqpYcPvgX2evf5q3mfM301nptwfGZBfM8zIyVfPfnkk7ffcsstj0eWfVF40zXz98gjj4iIqCuuuOL4hRde+LPLdu382FB5pHhydt4UCwF5nlpV2d1byGH1VpBWqSx2vKzB8ZmKMJOZmhhRT/30p59773vf+1UR8Vy/v6wFcCyB3rdvn3f77bf/v+9///u3SKe+sGnjOE/PnNLVeitpe1qJlZNzXFj9wEGrNfvtjsaxk/OiFJvNkxvUL/bv/9yePXv+Ntr54ZovZt++fR4AfOdb3/rg/Pz8sVBEDh2d6Zycq4g2RkREjDGr+pFVvr6vP8tcf3RzZ+e9aC3xY77akENH3whn52vSbrflZz/7+d9EkYfqibLFocPevXvf+Z73vOfebdu27X79xJw2RmhybJhLxSAT6pxT6P0stGAxDmt3NGYXqmi2Qn3elklVXTjVfOLxx//0wx/+8F2Oz5eeWJtYCT70oesnv/71e7/4tgsv+lSl3sbcqQVdGirw2MgQBb6XKMJg2zN+fcgkAAi1wXy1gWq9qQu+T1s2buC5U6f2P/bjH//JzTff/Fg+1u+Zu4mJIgB49NFHf3/37t1/NzY2dsHx2QqarXY4VAjUhnKRigU/cZCDb9p6U7FDy2Y243b4ePHaoUa13sRCtWkUs2yeGle63cTs7Mx/+/SnP/35+++/f241wl9EBK1AA01EJhARfecrX/nKvt/7vY//1fDw6J9MTUwGJ2cqODFbCT2PuVwscGkogO8p5A+UlbXMJFjFWBQ5nXavZ8TKcu/tpumr+C5yUX30t05o0Gx3UK23pNnuGCbwlqkJ9hRQXZj70ZGDhz53+dVX7wOAvXv3rkr464rQXE27//77r9u9e/efTUxOfmy4XB46VW2hUq2LQLTHzIXAp0LgUdwIkRR0Er1lGSIlEQDGGIRa0A41Wu1QWp2OhPYIMSoVC2rjWBmtVhvNZuPHJ44f/+87d+6814pCFACTJ3l6bgHyYWJkDZiIfgrg97/3ve9ddt111/2bUqn08anx8iXFQuDVWga1egOzC3Voow1Hk5SZQUxMcZ1/HnBRNyTWBZElR6IsYVaWomAzo2go+7duGzltVFvcs0DdvkcWdzdIbqcbY+xwDBERA7H/CkDgIPBpZLhMG4Z81gaoVatzb5w8+cDc3Nx3du7c+UAkcNx7772r3vU952juuOMOvvPOOxHjg1tvvXX4b/76r39jYtOmD5ZKpff6QWGXgMaKhYICMzqhQScMoTshQq2htXZO38r8kjQLJqOh80xk15Pru2N3WspNUF5o3RZK0kO2k+/M9jQuen92wGnmFyKC79nTzpVS8H0fvmfvtdloQCCVsN062Ol0nmw0qg8/+uhjD992221H4vcaY9Yl+L6QdJEicI544O9///tbL7ts52VDhZFLla92NlqNy5r1xs5yqVwolMrlDSPDgTGypDuVRfswf/WSdhYj+lWWkIJ0J9PygstbI8l91uKPki4X1sWWRI0szIxarVprNZvNysJCxyv4rxaLpecbtdornU7zpRMnZp75whe+cOgHP/hBywXh3wXo4z0QfPz4/y5jUkuvXaxoAAAAAElFTkSuQmCC">
-<meta name="theme-color" content="#2E3945">
 <title>APhO 2023 E2</title>
 <style>
  :root{--ink:#1d2126;--dim:#6b7480;--line:#c9ced6;--panel:#eceae5}
@@ -138,8 +135,9 @@ const I18N = {
   laser:   ["laser", "레이저"],
   scrhole: ["screen (hole)", "스크린 (구멍)"],
   target:  ["PMMA target", "PMMA 시료"],
-  draghint:["drag the screen or the target along the rail",
-            "스크린이나 시료를 레일 위에서 끌어 옮기세요"],
+  draghint:["drag the laser, the screen and the target along the rail, "
+            + "and up and down to set their heights",
+            "레이저·스크린·시료를 레일 위에서 끌어 옮기고, 위아래로 끌어 높이를 맞추세요"],
   pfront:  ["PMMA, front", "PMMA, 정면"],
   psurf:   ["PMMA surface, 0.25 mm", "PMMA 표면, 0.25 mm"],
   lifesize:["life\nsize", "실물\n크기"],
@@ -159,10 +157,7 @@ const I18N = {
             "단자를 클릭한 뒤 연결할 단자를 클릭하세요.  리드를 클릭하면 "
             + "빠지고, 우클릭하면 취소됩니다."],
 };
-/* the index page hands the language over in the query string; that wins,
-   then whatever was stored here, then the browser's own setting */
-let LANG = new URLSearchParams(location.search).get("lang");
-if (LANG !== "ko" && LANG !== "en") LANG = localStorage.getItem("aphoLang");
+let LANG = localStorage.getItem("aphoLang");
 if (LANG !== "ko" && LANG !== "en")
   LANG = (navigator.language || "").slice(0, 2) === "ko" ? "ko" : "en";
 function tr(k){ const e = I18N[k]; return e ? (LANG === "ko" ? e[1] : e[0]) : k; }
@@ -173,6 +168,36 @@ const R_BASE_LAMBDA = 167.82;
 const P_THRESHOLD = 287.0;
 const N_SLOPE = 0.4632;
 const P_YIELD_NOM = 363.6;
+const HIDDEN_ORDERS = 2.1722;   /* official C.3 intercept */
+
+/* The drive is limited by the control box, not by the knob.  Neither the
+   question sheet nor the solution states a maximum current, so the
+   ceiling is taken from what the marking scheme has to be able to reach:
+   D.1 requires the candidate's data to span 200 mW to 400 mW, and A.1
+   awards credit for a yield power anywhere up to 450 mW.  450 mW needs
+   116.3 mA on this diode's I-V curve, so a 115 mA ceiling - 444 mW -
+   left the top marking band out of reach.  120 mA gives 467 mW.  For
+   reference the official run itself never went above 98.3 mA (368 mW). */
+const I_MAX = 120.0;            /* mA, the control box will not go higher */
+
+/* A laser diode does not emit below its own threshold current: with the
+   dial wound right down the circuit is live and the meters read, but
+   there is no beam.  The cabling page used to light its indicator and
+   draw a beam out of the head from the mere fact that the circuit was
+   complete, so at minimum intensity it claimed an output the bench and
+   the control box both - correctly - showed as dark. */
+const I_LASING = 2.0;           /* mA, below this the diode does not lase */
+
+/* Every stand on the bench has a vertical slide with its own thumbscrew,
+   and they do not come set to the same height: the question sheet has
+   the candidate "position the beam at the same height along the axis of
+   the optical bench" so that it "passes freely through the hole in the
+   screen".  Until that is done the beam lands on the back of the screen
+   and there is nothing to measure. */
+const Z_MIN = 0.0, Z_MAX = 40.0;   /* mm of travel on a post */
+const Z_NOM = 20.0;                /* mm, the middle of that travel */
+const HOLE_R = 2.5;                /* mm, radius of the hole in the screen */
+const PLATE_HALF = 25.0;           /* mm, half height of the PMMA plate */
 
 /* ------------------------- randomness ----------------------------- */
 function mulberry(seed){
@@ -199,20 +224,43 @@ function gauss(rng){                                     /* Box-Muller */
    power the surface melts and the deformation is frozen in.
    ================================================================== */
 class ThermoModel {
+  /* PMMA, from the data on the question sheet and standard tables.
+     alpha = k/(rho c) = 0.19/(1180 x 1470) = 1.10e-7 m^2/s, so a heat
+     affected depth of half a millimetre gives tau = d^2/alpha = 2.3 s. */
+  static ALPHA_TH = 1.095e-7;
+  static SOFT_W = 0.9;          /* width of the knee at the threshold */
+  static TAU_HEAT = 0.50e-3 * 0.50e-3 / 1.095e-7;   /* 2.3 s */
+  static TAU_COOL = 0.60e-3 * 0.60e-3 / 1.095e-7;   /* 3.3 s */
+  static TAU_PLASTIC = 8.0;      /* viscous flow near the glass transition */
+  static RETAIN = 0.55;          /* of the excess deformation, what stays */
+  static SEC_RADIUS = 0.62;      /* melted core radius / thermal bump radius */
+  static SEC_BRIGHT = 0.32;      /* the second pattern is the fainter one */
   constructor(rng){
     this.rng = rng;
     this.R_base_lam = R_BASE_LAMBDA * (1 + 0.015 * gauss(rng));
     this.P_th = P_THRESHOLD * (1 + 0.004 * gauss(rng));
     this.slope = N_SLOPE * (1 + 0.03 * gauss(rng));
     this.P_yield = P_YIELD_NOM * (1 + 0.02 * gauss(rng));
-    this.hidden = 2.0 + 0.10 * gauss(rng);
+    /* The official solution's own regression is
+         m' = 167.82 sin(alpha_m) - 2.1722
+       so the number of orders swallowed by the central spot is
+       2.1722, not the 2 the write-up rounds it to. */
+    this.hidden = HIDDEN_ORDERS + 0.10 * gauss(rng);
     this.iv_a = 0.35928;
     this.iv_b = 0.73823 * (1 + 0.004 * gauss(rng));
+    this.sec_ratio = ThermoModel.SEC_RADIUS * (1 + 0.03 * gauss(rng));
     this.spot_key = "0,0";
     this.spots = new Map();
-    this.melted = false;
-    this.melt_extra = 0.0;
-    this.m_frozen = 0.0;
+    /* Two things deform the surface and they behave quite differently.
+       THERMAL is the bump the beam raises by heating: it follows the
+       power and it is fully reversible.  PLASTIC is what flows once the
+       material passes its glass transition: a small crater, confined to
+       the hottest core of the spot, that never comes back.  Being
+       narrower than the thermal bump it throws its rings out to wider
+       angles - the faint second set, with a bright one far out, that
+       shows up when you wind the power back down. */
+    this.m_th = 0.0;
+    this.m_pl = 0.0;
     this.dirty = Math.abs(0.35 * gauss(rng));      /* contamination */
     this.ellipticity = 1.0 + Math.abs(0.012 * gauss(rng));
     this.tilt = rng() * Math.PI;
@@ -228,20 +276,58 @@ class ThermoModel {
   }
   power_true(mA){ return mA * this.diode_voltage(mA); }
 
-  m_max(mA){
-    const P = this.power_true(mA);
-    const n_th = Math.max(this.slope * (P - this.P_th), 0.0);
-    if (P > this.P_yield){
-      this.melted = true;
-      /* the plastic part takes over from the thermal one, so nothing
-         jumps as the surface starts to yield */
-      this.m_frozen = Math.max(this.m_frozen, n_th);
-    }
-    if (this.melted) return Math.max(n_th, this.m_frozen);
-    return n_th;
+  /* Warm acrylic is always a little domed, so there is no power at which
+     the surface is exactly flat and the diffraction exactly vanishes - it
+     just falls below the two orders buried in the bright central spot and
+     stops being countable.  Clipping the official straight line at zero
+     put a kink in the surface that is not there on the bench, so the line
+     is rolled off smoothly:  m = w ln(1 + exp(slope (P - P_th) / w)).
+     Above the threshold this IS the official fit; at ten orders the two
+     differ by 5e-5. */
+  m_steady(mA, lit){
+    if (!lit) return 0.0;
+    const w = ThermoModel.SOFT_W;
+    const x = this.slope * (this.power_true(mA) - this.P_th) / w;
+    const soft = x > 0 ? x + Math.log1p(Math.exp(-x))
+                       : Math.log1p(Math.exp(x));
+    return w * soft;
   }
-  height_lambda(mA){ return this.m_max(mA) / 2.0; }
-
+  m_yield(){ return Math.max(this.slope * (this.P_yield - this.P_th), 0.0); }
+  /* Advance the surface by dt seconds.  The bump relaxes towards what
+     the present power supports; the crater creeps towards what the
+     present bump would leave behind, and never creeps back. */
+  step(dt, mA, lit){
+    if (!(dt > 0)) return;
+    dt = Math.min(dt, 1.0);        /* a long pause is not a long burn */
+    const target = this.m_steady(mA, lit);
+    const tau = target > this.m_th ? ThermoModel.TAU_HEAT
+                                   : ThermoModel.TAU_COOL;
+    this.m_th += (target - this.m_th) * (1 - Math.exp(-dt / tau));
+    const over = this.m_th - this.m_yield();
+    if (over > 0){
+      const want = ThermoModel.RETAIN * over;
+      if (want > this.m_pl)
+        this.m_pl += (want - this.m_pl)
+                   * (1 - Math.exp(-dt / ThermoModel.TAU_PLASTIC));
+    }
+  }
+  settle(mA, lit, seconds){
+    const n = Math.max(Math.round((seconds || 90) / 0.25), 1);
+    for (let i = 0; i < n; i++) this.step(0.25, mA, lit);
+  }
+  get melted(){ return this.m_pl > 0.05; }
+  height_lambda(){ return (this.m_th + this.m_pl) / 2.0; }
+  /* The frozen crater has a rim rather than a smooth shoulder, and a
+     sharp edge diffracts into a strong outermost ring instead of fading
+     away: the bright ring well outside the thermal pattern. */
+  crater(nu, mmax){
+    const env = 0.80 * Math.exp(-0.55 * Math.pow(nu / Math.max(mmax, 1), 2));
+    const cutoff = 0.5 * (1 - Math.tanh((nu - mmax) / 0.30));
+    const sv = Math.sin(Math.PI * nu);
+    let ring = env * cutoff * sv * sv;
+    ring *= 0.5 * (1 + Math.tanh((nu - this.hidden) / 0.55));
+    return ring + 0.95 * Math.exp(-Math.pow((nu - mmax) / 0.55, 2));
+  }
   intensity(nu, mmax){
     const core = 1.35 * Math.exp(-Math.pow(nu / 1.55, 2));
     const env = 0.80 * Math.exp(-0.85 * Math.pow(nu / Math.max(mmax, 1.0), 2));
@@ -252,14 +338,24 @@ class ThermoModel {
     return core + ring;
   }
 
-  /* one point of the pattern, in cm on the screen, before the speckle */
-  pixel(mA, L_cm, X, Y, mmax, Pw){
+  /* One point of the pattern, in cm on the screen, before the speckle.
+     Two apertures are superposed: the thermal bump, and - once the plate
+     has been past its yield point - the narrower frozen crater, whose
+     rings therefore sit at wider angles and reach further out.  Both are
+     lit by the same beam, so both scale with the drive. */
+  pixel(mA, L_cm, X, Y, Pw){
     const ca = Math.cos(this.tilt), sa = Math.sin(this.tilt);
     const Xr = X * ca + Y * sa, Yr = -X * sa + Y * ca;
     const Rr = Math.hypot(Xr / this.ellipticity, Yr * this.ellipticity);
-    const nu = this.R_base_lam * Math.sin(Math.atan2(Rr, L_cm));
-    let img = (mmax > 0.4) ? this.intensity(nu, mmax)
-                           : 1.35 * Math.exp(-Math.pow(nu / 1.55, 2));
+    const sin_a = Rr / Math.sqrt(Rr * Rr + L_cm * L_cm);
+    const nu = this.R_base_lam * sin_a;
+    /* No branch on the amplitude: intensity() already collapses to the
+       bare central spot when the bump is small, because the hidden order
+       factor suppresses everything below order two. */
+    let img = this.intensity(nu, this.m_th);
+    if (this.m_pl > 0.4)
+      img += ThermoModel.SEC_BRIGHT
+           * this.crater(this.R_base_lam * this.sec_ratio * sin_a, this.m_pl);
     /* brightness follows the drive: below the fringe threshold the knob
        still does something visible, as it does on the bench */
     img *= Math.min(Math.max(Pw / 300.0, 0.0), 1.6);
@@ -269,21 +365,22 @@ class ThermoModel {
   }
 
   /* The stand slides the plate across the beam.  Every spot keeps its
-     own history, so a shot that has been melted is still melted when
-     you wind the stand back to it. */
+     own history: the crater melted into one shot is still there when you
+     wind the stand back to it, while a fresh shot starts flat.  The
+     thermal bump does not travel with the stand - it belongs to wherever
+     the beam is now. */
   goto_spot(key){
-    this.spots.set(this.spot_key, [this.melted, this.melt_extra,
-                                   this.R_base_lam, this.m_frozen]);
+    this.spots.set(this.spot_key,
+                   [this.m_pl, this.R_base_lam, this.sec_ratio]);
     this.spot_key = key;
+    this.m_th = 0.0;
     if (this.spots.has(key)){
       const s = this.spots.get(key);
-      this.melted = s[0]; this.melt_extra = s[1];
-      this.R_base_lam = s[2]; this.m_frozen = s[3];
+      this.m_pl = s[0]; this.R_base_lam = s[1]; this.sec_ratio = s[2];
     } else {
-      this.melted = false;
-      this.melt_extra = 0.0;
-      this.m_frozen = 0.0;
+      this.m_pl = 0.0;
       this.R_base_lam = R_BASE_LAMBDA * (1 + 0.015 * gauss(this.rng));
+      this.sec_ratio = ThermoModel.SEC_RADIUS * (1 + 0.03 * gauss(this.rng));
     }
   }
 }
@@ -382,6 +479,20 @@ const app = {
   reading: [0.0, 0.0],
   x_target: 0.0,
   x_screen: 49.2,
+  x_laser: 72.0,
+  /* each stand comes at whatever height it was left at */
+  z_target: Z_MIN + 5 + Math.random() * (Z_MAX - Z_MIN - 10),
+  z_screen: Z_MIN + 5 + Math.random() * (Z_MAX - Z_MIN - 10),
+  z_laser:  Z_MIN + 5 + Math.random() * (Z_MAX - Z_MIN - 10),
+  /* Where the beam gets to: 'blocked' misses the hole and stops on the
+     screen, 'missed' clears the hole but flies past the plate. */
+  /* Is the diode actually giving light, not merely powered? */
+  emitting(){ return !!this.lit && this.cur > I_LASING; },
+  beamPath(){
+    if (Math.abs(this.z_laser - this.z_screen) > HOLE_R) return "blocked";
+    if (Math.abs(this.z_laser - this.z_target) > PLATE_HALF) return "missed";
+    return "ok";
+  },
   ruler: null,
   L(){ return this.x_screen - this.x_target; },
 };
@@ -536,9 +647,15 @@ function line(g, pts, col, w, dash){
    THE OPTICAL BENCH  (class BenchCanvas)
    ================================================================== */
 const BW = 560, BH = 434;
-const X_LASER = 72.0, X_FRONT = 66.0;
-const bpx = cm => 40 + cm * (BW - 90) / 80.0;
-const bcm = px => (px - 40) * 80.0 / (BW - 90);
+/* The rail carries three carriers, and all three slide: on the bench the
+   laser sits in a carrier of exactly the same pattern as the screen and
+   the target, clamped into the T slot with a knurled screw, and the
+   instructions have the candidate place all three of them. */
+const RAIL = 100.0;              /* cm of rail */
+const GAP_LS = 8.0;              /* laser head to screen, minimum */
+const GAP_TS = 5.0;              /* target to screen, minimum */
+const bpx = cm => 40 + cm * (BW - 90) / RAIL;
+const bcm = px => (px - 40) * RAIL / (BW - 90);
 
 function plateViews(g, x0, y0){
   /* The PMMA plate itself, not a graph: the face you shoot at, and the
@@ -582,45 +699,74 @@ function drawBench(){
 
   const yb = 290;
   rect(g, 24, yb, BW - 24, yb + 16, "#b9bcc2", "#8b8f96", 1);
-  for (let cm = 0; cm <= 80; cm += 5){
+  for (let cm = 0; cm <= RAIL; cm += 5){
     const x = bpx(cm);
     line(g, [x, yb, x, yb - 6], "#6b7076", 1);
     txt(g, x, yb - 13, String(cm), "#6b7076", 10);
   }
   txt(g, BW - 28, yb + 26, tr("benchcm"), "#6b7076", 10, false, "right");
 
-  const xs = bpx(app.x_screen), xt = bpx(app.x_target), xl = bpx(X_LASER);
+  const xs = bpx(app.x_screen), xt = bpx(app.x_target),
+        xl = bpx(app.x_laser);
   const beam_y = 190;
+  /* each post carries its own height, so the three no longer share one
+     line: this is what the candidate has to set */
+  const py = z => 190 - (z - Z_NOM) * 1.15;
+  const yl = py(app.z_laser), ysc = py(app.z_screen), yt = py(app.z_target);
+  const path = app.beamPath();
+  const stand = (x, yTop) => {
+    rect(g, x - 15, yb - 10, x + 15, yb + 6, "#4a4f55", "#2f343a", 1);
+    oval(g, x + 10, yb - 7, x + 21, yb + 4, "#b6bcc4", "#7d848c", 1);
+    rect(g, x - 5, yTop, x + 5, yb - 8, "#8b9096", "#5c6169", 1);
+    rect(g, x - 11, yTop - 5, x + 11, yTop + 6, "#5c6169", "#2f343a", 1);
+  };
 
-  rect(g, xl - 6, yb - 40, xl + 6, yb, "#7d848c", "#5c6169", 1);
-  rect(g, xl - 26, beam_y - 13, xl + 30, beam_y + 13, "#4a5059", "#2f343a", 1);
-  rect(g, xl - 34, beam_y - 6, xl - 26, beam_y + 6, "#2f343a");
-  txt(g, xl + 2, beam_y - 22, tr("laser"), "#4a5059", 11);
+  /* The laser head on its stand.  The post used to stop 47 px short of
+     the head, which left the laser hanging in mid air; it now runs from
+     the head down to a carrier of the same pattern as the ones under the
+     screen and the target, with its clamping screw. */
+  stand(xl, yl + 13);
+  rect(g, xl - 26, yl - 13, xl + 30, yl + 13, "#4a5059", "#2f343a", 1);
+  rect(g, xl - 34, yl - 6, xl - 26, yl + 6, "#2f343a");
+  txt(g, xl + 2, yl - 22, tr("laser"), "#4a5059", 11);
 
-  rect(g, xs - 3, beam_y - 96, xs + 3, yb, "#dcdcd4", "#9a9a92", 1);
-  rect(g, xs - 4, beam_y - 5, xs + 4, beam_y + 5, "#e9e7e2");
-  txt(g, xs, beam_y - 104, tr("scrhole"), "#5c6169", 11);
+  stand(xs, ysc + 88);
+  rect(g, xs - 3, ysc - 96, xs + 3, ysc + 88, "#dcdcd4", "#9a9a92", 1);
+  rect(g, xs - 4, ysc - 5, xs + 4, ysc + 5, "#e9e7e2");
+  txt(g, xs, ysc - 104, tr("scrhole"), "#5c6169", 11);
 
-  rect(g, xt - 5, beam_y - 60, xt + 5, beam_y + 60, "#cfe0e6", "#7fa3ad", 2);
-  rect(g, xt - 10, yb - 34, xt + 10, yb, "#7d848c", "#5c6169", 1);
-  txt(g, xt, beam_y - 72, tr("target"), "#4d707a", 11);
+  /* the plate had a 6 px gap under it and no carrier at all, so it
+     floated the way the laser did */
+  stand(xt, yt + 60);
+  rect(g, xt - 5, yt - 60, xt + 5, yt + 60, "#cfe0e6", "#7fa3ad", 2);
+  txt(g, xt, yt - 72, tr("target"), "#4d707a", 11);
 
-  if (app.lit && app.cur > 2.0){
+  if (app.emitting()){
     const bw = 1 + Math.floor(3.0 * Math.min(
       app.model.power_true(app.cur) / 380.0, 1.0));
-    line(g, [xl - 26, beam_y, xt + 5, beam_y], "#e02020", bw);
-    for (const dy of [-1, 1])
-      line(g, [xt + 5, beam_y, xs - 3, beam_y + dy * 78], "#e02020", 1);
+    if (path === "blocked"){
+      /* it stops on the back of the screen, and the spot shows through:
+         that red dot is how you find the hole */
+      line(g, [xl - 26, yl, xs + 3, yl], "#e02020", bw);
+      oval(g, xs - 2, yl - 4, xs + 8, yl + 4, "#ff5040", null, 1);
+    } else {
+      line(g, [xl - 26, yl, xt + 5, yl], "#e02020", bw);
+      if (path === "ok")
+        for (const dy of [-1, 1])
+          line(g, [xt + 5, yl, xs - 3, ysc + dy * 78], "#e02020", 1);
+    }
   }
   /* the distance the student has to quote */
-  line(g, [xt, beam_y + 78, xs, beam_y + 78], "#30507a", 1);
+  line(g, [xt, beam_y + 72, xs, beam_y + 72], "#30507a", 1);
   for (const [x, s] of [[xt, 1], [xs, -1]]){
     g.fillStyle = "#30507a"; g.beginPath();
-    g.moveTo(x, beam_y + 78);
-    g.lineTo(x + s * 7, beam_y + 74); g.lineTo(x + s * 7, beam_y + 82);
+    g.moveTo(x, beam_y + 72);
+    g.lineTo(x + s * 7, beam_y + 68); g.lineTo(x + s * 7, beam_y + 76);
     g.closePath(); g.fill();
   }
-  txt(g, (xt + xs) / 2, beam_y + 89, "L", "#30507a", 12, true);
+  /* above the arrow: below it the label sat on top of the rail
+     graduations and neither could be read */
+  txt(g, (xt + xs) / 2, beam_y + 62, "L", "#30507a", 12, true);
   txt(g, 12, 14, tr("draghint"), "#8b8f96", 11, false, "left");
   plateViews(g, 100, 360);
 }
@@ -636,20 +782,35 @@ function drawBench(){
   };
   cv.addEventListener("pointerdown", ev => {
     const [x, y] = at(ev);
-    for (const [name, cm] of [["screen", app.x_screen], ["target", app.x_target]])
-      if (Math.abs(x - bpx(cm)) < 14 && y > 60 && y < 235){
+    for (const [name, cm] of [["laser", app.x_laser], ["screen", app.x_screen],
+                              ["target", app.x_target]])
+      /* down to the rail, so the stand and its carrier can be grabbed
+         as well as the head */
+      if (Math.abs(x - bpx(cm)) < 16 && y > 60 && y < 300){
         drag = name; cv.setPointerCapture(ev.pointerId); return;
       }
   });
   cv.addEventListener("pointermove", ev => {
     if (!drag) return;
-    const [x] = at(ev);
-    const cm = Math.max(0.0, Math.min(X_FRONT, bcm(x)));
-    if (drag === "screen")
-      app.x_screen = Math.min(Math.max(cm, app.x_target + 5.0), X_FRONT);
+    const [x, y] = at(ev);
+    /* up and down on the post as well as along the rail */
+    const zz = Math.max(Z_MIN, Math.min(Z_MAX, Z_NOM - (y - 190) / 1.15));
+    app["z_" + drag] = zz;
+    const cm = Math.max(0.0, Math.min(RAIL, bcm(x)));
+    if (drag === "laser")
+      /* it has to stay behind the screen, or its own beam would never
+         reach the hole */
+      app.x_laser = Math.max(cm, app.x_screen + GAP_LS);
+    else if (drag === "screen")
+      app.x_screen = Math.min(Math.max(cm, app.x_target + GAP_TS),
+                              app.x_laser - GAP_LS);
     else
-      app.x_target = Math.min(cm, app.x_screen - 5.0);
-    refresh();
+      app.x_target = Math.min(cm, app.x_screen - GAP_TS);
+    /* Sliding the laser changes nothing the screen shows - the pattern
+       depends on the distance from the target to the screen, not on
+       where the head sits behind it - so that case only repaints the
+       bench and leaves the diffraction pattern alone. */
+    if (drag === "laser") drawBench(); else refresh();
   });
   const stop = () => { drag = null; };
   cv.addEventListener("pointerup", stop);
@@ -689,7 +850,7 @@ function drawCtrl(){
 
   txt(g, 232, 76, "LASER", "#dbe8f4", 11);
   oval(g, 222, 86, 242, 106,
-       (app.lit && app.cur > 2.0) ? "#ff4030" : "#603030", "#123", 1);
+       app.emitting() ? "#ff4030" : "#603030", "#123", 1);
   txt(g, 232, 120, "DC 12 V", "#dbe8f4", 10);
 
   const [i, v] = app.reading;
@@ -708,11 +869,18 @@ function drawCtrl(){
 }
 
 function turnKnob(s){
-  app.knob_a += s * 0.35;
   /* set_current of the desktop program: 0.1 mA resolution, and the
-     diode's own limit at 115 mA */
-  const v = app.cur + s * (app.fine ? 0.1 : 1.0);
-  app.cur = Math.max(0.0, Math.min(115.0, Math.round(v * 10) / 10));
+     ceiling the marking scheme has to be able to reach (see I_MAX).
+
+     The pointer only moves if the current actually moved with it.  This
+     is a potentiometer with end stops: once it is wound down to zero or
+     up against the limit of the control box it will not go any further
+     in that direction, and the knob does not carry on rotating while
+     nothing changes. */
+  const before = app.cur;
+  const v = before + s * (app.fine ? 0.1 : 1.0);
+  app.cur = Math.max(0.0, Math.min(I_MAX, Math.round(v * 10) / 10));
+  if (app.cur !== before) app.knob_a += s * 0.35;
   readMeters();
   refresh();
 }
@@ -759,18 +927,38 @@ function drawScreen(){
 
   const im = offg.createImageData(NGRID, NGRID);
   const d = im.data;
-  const live = app.lit && app.cur > 2.0;
+  const live = app.emitting();
   const Ical = new Float32Array(NGRID * NGRID);
-  if (live){
+  const path = app.beamPath();
+  if (live && path !== "ok"){
+    /* The beam never reaches the plate.  If it is stopped by the screen
+       its spot still shows through the translucent sheet, displaced from
+       the hole by exactly the height error - which is what you steer by
+       when you line the stands up. */
+    const dy = -(app.z_laser - app.z_screen) / 10.0;
+    const A = (path === "blocked")
+      ? 1.45 * Math.min(Math.max(app.model.power_true(app.cur) / 300, 0), 1.6)
+      : 0.0;
+    for (let j = 0; j < NGRID; j++){
+      const Y = -HALF + 2 * HALF * j / (NGRID - 1);
+      for (let i2 = 0; i2 < NGRID; i2++){
+        const X = -HALF + 2 * HALF * i2 / (NGRID - 1);
+        const I = Math.min(A * Math.exp(-((X * X + (Y - dy) * (Y - dy))
+                                          / (2 * 0.075 * 0.075))), 1.6);
+        Ical[j * NGRID + i2] = I;
+        const k = (j * NGRID + i2) * 4;
+        laser_rgb(I, d, k); d[k + 3] = 255;
+      }
+    }
+  } else if (live){
     const m = app.model, L = app.L();
-    const mmax = m.m_max(app.cur);          /* this is where it can melt */
     const Pw = m.power_true(app.cur);
     const rg = mulberry(7);                 /* the speckle is fixed */
     for (let j = 0; j < NGRID; j++){
       const Y = -HALF + 2 * HALF * j / (NGRID - 1);
       for (let i2 = 0; i2 < NGRID; i2++){
         const X = -HALF + 2 * HALF * i2 / (NGRID - 1);
-        let I = m.pixel(app.cur, L, X, Y, mmax, Pw);
+        let I = m.pixel(app.cur, L, X, Y, Pw);
         /* the speckle scales with the light that is actually there: a
            flat dither would put false minima in the black background
            outside the pattern and make the ring count ambiguous */
@@ -900,7 +1088,8 @@ function drawWire(){
   rect(g, 312, 74, 408, 506, WP.FACE, "#3d8ec0", 1);
   txt(g, 320, 100, "\u25c4 LASER +", "#c02020", 11, true, "left");
   txt(g, 320, 214, "\u25c4 LASER \u2212", WP.NAVY, 11, true, "left");
-  oval(g, 346, 118, 374, 146, st.lit ? "#ff4030" : "#603030", "#7a1218", 1);
+  oval(g, 346, 118, 374, 146, app.emitting() ? "#ff4030" : "#603030",
+       "#7a1218", 1);
   rect(g, 300, 300, 360, 350, app.on ? "#3fbf5f" : "#8b3030", "#123", 2);
   txt(g, 330, 325, app.on ? "ON" : "OFF", "#ffffff", 12, true);
   txt(g, 330, 364, tr("power"), WP.NAVY, 10, true);
@@ -917,7 +1106,7 @@ function drawWire(){
   rect(g, 560, 330, 700, 412, "#7d848c", "#4a4f55", 2);
   rect(g, 700, 356, 730, 386, "#2b2e32", "#1b1d1f", 1);
   txt(g, 630, 434, tr("diode"), "#c9ccd1", 11);
-  if (st.lit){
+  if (app.emitting()){
     const bw = 1 + Math.floor(4.0 * Math.min(
       app.model.power_true(app.cur) / 380.0, 1.0));
     line(g, [730, 371, 800, 371], "#ff5040", bw);
@@ -1005,8 +1194,11 @@ function spotLabel(){
     tr("plate") + " " + app.seed;
 }
 
+let PAGE = 0;                    /* 0 = bench, 1 = cabling */
 function refresh(){
-  drawWire();
+  /* the cabling page is behind the bench page most of the time, and
+     redrawing a hidden canvas is pure cost */
+  if (PAGE === 1) drawWire();
   drawCtrl();
   drawScreen();        /* this is where the plate can melt */
   spotLabel();
@@ -1018,6 +1210,7 @@ function showTab(i){
     document.getElementById("page" + k).className = "page" + (k === i ? " on" : "");
     document.getElementById("tab" + k).className = (k === i ? "on" : "");
   }
+  PAGE = i;
   refresh();
 }
 document.getElementById("tab0").addEventListener("click", () => showTab(0));
@@ -1041,6 +1234,33 @@ function applyLang(){
 function setLang(l){ LANG = l; localStorage.setItem("aphoLang", l); applyLang(); }
 document.getElementById("btn-ko").addEventListener("click", () => setLang("ko"));
 document.getElementById("btn-en").addEventListener("click", () => setLang("en"));
+
+/* ------------------------------------------------------------------
+   The surface has a clock of its own.
+
+   The acrylic does not deform the instant you move the knob: the beam
+   has to heat it and the heat has to diffuse.  With PMMA's diffusivity
+   that takes a couple of seconds to rise and rather longer to fall, so
+   the pattern grows and shrinks visibly after every change and does not
+   vanish the moment the laser goes out.  Give it time to settle before
+   you read anything off it.
+   ------------------------------------------------------------------ */
+let tSurface = (typeof performance !== "undefined" && performance.now)
+  ? performance.now() / 1000 : Date.now() / 1000;
+function evolve(){
+  const now = (typeof performance !== "undefined" && performance.now)
+    ? performance.now() / 1000 : Date.now() / 1000;
+  const dt = now - tSurface;
+  tSurface = now;
+  const m = app.model;
+  const b0 = m.m_th, b1 = m.m_pl;
+  m.step(dt, app.cur, app.emitting());
+  if (Math.abs(m.m_th - b0) > 2e-3 || Math.abs(m.m_pl - b1) > 2e-3){
+    drawScreen();
+    drawBench();          /* the edge view swells with it */
+  }
+}
+setInterval(evolve, 90);
 
 window.addEventListener("resize", () => refresh());
 
