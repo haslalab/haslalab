@@ -102,8 +102,8 @@
     <p id="t-sub"></p>
   </div>
   <div class="lang">
-    <button id="lang-ko" class="on">한국어</button>
-    <button id="lang-en">English</button>
+    <button id="btn-ko" class="on">한국어</button>
+    <button id="btn-en">English</button>
   </div>
 </header>
 
@@ -185,8 +185,8 @@ const T = {
     papercap:"스크린 위의 모눈종이 (30 × 30 cm, 가는 눈금 1 mm / 굵은 눈금 1 cm)",
     cursor:"커서", none:"—",
     note:"셀과 스크린은 레일을 따라, 레이저와 스크린은 위아래로 끌 수 있습니다. "+
-         ""+
-         "확산 셀: 6.5 × 0.8 × 9.5 cm."
+         "Z₀·d·Z는 레일 눈금에서, ξᵢ·δᵢ는 모눈에서 직접 읽으세요. "+
+         "확산 셀: 6.5 × 0.8 × 9.5 cm. 프로그램은 아무것도 계산해 주지 않습니다."
   },
   en:{
     title:"IPhO 2017 E1 — Diffusion Coefficient from Laser Deflection",
@@ -207,7 +207,7 @@ const T = {
     cursor:"cursor", none:"—",
     note:"Drag the cell and the screen along the rail, and the laser or screen up and down. "+
          "Read Z₀, d and Z off the rail scale, and ξᵢ, δᵢ off the millimetre grid. "+
-         "Diffusion cell: 6.5 × 0.8 × 9.5 cm."
+         "Diffusion cell: 6.5 × 0.8 × 9.5 cm. Nothing is computed for you."
   }
 };
 let lang = (new URLSearchParams(location.search).get("lang")==="en") ? "en" : "ko";
@@ -655,12 +655,12 @@ function applyLang(){
   $("t-benchcap").textContent=d.benchcap; $("t-papercap").textContent=d.papercap;
   $("t-note").textContent=d.note;
   $("cursor").textContent=d.none;
-  $("lang-ko").className = lang==="ko"?"on":"";
-  $("lang-en").className = lang==="en"?"on":"";
+  $("btn-ko").className = lang==="ko"?"on":"";
+  $("btn-en").className = lang==="en"?"on":"";
   buildConc(); updGeom();
 }
-$("lang-ko").onclick=()=>{ lang="ko"; applyLang(); };
-$("lang-en").onclick=()=>{ lang="en"; applyLang(); };
+$("btn-ko").onclick=()=>{ lang="ko"; applyLang(); };
+$("btn-en").onclick=()=>{ lang="en"; applyLang(); };
 
 /* ══════════════════════════════════════════════════════════════
    11.  MAIN LOOP

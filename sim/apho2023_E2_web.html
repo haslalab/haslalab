@@ -159,7 +159,10 @@ const I18N = {
             "단자를 클릭한 뒤 연결할 단자를 클릭하세요.  리드를 클릭하면 "
             + "빠지고, 우클릭하면 취소됩니다."],
 };
-let LANG = localStorage.getItem("aphoLang");
+/* the index page hands the language over in the query string; that wins,
+   then whatever was stored here, then the browser's own setting */
+let LANG = new URLSearchParams(location.search).get("lang");
+if (LANG !== "ko" && LANG !== "en") LANG = localStorage.getItem("aphoLang");
 if (LANG !== "ko" && LANG !== "en")
   LANG = (navigator.language || "").slice(0, 2) === "ko" ? "ko" : "en";
 function tr(k){ const e = I18N[k]; return e ? (LANG === "ko" ? e[1] : e[0]) : k; }

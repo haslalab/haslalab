@@ -193,7 +193,10 @@ const I18N = {
 /* || binds looser than ===, so the obvious one-liner here always came
    out Korean once anything had been stored.  Read the two sources
    separately. */
-let LANG = localStorage.getItem("aphoLang");
+/* the index page hands the language over in the query string; that wins,
+   then whatever was stored here, then the browser's own setting */
+let LANG = new URLSearchParams(location.search).get("lang");
+if (LANG !== "ko" && LANG !== "en") LANG = localStorage.getItem("aphoLang");
 if (LANG !== "ko" && LANG !== "en")
   LANG = (navigator.language || "").slice(0, 2) === "ko" ? "ko" : "en";
 function tr(k){ const e = I18N[k]; return e ? (LANG === "ko" ? e[1] : e[0]) : k; }
