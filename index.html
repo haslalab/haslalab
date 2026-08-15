@@ -201,17 +201,10 @@ section{padding:58px 0}
   display:block;cursor:pointer;transition:.16s;position:relative}
 .comp:hover{border-color:var(--rail);transform:translateY(-2px);
             box-shadow:0 14px 30px -22px rgba(22,33,46,.55)}
-.comp .chead{display:flex;align-items:center;gap:13px}
+.comp .chead{display:flex;align-items:center;gap:12px;min-height:34px}
 .comp .chead .abbr{margin:0}
-.clogo{width:46px;height:46px;flex:none;border-radius:8px;object-fit:contain;
-       background:#fff;border:1px solid var(--grid-bold);padding:4px;display:block}
-.clogo.mark{display:flex;align-items:center;justify-content:center;padding:0;
-            position:relative;overflow:hidden;background:var(--paper)}
-.clogo.mark .yr{font-family:var(--mono);font-size:11.5px;font-weight:600;
-                letter-spacing:.02em;color:var(--ink);line-height:1;z-index:1}
-.clogo.mark .flag{position:absolute;inset:auto 0 0 0;width:100%;height:12px;
-                  border-radius:0;object-fit:cover;opacity:.9}
-.clogo.mark .flag.orgbadge,.clogo.mark .flag.noflag{display:none}
+.clogo{height:30px;width:auto;max-width:132px;flex:none;object-fit:contain;
+       display:block;border-radius:4px}
 .comp .abbr{font-size:1.5rem;font-weight:650;letter-spacing:-.03em}
 .comp .full{font-size:12.5px;color:var(--graphite);margin-top:2px;min-height:2.6em}
 .comp dl{display:flex;gap:22px;margin:15px 0 0;padding-top:13px;border-top:1px dashed var(--grid-bold)}
@@ -504,7 +497,7 @@ en:{
    and Stefan Ivanov's collection.
    ══════════════════════════════════════════════════════════════ */
 /* 준비 중인 문제도 제목은 두 언어로 보여 준다 */
-const KO_TITLE = {"Acoustic Black Box": "음향 블랙박스", "Acoustic Levitation": "음향 부양", "An Optical \"Black Box\"": "광학 블랙박스", "Band Gap of Semiconductor Thin Films": "반도체 박막의 띠간격", "Basic Characteristics of Solar Cells": "태양전지의 기본 특성", "Birefringence": "복굴절", "Birefringence of Mica": "운모의 복굴절", "Black Box": "블랙박스", "Blackbox: Capacitive Displacement Sensor": "블랙박스 — 정전용량식 변위 센서", "CD-ROM Spectrometer": "CD-ROM 분광기", "Crystallography": "결정학", "Cylindrical Bore": "원통형 구멍", "Cylindrical Diode": "원통형 다이오드", "Deep Learning": "딥러닝", "Determination of Capacitance": "전기용량 측정", "Determination of Shapes by Reflection": "반사를 이용한 형상 측정", "Determination of the Density of Oil": "기름의 밀도 측정", "Determination of the Stefan–Boltzmann Constant": "슈테판–볼츠만 상수 측정", "Differential Thermometric Method": "시차 온도측정법", "Diffraction due to Helical Structure": "나선 구조에 의한 회절", "Diffraction due to Surface Tension": "표면장력에 의한 회절", "Diffraction from Phase Steps": "위상 계단에 의한 회절", "Earth's magnetic field measurement": "지구 자기장 측정", "Elasticity of Cantilever": "외팔보의 탄성", "Elasticity of Sheets": "박판의 탄성", "Electrical Conductivity in 2D": "2차원 전기전도도", "Electromagnetic Induction": "전자기 유도", "Estimation of Unknown Resistance": "미지 저항의 추정", "Exploring the Spatial Structure of the Sample with Optical Methods": "광학적 방법을 이용한 시료의 공간 구조 탐구", "Forces between Magnets": "자석 사이의 힘", "Frequency of Vibration of a Tuning Fork": "소리굽쇠의 진동수", "Friction": "마찰", "Gyroscope": "자이로스코프", "Hall Effect and Magnetoresistivity Effect": "홀 효과와 자기저항 효과", "Heat Conduction in a Copper Rod": "구리 막대의 열전도", "Hertzian Contact Stress": "헤르츠 접촉 응력", "Hidden Charge": "숨은 전하", "Hidden Pattern": "숨은 무늬", "Hidden Wire": "숨은 도선", "Hot Cylinder": "가열된 원통", "Ideal Gas, Vapor Pressure, and Heat Conduction": "이상기체, 증기압, 그리고 열전도", "Interference Method for the Thermal Expansion and Refractive Index of Glass": "간섭법으로 재는 유리의 열팽창과 굴절률", "Interference from a Thermally Deformed Surface": "열변형된 표면에 의한 간섭", "Interference, Reflection and Diffraction": "간섭, 반사, 회절", "Jumping Beads": "튀는 구슬", "LEDs": "발광 다이오드", "Levitation of Conductors in an Oscillating Magnetic Field": "진동 자기장 속 도체의 부양", "Light-Emitting Diode": "발광 다이오드", "Magnetic Black Box": "자기 블랙박스", "Magnetic Braking on an Inclined Plane": "경사면에서의 자기 제동", "Magnetic Force Probe": "자기력 탐침", "Magnetic Pendulum": "자기 진자", "Mass Measurement": "질량 측정", "Measurement of Liquid Electric Conductivity": "액체의 전기전도도 측정", "Measurement of Reflectance and Determination of Refractive Index": "반사율 측정과 굴절률 결정", "Mechanical \"Black Box\"": "역학 블랙박스", "Mechanical Blackbox: A Cylinder with a Ball Inside": "역학 블랙박스 — 공이 든 원통", "Non-ideal Capacitors": "비이상적 축전기", "Nonlinear Black Box": "비선형 블랙박스", "Optical Black Box": "광학 블랙박스", "Optical Black-Box": "광학 블랙박스", "Optical Measurements": "광학 측정", "Optical Properties of Laser Diode": "레이저 다이오드의 광학적 성질", "Oscillation of a Water-Filled Vessel": "물을 담은 용기의 진동", "Paper Transistor": "종이 트랜지스터", "Photonic Crystal": "광결정", "Physical Constants with Electrolysis": "전기분해로 구하는 물리 상수", "Physics of Illumination": "조명의 물리", "Physics of Induction Cooking": "인덕션 가열의 물리", "Physics of Piezoelectricity": "압전 현상의 물리", "Planck's Constant in an Incandescent Lamp": "백열전구로 구하는 플랑크 상수", "Planet": "행성", "Porous Membrane": "다공성 막", "Propagation of Radio Waves": "전파의 전파(傳播)", "Reflected Optical Diffraction Patterns from One-Dimensional Structures": "1차원 구조의 반사 회절 무늬", "Reflection Phase Shift of Metal": "금속에서의 반사 위상 변화", "Rotating Liquid": "회전하는 액체", "Sand craters and dunes": "모래 크레이터와 사구", "Solar Cells": "태양전지", "Specific Heat of Aluminium and Latent Heat of Evaporation": "알루미늄의 비열과 증발 잠열", "Speed of Light": "빛의 속력", "Speed of Ultrasonic Sound in Solution": "용액에서의 초음파 속력", "Static Response of a Magnetically Active Fluid": "자성유체의 정적 응답", "The Earth's Horizontal Magnetic Field": "지구 자기장의 수평 성분", "The Magnetic Permeability of Water": "물의 자기 투자율", "The Magnetic Puck": "자기 퍽", "The Physics of Sound Waves": "음파의 물리", "The Piezoelectric Effect and Its Applications": "압전 효과와 그 응용", "To see invisible!": "보이지 않는 것을 보다", "Understanding Semiconductor Lasers": "반도체 레이저의 이해", "Viscoelasticity of a Polymer Thread": "고분자 실의 점탄성", "Water Clock Experiment": "물시계 실험", "Wave Pulses in a Magnetically Active Fluid": "자성유체 속의 파동 펄스", "Wavelength of a Diode Laser": "다이오드 레이저의 파장", "Wiedemann–Franz Law": "비데만–프란츠 법칙", "Wind Power and Its Metrologies": "풍력과 그 계측", "Electric Experiment": "전기 실험", "Optics Experiment": "광학 실험", "Magnetic Experiment": "자기 실험", "Black Box Experiment": "블랙박스 실험", "Fiber Bragg Grating": "광섬유 브래그 격자", "LED Color": "LED의 색", "Absorption Spectroscopy and Chemical Kinetics": "흡수 분광법과 화학 반응속도론", "Ferromagnetic Domain Wall Dynamics": "강자성 자구벽 동역학", "Thermal Oxidation": "열산화", "Polycrystal Diffusion": "다결정 확산"};
+const KO_TITLE = {"Acoustic Black Box": "음향 블랙박스", "Acoustic Levitation": "음향 부양", "An Optical \"Black Box\"": "광학 블랙박스", "Band Gap of Semiconductor Thin Films": "반도체 박막의 띠간격", "Basic Characteristics of Solar Cells": "태양전지의 기본 특성", "Birefringence": "복굴절", "Birefringence of Mica": "운모의 복굴절", "Black Box": "블랙박스", "Blackbox: Capacitive Displacement Sensor": "블랙박스 — 정전용량식 변위 센서", "CD-ROM Spectrometer": "CD-ROM 분광기", "Crystallography": "결정학", "Cylindrical Bore": "원통형 구멍", "Cylindrical Diode": "원통형 다이오드", "Deep Learning": "딥러닝", "Determination of Capacitance": "전기용량 측정", "Determination of Shapes by Reflection": "반사를 이용한 형상 측정", "Determination of the Density of Oil": "기름의 밀도 측정", "Determination of the Stefan–Boltzmann Constant": "슈테판–볼츠만 상수 측정", "Differential Thermometric Method": "시차 온도측정법", "Diffraction due to Helical Structure": "나선 구조에 의한 회절", "Diffraction due to Surface Tension": "표면장력에 의한 회절", "Diffraction from Phase Steps": "위상 계단에 의한 회절", "Earth's magnetic field measurement": "지구 자기장 측정", "Elasticity of Cantilever": "외팔보의 탄성", "Elasticity of Sheets": "박판의 탄성", "Electrical Conductivity in 2D": "2차원 전기전도도", "Electromagnetic Induction": "전자기 유도", "Estimation of Unknown Resistance": "미지 저항의 추정", "Exploring the Spatial Structure of the Sample with Optical Methods": "광학적 방법을 이용한 시료의 공간 구조 탐구", "Forces between Magnets": "자석 사이의 힘", "Frequency of Vibration of a Tuning Fork": "소리굽쇠의 진동수", "Friction": "마찰", "Gyroscope": "자이로스코프", "Hall Effect and Magnetoresistivity Effect": "홀 효과와 자기저항 효과", "Heat Conduction in a Copper Rod": "구리 막대의 열전도", "Hertzian Contact Stress": "헤르츠 접촉 응력", "Hidden Charge": "숨은 전하", "Hidden Pattern": "숨은 무늬", "Hidden Wire": "숨은 도선", "Hot Cylinder": "가열된 원통", "Ideal Gas, Vapor Pressure, and Heat Conduction": "이상기체, 증기압, 그리고 열전도", "Interference Method for the Thermal Expansion and Refractive Index of Glass": "간섭법으로 재는 유리의 열팽창과 굴절률", "Interference from a Thermally Deformed Surface": "열변형된 표면에 의한 간섭", "Interference, Reflection and Diffraction": "간섭, 반사, 회절", "Jumping Beads": "튀는 구슬", "LEDs": "발광 다이오드", "Levitation of Conductors in an Oscillating Magnetic Field": "진동 자기장 속 도체의 부양", "Light-Emitting Diode": "발광 다이오드", "Magnetic Black Box": "자기 블랙박스", "Magnetic Braking on an Inclined Plane": "경사면에서의 자기 제동", "Magnetic Force Probe": "자기력 탐침", "Magnetic Pendulum": "자기 진자", "Mass Measurement": "질량 측정", "Measurement of Liquid Electric Conductivity": "액체의 전기전도도 측정", "Measurement of Reflectance and Determination of Refractive Index": "반사율 측정과 굴절률 결정", "Mechanical \"Black Box\"": "역학 블랙박스", "Mechanical Blackbox: A Cylinder with a Ball Inside": "역학 블랙박스 — 공이 든 원통", "Non-ideal Capacitors": "비이상적 축전기", "Nonlinear Black Box": "비선형 블랙박스", "Optical Black Box": "광학 블랙박스", "Optical Black-Box": "광학 블랙박스", "Optical Measurements": "광학 측정", "Optical Properties of Laser Diode": "레이저 다이오드의 광학적 성질", "Oscillation of a Water-Filled Vessel": "물을 담은 용기의 진동", "Paper Transistor": "종이 트랜지스터", "Photonic Crystal": "광결정", "Physical Constants with Electrolysis": "전기분해로 구하는 물리 상수", "Physics of Illumination": "조명의 물리", "Physics of Induction Cooking": "인덕션 가열의 물리", "Physics of Piezoelectricity": "압전 현상의 물리", "Planck's Constant in an Incandescent Lamp": "백열전구로 구하는 플랑크 상수", "Planet": "행성", "Porous Membrane": "다공성 막", "Propagation of Radio Waves": "전파의 전파(傳播)", "Reflected Optical Diffraction Patterns from One-Dimensional Structures": "1차원 구조의 반사 회절 무늬", "Reflection Phase Shift of Metal": "금속에서의 반사 위상 변화", "Rotating Liquid": "회전하는 액체", "Sand craters and dunes": "모래 크레이터와 사구", "Solar Cells": "태양전지", "Specific Heat of Aluminium and Latent Heat of Evaporation": "알루미늄의 비열과 증발 잠열", "Speed of Light": "빛의 속력", "Speed of Ultrasonic Sound in Solution": "용액에서의 초음파 속력", "Static Response of a Magnetically Active Fluid": "자성유체의 정적 응답", "The Earth's Horizontal Magnetic Field": "지구 자기장의 수평 성분", "The Magnetic Permeability of Water": "물의 자기 투자율", "The Magnetic Puck": "자기 퍽", "The Physics of Sound Waves": "음파의 물리", "The Piezoelectric Effect and Its Applications": "압전 효과와 그 응용", "To see invisible!": "보이지 않는 것을 보다", "Understanding Semiconductor Lasers": "반도체 레이저의 이해", "Viscoelasticity of a Polymer Thread": "고분자 실의 점탄성", "Water Clock Experiment": "물시계 실험", "Wave Pulses in a Magnetically Active Fluid": "자성유체 속의 파동 펄스", "Wavelength of a Diode Laser": "다이오드 레이저의 파장", "Wiedemann–Franz Law": "비데만–프란츠 법칙", "Wind Power and Its Metrologies": "풍력과 그 계측", "Electric Experiment": "전기 실험", "Optics Experiment": "광학 실험", "Magnetic Experiment": "자기 실험", "Black Box Experiment": "블랙박스 실험", "Fiber Bragg Grating": "광섬유 브래그 격자", "LED Color": "LED의 색", "Absorption Spectroscopy and Chemical Kinetics": "흡수 분광법과 화학 반응속도론", "Ferromagnetic Domain Wall Dynamics": "강자성 자구벽 동역학", "Thermal Oxidation": "열산화", "Polycrystal Diffusion": "다결정 확산", "Ferromagnetic phase transition: The Ising model": "강자성 상전이 — 이징 모형", "Experimental studies in rotating reference frames": "회전 좌표계에서의 실험", "Measurement of D\u2070 lifetime": "D\u2070 입자의 수명 측정", "Polycrystals and monomolecular layers": "다결정과 단분자막", "Polarization and Photodiodes": "편광과 광다이오드", "Determination of data using a chronometer": "크로노미터를 이용한 데이터 측정", "Eletrical Black Box": "전기 블랙박스", "Porosity": "다공성", "Maxwell-Boltzmann distributions": "맥스웰–볼츠만 분포", "Optics with lasers": "레이저 광학"};
 const wip = (...titles) => titles.map((t,i)=>(
   {id:"E"+(i+1), en:t, ko:KO_TITLE[t]||t, state:"wip"}));
 /* 이론 문제이지만 주최측이 시뮬레이터를 함께 배포한 것들 */
@@ -540,7 +533,21 @@ const DATA={
               pdf:{ko:"pdf/IPhO_2019_E2_KO.pdf", en:"pdf/IPhO_2019_E2_EN.pdf"},
               sol:"pdf/IPhO_2019_S2.pdf"}}
     ]},
-   {y:2018,host:{ko:"포르투갈 · 리스본",en:"Lisbon, Portugal"},cc:"pt",problems:wip("Paper Transistor","Viscoelasticity of a Polymer Thread")},
+   {y:2018,host:{ko:"포르투갈 · 리스본",en:"Lisbon, Portugal"},cc:"pt",
+    problems:[
+      {id:"E1", en:"Paper Transistor", ko:"종이 트랜지스터", state:"wip", hold:true,
+       files:{sim:"sim/ipho2018_E1_web.html",
+              exe:{ko:REL+"v1.0/IPhO2018_E1_sim_KO.exe", en:REL+"v1.0/IPhO2018_E1_sim_EN.exe"},
+              src:{ko:"src/ipho2018_E1_sim_KO.py", en:"src/ipho2018_E1_sim_EN.py"},
+              pdf:{ko:"pdf/IPhO_2018_E1_KO.pdf", en:"pdf/IPhO_2018_E1_EN.pdf"},
+              sol:"pdf/IPhO_2018_S1.pdf"}},
+      {id:"E2", en:"Viscoelasticity of a Polymer Thread", ko:"고분자 실의 점탄성", state:"wip", hold:true,
+       files:{sim:"sim/ipho2018_E2_web.html",
+              exe:{ko:REL+"v1.0/IPhO2018_E2_sim_KO.exe", en:REL+"v1.0/IPhO2018_E2_sim_EN.exe"},
+              src:{ko:"src/ipho2018_E2_sim_KO.py", en:"src/ipho2018_E2_sim_EN.py"},
+              pdf:{ko:"pdf/IPhO_2018_E2_KO.pdf", en:"pdf/IPhO_2018_E2_EN.pdf"},
+              sol:"pdf/IPhO_2018_S2.pdf"}}
+    ]},
    {y:2017,host:{ko:"인도네시아 · 욕야카르타",en:"Yogyakarta, Indonesia"},cc:"id",
     general:{ko:"pdf/IPhO_2017_G0_KO.pdf"},
     problems:[
@@ -574,7 +581,21 @@ const DATA={
    {y:2014,host:{ko:"카자흐스탄 · 아스타나",en:"Astana, Kazakhstan"},cc:"kz",problems:wip("To see invisible!")},
    {y:2013,host:{ko:"덴마크 · 코펜하겐",en:"Copenhagen, Denmark"},cc:"dk",problems:wip("Speed of Light","Solar Cells")},
    {y:2012,host:{ko:"에스토니아 · 타르투, 탈린",en:"Tartu and Tallinn, Estonia"},cc:"ee",problems:wip("The Magnetic Permeability of Water","Nonlinear Black Box")},
-   {y:2011,host:{ko:"태국 · 방콕",en:"Bangkok, Thailand"},cc:"th",problems:wip("Blackbox: Capacitive Displacement Sensor","Mechanical Blackbox: A Cylinder with a Ball Inside")},
+   {y:2011,host:{ko:"태국 · 방콕",en:"Bangkok, Thailand"},cc:"th",
+    problems:[
+      {id:"E1", en:"Blackbox: Capacitive Displacement Sensor", ko:"블랙박스: 정전용량 변위 센서", state:"wip", hold:true,
+       files:{sim:"sim/ipho2011_E1_web.html",
+              exe:{ko:REL+"v1.0/IPhO2011_E1_sim_KO.exe", en:REL+"v1.0/IPhO2011_E1_sim_EN.exe"},
+              src:{ko:"src/ipho2011_E1_sim_KO.py", en:"src/ipho2011_E1_sim_EN.py"},
+              pdf:{ko:"pdf/IPhO_2011_E1_KO.pdf", en:"pdf/IPhO_2011_E1_EN.pdf"},
+              sol:"pdf/IPhO_2011_S1.pdf"}},
+      {id:"E2", en:"Mechanical Blackbox: A Cylinder with a Ball Inside", ko:"역학 블랙박스: 공이 든 원통", state:"wip", hold:true,
+       files:{sim:"sim/ipho2011_E2_web.html",
+              exe:{ko:REL+"v1.0/IPhO2011_E2_sim_KO.exe", en:REL+"v1.0/IPhO2011_E2_sim_EN.exe"},
+              src:{ko:"src/ipho2011_E2_sim_KO.py", en:"src/ipho2011_E2_sim_EN.py"},
+              pdf:{ko:"pdf/IPhO_2011_E2_KO.pdf", en:"pdf/IPhO_2011_E2_EN.pdf"},
+              sol:"pdf/IPhO_2011_S2.pdf"}}
+    ]},
    {y:2010,host:{ko:"크로아티아 · 자그레브",en:"Zagreb, Croatia"},cc:"hr",problems:wip("Elasticity of Sheets","Forces between Magnets")},
    {y:2009,host:{ko:"멕시코 · 메리다",en:"Mérida, Mexico"},cc:"mx",problems:wip("Wavelength of a Diode Laser","Birefringence of Mica")},
    {y:2008,host:{ko:"베트남 · 하노이",en:"Hanoi, Vietnam"},cc:"vn",problems:wip("Differential Thermometric Method")},
@@ -752,6 +773,30 @@ const DATA={
        files:{pdf:{ko:"pdf/ISPhO_2023_T_KO.pdf", en:"pdf/ISPhO_2023_T_EN.pdf"},
               sol:"pdf/ISPhO_2023_S_T.pdf"}}
     ]}
+  ]},
+ rmph:{
+  abbr:"RMPh", since:2010,
+  full:{ko:"루마니안 마스터 오브 피직스",en:"Romanian Master of Physics"},
+  scope:{ko:"초청 · 루마니아",en:"Invitational \u00b7 Romania"},
+  note:{ko:"부쿠레슈티의 초청 대회로, 2010년 Romanian Master of Mathematics and Sciences의 물리 부문으로 시작해 2015년부터 독립 대회로 열립니다. 아래에는 실험 라운드만 실었습니다. 2015년과 2016년 대회는 공개된 실험 문제가 없고, 2010년 문제지도 남아 있지 않습니다.",
+        en:"An invitational contest in Bucharest, begun in 2010 as the physics side of the Romanian Master of Mathematics and Sciences and run on its own since 2015. Only the experimental round is listed here. The 2015 and 2016 editions have no published experimental paper, and the 2010 papers have not survived."},
+  years:[
+   {y:2024,host:{ko:"루마니아 · 부쿠레슈티",en:"Bucharest, Romania"},cc:"ro",
+    problems:wip("Ferromagnetic phase transition: The Ising model")},
+   {y:2023,host:{ko:"루마니아 · 부쿠레슈티",en:"Bucharest, Romania"},cc:"ro",
+    problems:wip("Experimental studies in rotating reference frames")},
+   {y:2021,host:{ko:"온라인",en:"Online"},
+    problems:wip("Measurement of D\u2070 lifetime")},
+   {y:2018,host:{ko:"루마니아 · 부쿠레슈티",en:"Bucharest, Romania"},cc:"ro",
+    problems:wip("Polycrystals and monomolecular layers")},
+   {y:2017,host:{ko:"루마니아 · 부쿠레슈티",en:"Bucharest, Romania"},cc:"ro",
+    problems:wip("Polarization and Photodiodes")},
+   {y:2014,host:{ko:"루마니아 · 부쿠레슈티",en:"Bucharest, Romania"},cc:"ro",
+    problems:wip("Determination of data using a chronometer","Eletrical Black Box")},
+   {y:2013,host:{ko:"루마니아 · 부쿠레슈티",en:"Bucharest, Romania"},cc:"ro",
+    problems:wip("Porosity","Black Box")},
+   {y:2012,host:{ko:"루마니아 · 부쿠레슈티",en:"Bucharest, Romania"},cc:"ro",
+    problems:wip("Maxwell-Boltzmann distributions","Optics with lasers")}
   ]}
 
 };
@@ -787,28 +832,19 @@ const flagImg = (cc,cls="flag",org=null) =>
   : org ? `<span class="${cls} orgbadge" title="${esc(org.name||org.abbr)}">${esc(org.abbr)}</span>`
   :       `<span class="${cls} noflag"></span>`;
 
-/* Each competition can carry its own logo for the current edition, dropped
-   into logo/ as e.g. logo/ipho2026.svg.  Until the file is there the card
-   shows a plain year-and-flag mark instead, so nothing ever renders broken. */
-const LOGO_YEAR = 2026;
+/* Each competition carries its own logo in logo/, named after the key:
+   logo/ipho.svg, logo/apho.svg, and so on.  .svg is tried first, then .png;
+   if neither is there the image removes itself and the card falls back to
+   the wordmark alone, exactly as it looked before. */
 function logoFallback(img){
-  const tries=img.dataset.try||"svg";
-  if(tries==="svg"){ img.dataset.try="png"; img.src=img.src.replace(/\.svg$/,".png"); return; }
-  const span=document.createElement("span");
-  span.className="clogo mark";
-  span.innerHTML=`<span class="yr">${img.dataset.yr}</span>${img.dataset.flag||""}`;
-  img.replaceWith(span);
+  if((img.dataset.try||"png")==="png"){
+    img.dataset.try="svg"; img.src=img.src.replace(/\.png$/,".svg"); return;
+  }
+  img.remove();
 }
-const compLogo = (key,c) => {
-  /* NBPhO has not run a 2026 edition, so each card falls back to its own
-     most recent year rather than showing a year that does not exist */
-  const yr=c.years.find(y=>y.y===LOGO_YEAR)||c.years[0];
-  const n=yr?yr.y:LOGO_YEAR;
-  const flag=yr?flagImg(yr.cc,"flag",yr.org):"";
-  return `<img class="clogo" loading="lazy" decoding="async"
-    src="logo/${key}${n}.svg" alt="${esc(c.abbr)} ${n}"
-    data-yr="${n}" data-flag="${esc(flag)}" onerror="logoFallback(this)">`;
-};
+const compLogo = key =>
+  `<img class="clogo" loading="lazy" decoding="async" alt=""
+     src="logo/${key}.png" onerror="logoFallback(this)">`;
 
 const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
@@ -872,7 +908,7 @@ function viewComps(){
       ${Object.entries(DATA).map(([key,c])=>{
         const probs=c.years.reduce((n,y)=>n+y.problems.length,0);
         return `<a class="comp" href="#/${key}">
-          <div class="chead">${compLogo(key,c)}<div class="abbr">${c.abbr}</div></div>
+          <div class="chead">${compLogo(key)}<div class="abbr">${c.abbr}</div></div>
           <div class="full">${c.full[lang]}</div>
           <dl>
             <div><dt>${d.lSince}</dt><dd>${c.since}</dd></div>
