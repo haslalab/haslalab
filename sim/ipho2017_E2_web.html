@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAArg0lEQVR42u19a5BdV3Xmt9Y+59zb93arX2q9bBkby8jC8ttGxGDAMEkqxAyUqwyZDM5kKlRIeYrJTBIqyY9gM6kiUFNQmWKGqjGhUkDM2OLHFINdxjWDZcdgGwdjjPADP2RJlqWW5O5W933fe/Ze82Ofxz6nb7f6ce+VLHyrutTq+zpnr7XX+ta3HpvQw8fevXvVrbfeCiLS8d8+85nPFH7zN3/zos2bN18zMjp6iQnDq8rDw+ePjY6WAUwy8/DIyEgJIgBRz65FREA9/LzuXwJgHV9Rr9erYRg2jDGnKpVKtVKpHCWiX3Q6nReOHj26/yc/+cmvPv/5z9ede6KHH35Y3XTTTTr69nU/qEeLrQAYIhIA+Pa3v711z549N5VKpQ+Wy+V3FYvFt3ueV/Y8b0lh9XBdB6YA6/2Opd6rtYbWutFqtY50dOcnM7Mzjz23/7mHPvaxj/0qfs2+ffu8XigCrXMBGIDEgn/66ad/a/PmzX8wMjLyO8PDwxNd9ovRWlP8vUQEEIjQ553affUBEZzJR6T44v5ORMLMnJdNrVZrVev1fbNvvPGt22677XtPPfVUPd58rsUdlAKQiHD8xc8888xHt2/f/qcbNmy4SSkFADDGGAAGAFtZE+EseYhIrIE42x6x9RMRiRTUsF1TFb9mZmbm2WPHjn3t8ssv/0cAjfxG7KsCiAgrpYwxBg899NCe3bsv//zU1Mbfjp/WWhsi4tUKnHrl1M4WfND7axaIGCYiWAuBubm5p48ePXrn7t27/89arYG3Wl8ffUHx1VcP/dXU1ORflsvlYmTawfahzvbF7Cr8s8AlnOaaCURKRCDWusr4+PjV4+Pj3zt48NA999zzv/6SiA6vVglotcK/7777dl199TX/uG3b1j0RYNFvBqGfiw9jjFFEADPPzs4eevzxx//DzTfffH8kK7MSo0qrEf63vnX3xz7ykQ/fNTY2NmWMCQEoerPZ0tMshLwJr11EQmb2KpUKnnnmmb+68cYbvxRhNDndLdEKPtwjovC+++779I033vg/NmzYoN7a9csu2BkBl8YYEwFwfuGFF76ya9euP1+JEtBKhP/ggw/+0Q3vec8/DJfLorWOw5SzCtj1/TpWKlgiwJi+KUEcvUgXvCIiwswGgHrhxRe+smvn6ZVgSRC4b98+j4jChx565N9ef/01/zBcLhtjDFYq/LPJnPaGMqOzwwIQQZZQMCIiY4wCoC99x6V/tn//fiKiP1sOGHYV5t69e9VNN90UPvDAAzded93V3xgeHjah1kREfLb6yTej717zfS6jYGyfUwD07t27//MTT/z4L4hIR2zt6RXgjjvu4E984hP6S1/60iV73rVn78jISEEbA8VM62WPBgHifi0wxumIJCIYYxiAvvyKq7704IMP/k6kBIvkndcKevjhh/nOO+9Ud/3Pu767ddvW3W8BvjdpVGPdAQpBgcdGxz60YXTDPe973/sqAPiRRx6Rrhsn9hU///nP/+LKK6/8r4AJRch7aznf1FyBVkqpAwcO3HvxxRf/Xh4PsCN8BmDuvvvuSy+++OI7ABit5a2df/bE+mu1BAqAftvb3vaJH/3oRx/N4wEv92J59dVD/2V4eHg4Mv381tKfNSZ9ze8zWpNSCjt37fq7z372sw8BqMbRMce7n5nND3/4wxu2bdtyC2xu/63df64oDzMbY/TGiYldn/yDT95GRBIDQtcF4JIdl/x5EARKay3nCMP71iMbKMn287f/p9tvv32YmTUAcMQUmXvuuefKjVMbfxc2r/zW7j/HQsuIwzHjY+OX3H77Zz4qIti3b5+XVJ5ce+21/25oaKhgbD7/1y5+XpJ0ObciAgCQLVum/j0A+sAHPmCYmfUf//EflyYmJz+yLrQxSFk6wpGVb4E3i6b288MVACoOFd+/d+/e3URkWETwh3/4hzeMjo7uiMw/n+2CZ7I/FP0u59R+7Z+iRgyhLpfK3uVXXv5bCQjcuvW89ypmGGP02bwnmACG4ERL8MSC4MF5waGmgHFWF/P0XS1oFeGjiEAATIxNvD/hAYrFYE/05FlV3xEXSDIJxACvN4Ff1QXTIUEIEAKOtwU3jwkmfIaBgPDrFb2cTu+7EEhMAIaGhq758pe/POHdfffd48PDw7sdpHhWCV4b4LW64MUa4Y0QECIoBkhs5qtuBKfagglfzmnxS48cBkdJvSAItuzefdVV3sjIyDW+7289GyIfEYAZIAg6GjhYB16sArMhgZngswAEGInwgLGXbIyxBejU/zs4W4pc1hUNACYIAnXRRdt3elNTU5f5vm87e5aoD+i7ZseCJ0EzBA5UBa9UCQuGQAQUYsFHQqZI0AJbOq+1gUUChN70Fa1vl1IXhaGVCWYwu9AYIWZ4gfcOb2pqajtbADhQ9s8VPAiotg1eqQAHaoSqJvhMCJT1YUayRlAkjQaS/2T2Zf+UQJb5e1wxoSUFpYnFIOu2upsS+4uynVIrA7TrKGMXEQKA8lB5hwdgJwAYEVIDUoBksUgw3xK8NA8cqAItIfiKUGCBwPp/d6HiyzPx/8XRJIn/MHgjHbuumgZ+WRec1BLppbVg8XUTpUoSg1iOkTkBJQguCwibfIKR0xZsrjuoqDcauzyl1AQc7R3MYgkWWoJfzgJH6oSmBnwFBGSFaYxdnK5AR5A6qkWljjRwKCMAiIFaKHhoXlAxBEWECJ5Eiu5ckePCYkWI/BkqBEy3BO8DcJ5HfVPjuH2PmSe90dHRSW0XkqjPa2eFb3BkQfD4cUJDWzNfVJEsBYCOFoVc5ier9LQk4LNxwKBBGgnwfA2Y14wSS9IQ6aolOcbKvfTYmjHb9zTB+GXLYKuirOL0+KGNYNOmTR0m4vPCMEzCg35xV/HOn64IHnmdoIVRVPHFdKF2TbpYIlk3QM7up9hU0ACI1CUeoTY42TYoRBFKYr6ja5Tc/Un0mgzoE4sdPAjqAJra9A2RiwgZYwBBkcvD5REd6oFYzrBj8LPjBCMEjk29u0hdCP7ExTtKkId7IjijsVkY+/zoh5EDfA5WJXFMWdylHP0pfo8YIDTp5/XcYhGgjQExj7Ax6/8GWcHzTAZHK4I3GkDAgA6jJ0z6InG62Si3cPFimMzC0JpLpXrp12LA6gI3g9S35xXYXjdAOeJKnHs20ecuAXZ6Al5EJLUy/QwBrZIJjlUFRghiUlPpChmOoDPa7yyiK28TMULkIICebI9VKr/A7tgYD4gT3rkKHAcrkr+njOvLdSmu85boNM96/febUa7OCGptAYQShYDQIhAvYv9uuWAnpKecO0CcCSQn5u5B/L9Si+IqrTFgMEgA7QDDTCST3JvdbG4Y7wavEvEFYiSyElhXKluWVQuB12/fSdGtGSMQsSZbbPdCeoN5YoQsr5+Rp/O7xJ1RQlnG5UwwgEYSwZrI/yMWvnPNmf/Gl+3ccyz4eBMkm6TP3Ayn2ix93P8J+kxUwjV/iQ2M/GKyepLbbeJ+HsVG9szUepCrc2QjGdfMdwGB1uJR6uJM5taj90lP6xtkGQsnAnjWvFLfGTRxwh2JFY4onSIkKWWabomcHsScQLRL4kVMlIQGmwcQioGrdF11x6CBOAtmqRuZxSlAFAdArueWaAmME0NMtmO6egCflvGd4mxjcfw/zGK/Dnd3SJfQ0FkwF0Sm7mawBFCiq7QYwLpLkglznfs0JgcMF8cE/QGzksAs12GtYzGW6SGhnJCTXevqjkkJkljrXeUQWRwSQvJuQdZuGteJc4xZYtdFEY9r9jM2HzkrFq0F0ToZzdOAWXKNjqzUziz3ocs+l368jePJWgKJF0hsBs0sDpUW+VVjX2eM/UiDnMKsCvysHwdklEDnY9ru+ziPEch5bRwirxP8r8h92XWQVYQ/y+xyWem2E0rAYLorKMMB5E1mhgWUVIDGRHmBVVDSPbUA4rgdicNdWqy8JmuxENHAeZdgTGoBaUC8tpddPulNjLxI2wSU+LooYRNvAwKIySFOLFGUhEqciwadsJByyRJBPu7uMwhMJGXvh8lhNCnPb2SHhySezsl80uqZnHWGMeIoQD+DgNhExwmeHPtFIpYBSxBqNvdvhWlXkTjJE8EDQS/xZQNhiMmCWiJAgSA6FTZF0ZUWSYMsWgz28hUMmbC4X8J3chBef2DR0rA59nHuqJN4ZK6A4kgo4dUp5g9Iovk4kjQF6CilRokXHnQUQNEtSBKWmoSTtIDFTU9ztAli0icOBROL5+ADgUsNorezh5zP8WQgJoAWc/qUWoI4hZYQKyIRK7a4ph1MyfsoyRXTGW/80dql+yS1Ws4KxMCVXTZQVuhpV3iDK5ViTDd5NKAJiXGyyXRJ61ploBQDxFqfmFNbIhUrhyT2N7YmsjjcGBAbmMnmGIuTDbIUbzd770CgbIVTTHV3C6F6DW4FA8IA7tW5iBjRjkbq+2NmUBJcgFT4SDN+5LJqeeCwykWhdd4SKMt1xLvd/eAkouFcnoByPl9c2nyJWLp32osBzf+xd2ji3Rv5SiJrzk1GtK5rcHbHIktl/QgDKCmCydlQiaTCtPKKJVmDQiT5f+MQPRRRv66QnRQHxdGN84UuF7B46PvqhX/6/Sx5ENhvW+kUdUg+SZRy5ZSAIsqm0CRPvNjPKbPBWCE2HDGQJBBbzWpqQVUTGhpoAQijHaog8BkoMjCsCEMMcNRpulIQnivuyd5UlLHMM9iZbGAKYVKsR91mAdLaLNMKXjDQCWBxps81b5KQ6pRU16QbnNKkCbIJdPYItQ5h54YQ5UAhFILHlhtsGsLxhuBkCFRCK/S4Sjc6pMQaF7ZoXRFQIsGEB2zyBKMeg9kp41qOCIoElczmVrniT0lLwGMGy+TqHBiLi2IG9RicAkguzs2n8o0VeFrZK6l1cHyinY4O1DqETV4LV2wkhGAUWNAIDQ7WCdNtQd0QmO0NEkX/JjtQIqMiCTCtGMK8AV7rEEaVwXafsDmw0cVSNfrxcy6P75JA4ma23QIXk6WujWSSnxl2cyAKsCIDs15qLWHJxDGzEkXvlG2SIUkb/+O4P/4zE2ptwaagifefJygGPgDg5argYJ3RFMDnqMdAsmQSOby7HZiSaoWiVFnmNGEmBMZaBjsKwGQQ5fFza2XpCclDnUxuIuO9ojo8YudJTm9ZEI/t6pWfX40FkGXQUY+DbJP0dsWAUCI5UEqimPR7xQiUxwiNoBWG2DXaxjVbCOWCh4UO4fkKYVYTfCIEEdkUxjAiBwITZTCLvErCVipryTFvGD+tG7wtFFwyhKThg7oIQJxMHtzQzl3KKMsHk6aQM8gzWxlyWv+/ZuFLQq/GCkCnZ43W6Zgk4p4TACiUFlBSGvq5XDnFkQIJGm3BsNfBu7d28PYJBSaFQzXGCzWGFkIQt5PpLOJ2FzeeH0CUBaLkGDgXuPtRadqBFjDTAa4sGwx7nCqB2+ETF/qzQ3vz4hS/kKRMkHF2fI4jyJirfiQFsiBQ+scDuImOeIckqU9J79OQXRxKwROxNRONtsEFw01cfx4wXvLRNoRnFxiH6oyAAY/TPsLYnLrFQW6dKRw6VsTp1cuHZJTm8YsgVAzw+AJwVdlgqmh7G1JSCmBJvyj566IOpiwDJo6wY68wkOKW2PQQ+l8Umkl8xB0xEVVG9kA5SMQRxIpADCgFtEKA0ca7t4V4xxTDVwqn2sAvFxRm24SC01kEB+W7HWWZXR75ceMGHsgi8gS1OzG5jrJmGoR/qQLXiGDLEDl5e9sPKAbQYqzVYkfxOBVqPhlExuEEHGKIkIsbV4MDlnHbyYlp5FiAQQ1Zylb8UJozj2xw4ppAqDQNtg638e4LDCZHPChiHK0TnpkjdIRsc4nJdt66TFxcbgjn/8K5tcklnbKsXZRVdFK5HEUPT1WBq8Vg2xAjFKDgETw2aIcKpSAycm40YNKyy9jVxDF/opGcswyy6v21yG130wPKsdirqwfogTEgSWN6ifrE4/4+xUDHEHQ7xFXb2rjyfEbR96FBeO4U4aUKQxHBp6iCCEmSMNktXXMbtDhEA8GmbznbuJm4CtCiJYkP6vCI8XRVQNDYUiCEAlwyGWK6yoB4IFisk2T7RCynQbneRpcfMM59iNMg22tX4Gg/JfUAMgDywUW5Jkvdx2Cv1haMFVu4YUeI8yd8KGI0NOGpNwjHGoySZ4MxLdmoi8W6DAMrjHhXczRPSEU3GPfxZ3y+yYGuKAXB7vUi281LECgBnq4w3kUaowp4+0YP1VYHT00rDHl22okIZSp+BbCdI5xV2kz3czfKG7Q+WS+RDaTEAvSh/ii7eQQU+Xg3Zw4ASqxvbTdD7NzcxrsuIpQKAXwiTNcJPzlBaIltu9YmBkvR4pKgEDB8Dzg2YzDqtTDEbRSjXR0KoQmFFvsg5aPgOcpOkkHdlJs7INSlUCMP2IXw03nGe8YERaXwzs0GJ6sNvLYwhHKR0NGSxqLGyQ/EnxcLXjv5Au6J7FdmkckhgtbF86wkVIy+xC3iZCbUW0AxaOFDl2pcvMkDs4Ii4JezwLNzDIYdDhW/LzSApwhBgRAa4OhxjWdfbuOqrW1cf6ltqfY9jlLFGh0dotpp4kRbYS4sgQIfHi3meMXhBii/G13Y4pRwsQg6QviXOWDPuAaTwo1vJ/z41RZePVVAuUDZ2r/YBeV7ITJVswMA5QkdLnFjyDoxQFwTTbQEOHGSQdEu7hig3tLYsamNG3YAo6UATISOAR6fJhyqUmJKtVjhKI9Q8IBmR/DaIY2DhzReft3gfTtDfOJ6Rr3lQSmOD06CQOAbwVDRYDIMcapZwYF6gLpXRsGPqouoywLFBFXu6RgQuiVtCsB8SPiXOcYNkwKlPNxwYQeNl1o4WS+iGAhCs7ie1tYCWkSetIVxzI52if97ZQ3ctus4HSxCPQIWyyeCOhogMGotgaIO3rujg6suVAA8+Ao4USc8fhSodKzwTbTYrAD2CToEXjuk8fKBEAsVQSFQuHAz45Y9BCMehgoKnkepAoht3AyNoK0UJjyNDcUQr1YqONoqoxB4EKOTiMQgcjEOfJb8muWMnQjgEzDTVvj5vMG144LA9/Cvdmr888stHJ4PUC7a4Q+UZ0OjEJEif0MDKAfPS8VbJ6m4Yv0QELaOabw43cG2cYP3X6qxZSyANjaef/YNws9OEJjs/ABjrOCVR2i1BUdf0zhyRKPVJAS+wuZxQrNDuHAqxNYxH4CC7zEUc1JbEFcOeQJ4mtHpMJgV3jHWQalaxYuNEgqBn6J2chjoeHfmLZrJs3t2zxZYcLBKYBFcO0kgeHjfxR08+koLhxcKKAUEI8ZuNpcXMBFgTHLHlBS9Yn0Z4dMKRcQpCOnnoAUmIDSEKy5gbJ8IsaFECLwgScc+cpjwypxVBBUhZKWAZhM4dljj+AkTCZ4xOmyVhNl+8HiZEHiAEYZiygw6iusKFQmIFBQxVKjRJuD8kRAsNbzYLEMFPkhMUkQiEU2dgDSk1UpJCXeCBO0fQgEKDLxSYXgsuGpCYMTDBy7R+OmhBp49XkCxoKywjTuPQdLP5m7kT4+RYGTdYlfjIVd70a+HIgYUYdMoIxRCoATHqwaPHVGYawFDfsrMzVeAmRnBqTmNsAP4HqEwTFbAEWRXbBesVLAm345kW4L1gFUaUgCRAjPQbAPbRwlADc/XyygWA4gYG+vH/lqje70eZTuWXFp3iAnPzdmxMddOMdqasOciwmixiSdf82E4QNGPciJx7oPJwQUpKB9IOjipx+tnJwXFVTiWQy8qg5dmgCdeZ3TEmvxWG6jVgFNzBtWa3RGBrzDkR37Sye6ByMb94ep2CBEiK+GBiNBoE84fBRTX8VyN4PmeNelONY/olCIwlOVM3PLt+PWhCIoM/GqO0TGCd20maK1w6VbC1EiIJw42cKzqoxB48LwobyCpLcgMwEQfLAHR4mSQrCIXlHDJq5I/JX38TIIfHyY8Mw34TDBtYLYqqFUFWhNYEcrFdEGZKUnYUMTrMluCx8B2FYm4yPn0g9VtoYjCUGAtwXkbgI6p4dlqGaWiB4l6FcnJKBmXMHMsAEXSN5JVjiEPOHCKUGkLbthKKCuFiWHCb+3SeOVEC7+c7mChGcDzFNiz8aVSDAVCaIxT+tonEBAJ3FvtYAhmXjNe6GjBfb8AXpkhBAJU2mKHRQEIfAYXnD6BqGXMrQgjosQSMFsSiUmy81hXGAYxEzwoFCMluGBUYEwNLzaG4fsKYgyErPIZt7gE+aLNSPhGIvNtv0ALUFDAG3XCgwcF124GLtzAaIOwcwvjgokQR0818eoscLKuoElBC6OpgUsnOygXFAz6V7JFi1rDVowhVi98LQKPBb94VfDiMcaQsqyeryzYyxo6cZTNxUOSYpVIMEpRtqhiteCUCR4xiuKhKcBF4x0YVPFctYxSwQPEQEcgj7pMgM5OqqVFdKEACBTQ1oRHjwiOjAKXbyRs8BlMPi6aMjh/vINGO0S93UGzAwQeY8uol+YO+wYGJJcM6mcyIEp0n6gIfI+gvAjwSNyeTAkjRpQSNHHbFVNaKRR3ETDZiIFj7LLGfm8mhqcIxQLQaAMXj3egTQ0v1YdRDBQgxgnRHPe5XEcPZTkyFSnrq6eAY1XBjjHCRaPAsM8IVBFFXzAypFO6kSyZxX1EgtLvvoDF9XOpg6Rodyez/pAt4ICixL/GE7UsdU7pGlGyVusOYVhFlsC3luCSyQ48quK5agmFIADDwHTr53fIm0zZd7fpXwIUPUAbwv6TwAuzwNZhxvYRwXggKPsKDMDzrKvThqMq6rVbARevLYWOvCxbIz30MXlzKEkJOMXlX25FhpOW5eh1bsYwRsYxOUP5Qo91k5kETykUA0GzLXj7RAifa3h2wUD7BZuPcNC/28gBZ2aBe/Muwx7XJxDZkFcL4cgC4dA8oMAYLQKjJaBVA7YOGVx2vk14rccIuGA9d0p4stYDIYLcOnm38obYKQvjtMSq6+DH/A6kRRHNCjOTSy8WM+CRwhABjQ7h/DFCOWhg/2yIii6h6NlS4sxwR5FFxA05Li0RhGMV4pyQzwKfAFaMuTbw9CsGh48ILtwI7NwqUJwrL+4lCxhdshcjwj7TABlFkGjRssWP9sLIQVBEsoRPcSaMrFQBV3ihCgwoYAiEpgBjZcK7vA5empvHa80SyAsQqPQakwJXh3RyO65dYo+iBTDReUdeQAg1cOyEwasHNVoNYLjAUAR0tMU4pxP+Wr1fl/kAA6gIijSM4fQDZmhItzJTuhAYLscvyLWV9kZRo2EPpBjFwEM7ZIgQ3rmxg831Kg4s+JhrD0GUh0BFIBSCMLJkoKWHFTHbVDYxodkSHDwS4vBhQbUmKHiE8hAnp6PEgzVByxSI2nMA1zTmV1wmUPqchE58v0umRCVJi2E1ZUqz01x8vOtzEw1WGv+v0kQyKMos2h3ZCgmTwxqjxRBzjQperyrMtX20EMAQY6TEtgjFTf1KGskYAVptwclTgukTBiePGzQaQCFgjJRsDYRiW1xKFCvAafBfD0z2QDBAKljJ+U9yqOJ4PkBa3CeZPEXaGC6R5TB9m2+KqGePkvyBUjab2GbGJl+wsRyi1mzgjUYdldDDU68U0YTC+DAlmUStgWbToNEEKlWD+XlBp23Du8AjjI0wPLbsp2Jr8gUEXzmg+XTjnteIEhMXkHxNv4cqJT0BlOG+45m/ssRVipNMSJQ0SmUuBRLXyY4uWmClFIgMFDM8rdDRBlopDFOI8pCBMQZ3/98Wjs8HKBWtktucQ5S5VPZklMBXGCrHwqboxx6koZjgKYI2gxt9K4PDAJKOhnXCp7QVNGYA47hVktm6xGk8YDIpTTgHRcqqBbt61jCqMyCGUgwjBkbZdrV6q43JMQ8aCioSJkf8hfIIKuIrmARKUfR8RGSxJYmYYlrbup50l/anMFAWg8B+qkLUACqxb3NquJ1hDgA7XcDprieQraDJuQA43bnSgyhAVnAfzLboQ6AgrEBao0Q+Sj7D9xhDAZLj8JgtwmJFdpcTQ7HlQShSAMURMxrdGQHw/CV8fy91QWQxBhBZFsSulwteNPLVtQ9Jfb8zpCEZvpibu05EKZF0RiaFp7hcMcMww/cI5QIh8O1aKqboMMyoH4AJHtmRukQSPWfNv8fxNBPKzjrL9wVw7430wOYDuDN+k+RtYgnSEemU6blzTDzlt4A9eILcKHGVdmzdls7p9Al8IAgIvpKEVIorl2I5cuIKKLECFDUycoQXBHEU0YUAkp7qcDYZRAM8N9D9lyg7bjU5AjpNuCf1BHEuIK6jSyaOgtZk0Ne7nuS0lVkQB/heLORUAZL1jUI8drqE4gkhYElmJlE/zghaQg5eNkwz/elKzXW8iHFGQzhhXjpaLcsAijvRw6UPZXHj7Zl6EAs8D/AiZiWqgEvrGEgSpUUs8CSx5Y7sl9xhFH3qDokLQtJF7OMK5mfhOskBI/EJIrY9nCV7helASHIIIZcOzs3hGNCoQHegBGDrGjyP4HvJQQwZDJBmhcRJcFHmrA53mEV6tgp1377rNNmZxpCsv+2jEgilp4VlmieBbI8yZQGQU4ZjohwBZzJBUVn1IHd8bst4TPCUQKm0cilxcZRGPeSuNmc7le3kktMff7vuswQGDwKtJpuo4BKShnNI0LwT/zsRfiLc/LSPpRpaBzko1ImalIpCPxJwnMURq6hCeTC7ONSiCJUR0hpIyaxDr7FgHAauog99vWvrjmGJx6rHuXyCJO3b7GTUKKWRnCEPEg2b4oQ4ojOMAQAn9It3eSTJfF1jN9wazwYURPwASZ8V2kZfvJo9vPbXSTL4LT0PyD1UUdKzc+JTM40gjgnSo2EiKyKOIqxJEXu3qu7ZfswO6s8av8y5AgRJogTX5ysGQiOYKBvbuyi0pqmlK4H/8crxygxFjxbL5A9Uck4NEcqE+7ZMjDKDdJIzBxP6eK1Ck95tomjVlVMLRs6AJ+oqIaeJNh5Tx0BoGB5rXHleuKZqIFmpGXbewL2eQiGn0c305GzKKEIS8uVGpaVHyMRnA0RzfqJBAwkjOOiwr8v9Zs/9S319/iST2BWaWHGI0egAjBY+eHETm0bYHrDdz9uKppx68/Pz86Nj46NmiSwU9UwtXJBnC+QMpeVglN8d0Vi3ZJxMTAhJ6lTgVAvLgEfFuyUMib4aQNxehi5MKGfmExHaITDktXDpZBOXbRNMDgcQ2PRzvwKbuOFGa13xwk7npFJq1LYy9E/nXM1PZvVI91F4aZhLyBhSJyVMbMvHFUtmtg4GfHikO3cQufnW+Qkj8RpoYbRDg6JqYdemFnZuMhgrKzB5ACkEnook0S8NSA7ZaHr1em3WYyAMJWnS6If0CcC2cYOnDsRt2JL4wGREXNKEkTkgwP5fAENxI6j9uzbAlhEDIpUdBDgga5AnbF38wu5cB4l8vDAaHUHZb+GKLS3smAoxNqQA8sHsoeAxPI9tFrGPvAaJCDHT3Mys8cIwPBb92cAOvFgx+bHShy2pYuw6L8T+w228fDzAhiKDlQvKUn7cmks31x8FhlELNROh0gA2j7bxzvMEHU3w+AyQAZTiFJUQXSZD1DAB2jAabUE5aGLnlmjHlxSECmBmBIptj2BSR9Df6zeAMDOJkRlv69bNTwH4aNyqvBxANmtc2liwnsf43WtC/HB/iNdnCzCGEEb+gJ2Bii5sIHLLwO1sGVaCd24zePcOg8Dzs4WlNJjDT7qpmcAOgo6vN9TWx5f8Jq7a1sI7NhlsKDGAAMwM31PwVDTXIB6XR/2/Zm0EytaDH/QOHzx88pJLhwER9n3PmWrYS0Boq2C0URgeEvzr60PMVGqoNgCJJ2ui2+SNXHNDxJ0PBcDkiAdP+bZok7PMsaxmA6/blwIeA9oYCHx4Cmh1BO2OYNhv4Z3n2R0/WlIABSBWCCJTr6LdTqDBGS6ynQ0egDDsPO+dnJl57oJWKywUC96iOLGHDyaGr+xUmnaHMFFWGB+W3Ey0rFik6+fEu0VBMUcNorwmia7bSkTjYZmB6y4M8c8vMqp1wsiQxuXbrOA3lBgiAZSyI2w8ZjBzmganPinnMhqgtaGmCVEoeM96hw8f/sV1111/jFhtN8YI9csBUdySbUGOMZKwekuLhhbNGwTscAgmjn5k8emLA3wwAR2tsGubwdhQE6fqBptHgXKBILGpVwxPKVBU9o0zecSdJda41Wp2nn76Zy8RABybnr5/06bNH9ZhqD1vZbHAmtZb0lAuG0evXIKxubRTQyid2EC9MftdK4Ox3HEKBloL2qGBEW0nmRqAyA63tkWh0ei6M3y2oWVTjelo8MKp2YOf/exfXO0BQK1ef5IJH26GWnzf61+PQDLYmZNpH4udH63aDPec4FmFqyBiMBv4nh3wIEbgqXiKCScFH30JQNYAxjuhMYHvcafT/sk3v/nNUwwARw4ffqjWaJqOFrVS4UvPl3kwKKgfxVbMdsZA4DEKvoLvK3hK9T2eX8uj1eqQGMH8/PyPIkxF+NSnPvVkdWHhpUIQULsTml5dNA3cwK3sO6mHn+VGKEzkxPIDoKJX+dDaiBFSlWqt8cILLzwAAGyMUS+//HKrUavuLQaMerMtONsfAzhXrf9lmQPeHESoN1umXCpKs1F76JZbbnlFRDipNH/6ySe/OT9fqRExdzq6J7tX+iG45U7DWA6s4dx+nM5iiQia7ZAAQ9PT0/8IAA8//DB7RGRERBHRK4cPH/7f52/f/slTCzU9vqGser7TiM7YZ9Bqv0PeXCojp9n9lVrDlMtDNDs789zXvva1B0SEiChMGpmJCM8//4svN+qNlhZQs9WRsw3ADOxhzDllGbQxqDbaUgo8mnnjjb+/66676ojbESINMcYY/u3fvvnn09PHvrVxtMynKjUj8uspf5xLik+EUwt1MzE6oqanT+z/whe+8J1o95tEAQDgzjvvhIjQD37wg7+dnZ2bGSoWeW6hJkSEX1tF6DEIG5xFTRtsa402tBFhaDzzzNOf+6d/+qfad7/73QT75YZHCROReeyxx/7o3e/+jX84PrsQjpQKXnmoADHm3NoZAw9cnK7nASgAEaMTapyYrYTnbRrz9u/f/+0rrrjiDyK8p+NXejktlegF33jppZc+uGPHjt8/cnwuVEp5xcCDyFoTwv1luN4sFmBw38UwRnB8ZsFMTY56x45NH/j617/+52JPBskAHO5iO4yI0De+8Y3/OD19/PktU+PeiZkF3e6EadbtLCM4zlo+4Qz4zthlT8/MS7k0JLrdrD7xxOOf/OpXv3rSPp3toOAuHyB33nknffGLX5zZt++hW+fnZmY2To6q4zPzphPqpYcPvgX2evf5q3mfM301nptwfGZBfM8zIyVfPfnkk7ffcsstj0eWfVF40zXz98gjj4iIqCuuuOL4hRde+LPLdu382FB5pHhydt4UCwF5nlpV2d1byGH1VpBWqSx2vKzB8ZmKMJOZmhhRT/30p59773vf+1UR8Vy/v6wFcCyB3rdvn3f77bf/v+9///u3SKe+sGnjOE/PnNLVeitpe1qJlZNzXFj9wEGrNfvtjsaxk/OiFJvNkxvUL/bv/9yePXv+Ntr54ZovZt++fR4AfOdb3/rg/Pz8sVBEDh2d6Zycq4g2RkREjDGr+pFVvr6vP8tcf3RzZ+e9aC3xY77akENH3whn52vSbrflZz/7+d9EkYfqibLFocPevXvf+Z73vOfebdu27X79xJw2RmhybJhLxSAT6pxT6P0stGAxDmt3NGYXqmi2Qn3elklVXTjVfOLxx//0wx/+8F2Oz5eeWJtYCT70oesnv/71e7/4tgsv+lSl3sbcqQVdGirw2MgQBb6XKMJg2zN+fcgkAAi1wXy1gWq9qQu+T1s2buC5U6f2P/bjH//JzTff/Fg+1u+Zu4mJIgB49NFHf3/37t1/NzY2dsHx2QqarXY4VAjUhnKRigU/cZCDb9p6U7FDy2Y243b4ePHaoUa13sRCtWkUs2yeGle63cTs7Mx/+/SnP/35+++/f241wl9EBK1AA01EJhARfecrX/nKvt/7vY//1fDw6J9MTUwGJ2cqODFbCT2PuVwscGkogO8p5A+UlbXMJFjFWBQ5nXavZ8TKcu/tpumr+C5yUX30t05o0Gx3UK23pNnuGCbwlqkJ9hRQXZj70ZGDhz53+dVX7wOAvXv3rkr464rQXE27//77r9u9e/efTUxOfmy4XB46VW2hUq2LQLTHzIXAp0LgUdwIkRR0Er1lGSIlEQDGGIRa0A41Wu1QWp2OhPYIMSoVC2rjWBmtVhvNZuPHJ44f/+87d+6814pCFACTJ3l6bgHyYWJkDZiIfgrg97/3ve9ddt111/2bUqn08anx8iXFQuDVWga1egOzC3Voow1Hk5SZQUxMcZ1/HnBRNyTWBZElR6IsYVaWomAzo2go+7duGzltVFvcs0DdvkcWdzdIbqcbY+xwDBERA7H/CkDgIPBpZLhMG4Z81gaoVatzb5w8+cDc3Nx3du7c+UAkcNx7772r3vU952juuOMOvvPOOxHjg1tvvXX4b/76r39jYtOmD5ZKpff6QWGXgMaKhYICMzqhQScMoTshQq2htXZO38r8kjQLJqOh80xk15Pru2N3WspNUF5o3RZK0kO2k+/M9jQuen92wGnmFyKC79nTzpVS8H0fvmfvtdloQCCVsN062Ol0nmw0qg8/+uhjD992221H4vcaY9Yl+L6QdJEicI544O9///tbL7ts52VDhZFLla92NlqNy5r1xs5yqVwolMrlDSPDgTGypDuVRfswf/WSdhYj+lWWkIJ0J9PygstbI8l91uKPki4X1sWWRI0szIxarVprNZvNysJCxyv4rxaLpecbtdornU7zpRMnZp75whe+cOgHP/hBywXh3wXo4z0QfPz4/y5jUkuvXaxoAAAAAElFTkSuQmCC">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
+<meta name="theme-color" content="#2E3945">
+<title>IPhO 2017 E2 — PDL 자기 트랩 · PDL Magnetic Trap · HaslaLab</title>
+<meta name="description" content="IPhO 2017 실험 2번을 브라우저에서 실행합니다. 반자성 흑연 막대의 부양과 감쇠 진동을 측정해 자기 감수율과 감쇠 시간을 구합니다.">
+<link rel="canonical" href="https://haslalab.org/sim/ipho2017_E2_web.html">
+<link rel="alternate" hreflang="ko" href="https://haslalab.org/sim/ipho2017_E2_web.html?lang=ko">
+<link rel="alternate" hreflang="en" href="https://haslalab.org/sim/ipho2017_E2_web.html?lang=en">
+<link rel="alternate" hreflang="x-default" href="https://haslalab.org/sim/ipho2017_E2_web.html">
+<meta property="og:site_name" content="HaslaLab">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IPhO 2017 E2 — PDL 자기 트랩 · PDL Magnetic Trap">
+<meta property="og:description" content="IPhO 2017 실험 2번을 브라우저에서 실행합니다. 반자성 흑연 막대의 부양과 감쇠 진동을 측정해 자기 감수율과 감쇠 시간을 구합니다.">
+<meta property="og:url" content="https://haslalab.org/sim/ipho2017_E2_web.html">
+<meta property="og:image" content="https://haslalab.org/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://haslalab.org/og.png">
+<style>
+  :root{
+    --bg:#f4f6f8; --panel:#fff; --ink:#1b2430; --muted:#5b6b7c;
+    --line:#d8e0e8; --accent:#2c6f9b; --accent-soft:#eaf4fb;
+    --disp-bg:#101418; --disp-fg:#8fd6ff; --mag:#b9bec4; --rod:#2b2f36;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,
+         "Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+  .wrap{max-width:1400px;margin:0 auto;padding:16px;display:flex;gap:16px;align-items:flex-start}
+  @media(max-width:1080px){.wrap{flex-direction:column}}
+  .panel{flex:0 0 300px;background:var(--panel);border:1px solid var(--line);
+    border-radius:10px;padding:14px;position:sticky;top:16px}
+  @media(max-width:1080px){.panel{position:static;width:100%;flex:1 1 auto}}
+  .panel h2{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);
+    margin:16px 0 7px;padding-bottom:5px;border-bottom:1px solid var(--line)}
+  .panel h2:first-of-type{margin-top:0}
+  label.row{display:block;margin:9px 0 3px;color:var(--muted);font-size:12.5px}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  button{width:100%;padding:8px 10px;margin:4px 0;cursor:pointer;background:#fff;
+    border:1px solid var(--line);border-radius:6px;font:inherit;font-size:13px;
+    color:var(--ink);text-align:left;transition:background .12s,border-color .12s}
+  button:hover:not(:disabled){background:var(--accent-soft);border-color:var(--accent)}
+  button:disabled{opacity:.42;cursor:not-allowed}
+  button.primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+  button.primary:hover:not(:disabled){background:#22587c}
+  .seg{display:flex;gap:5px;margin:5px 0}
+  .seg button{flex:1;text-align:center;padding:6px 4px;margin:0}
+  .seg button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .disp{background:var(--disp-bg);border-radius:6px;padding:9px 12px;margin:6px 0;
+    text-align:right;color:var(--disp-fg);
+    font:700 24px/1.15 ui-monospace,Consolas,monospace;letter-spacing:.04em}
+  .disp small{display:block;font:400 10px/1.4 ui-monospace,monospace;
+    color:#5d7f96;letter-spacing:.12em;text-transform:uppercase;text-align:left}
+  .disp.off{color:#3a4a55}
+  #cvHead{cursor:ns-resize}
+.readout{font:12.5px ui-monospace,Consolas,monospace;color:var(--muted);
+    background:#f7f9fb;border:1px solid var(--line);border-radius:6px;padding:6px 8px;margin-top:8px}
+  .chk{display:flex;align-items:center;gap:7px;margin:6px 0;cursor:pointer;font-size:13px}
+  .chk input{accent-color:var(--accent);width:16px;height:16px}
+  .note{font-size:11.5px;color:#8494a3;line-height:1.6;margin-top:10px}
+  .warn{font-size:11.5px;color:#a4551f;background:#fdf4ec;border:1px solid #f0dcc8;
+    border-radius:6px;padding:6px 8px;margin-top:8px;line-height:1.55}
+
+  .stage{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:14px}
+/* 원본 gridspec : Part B 위 칸은 측면도와 나사 머리를 나란히 (1.12 : 1.0) */
+.brow{display:grid;grid-template-columns:1.9fr 1fr;gap:14px;align-items:start}
+@media(max-width:760px){.brow{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
+  .card h3{margin:0 0 8px;font-size:13px;font-weight:600;color:var(--muted)}
+  canvas{display:block;width:100%;height:auto;border-radius:6px;touch-action:none}
+
+  header{max-width:1400px;margin:0 auto;padding:18px 16px 0;display:flex;
+    justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+  header h1{margin:0;font-size:19px;font-weight:650}
+  header p{margin:3px 0 0;font-size:13px;color:var(--muted)}
+  .lang{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;background:#fff}
+  .lang button{width:auto;margin:0;border:0;border-radius:0;padding:7px 15px;
+    font-size:13px;font-weight:600;color:var(--muted);text-align:center}
+  .lang button.on{background:var(--accent);color:#fff}
+
+  .tabs{max-width:1400px;margin:14px auto 0;padding:0 16px;display:flex;gap:6px;flex-wrap:wrap}
+  .tabs button{width:auto;margin:0;padding:9px 16px;border-radius:8px 8px 0 0;
+    border-bottom-color:transparent;font-size:13px;font-weight:550}
+  .tabs button.on{background:var(--panel);border-color:var(--line);
+    border-bottom-color:var(--panel);color:var(--accent)}
+
+  table.data{width:100%;border-collapse:collapse;font:12px ui-monospace,Consolas,monospace}
+  table.data th{text-align:right;color:var(--muted);font-weight:500;padding:4px 6px;
+    border-bottom:1px solid var(--line);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase}
+  table.data td{text-align:right;padding:3px 6px;border-bottom:1px solid #eef2f6}
+  .tablewrap{max-height:230px;overflow:auto;margin-top:6px}
+</style>
+</head>
+<body>
+
+<header>
+  <div><h1 id="t-title"></h1><p id="t-sub"></p></div>
+  <div class="lang">
+    <button id="lang-ko" class="on">한국어</button>
+    <button id="lang-en">English</button>
+  </div>
+</header>
+
+<div class="tabs">
+  <button id="tab-a1" class="on"></button>
+  <button id="tab-a2"></button>
+  <button id="tab-b"></button>
+</div>
+
+<!-- ═══════════════ A1 : magnetisation ═══════════════ -->
+<div class="wrap" id="view-a1">
+  <aside class="panel">
+    <h2 id="t-h-meter"></h2>
+    <label class="chk"><input type="checkbox" id="meterOn"><span id="t-meteron"></span></label>
+    <div class="disp off" id="dispB"><small id="t-field"></small>-- OFF --</div>
+    <div class="readout" id="meterState" style="min-height:1.7em"></div>
+    <button id="btnZero"></button>
+    <div class="readout" id="zeroRead">—</div>
+
+    <h2 id="t-h-probe"></h2>
+    <label class="chk"><input type="checkbox" id="magOn" checked><span id="t-magon"></span></label>
+    <label class="row" id="t-ruler"></label>
+    <input type="range" id="ruler" min="0" max="40" step="0.1" value="8">
+    <label class="row" id="t-phi"></label>
+    <input type="range" id="phi" min="-90" max="90" step="1" value="25">
+    <div class="warn" id="t-warn"></div>
+
+    <h2 id="t-h-rec"></h2>
+    <button id="btnRec" class="primary"></button>
+    <button id="btnDel"></button>
+    <button id="btnNew"></button>
+    <button id="btnCsv"></button>
+    <p class="note" id="t-note1"></p>
+  </aside>
+  <div class="stage">
+    <div class="card"><h3 id="t-cap1"></h3><canvas id="cvA1"></canvas></div>
+    <div class="card"><h3 id="t-cap1b"></h3>
+      <div class="tablewrap"><table class="data" id="tblA1"></table></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ A2 : levitation and oscillation ═══════════════ -->
+<div class="wrap" id="view-a2" style="display:none">
+  <aside class="panel">
+    <h2 id="t-h-rod"></h2>
+    <div class="seg" id="rodSeg"></div>
+    <label class="row" id="t-len"></label>
+    <input type="range" id="rodLen" min="4" max="14" step="1" value="8">
+    <button id="btnPlace" class="primary"></button>
+    <button id="btnRemove"></button>
+
+    <h2 id="t-h-ruler"></h2>
+    <label class="chk"><input type="checkbox" id="insRuler"><span id="t-insruler"></span></label>
+    <div class="readout" id="t-rulerhint"></div>
+
+    <h2 id="t-h-osc"></h2>
+    <label class="row" id="t-amp"></label>
+    <input type="range" id="amp" min="0.2" max="4" step="0.1" value="3">
+    <button id="btnPush" disabled></button>
+
+    <h2 id="t-h-sw"></h2>
+    <div class="disp" id="swDisp"><small id="t-sw"></small>0.00 s</div>
+    <button id="btnSw"></button>
+    <button id="btnLap"></button>
+    <button id="btnSwReset"></button>
+    <div class="tablewrap"><table class="data" id="tblLap"></table></div>
+    <p class="note" id="t-note2"></p>
+  </aside>
+  <div class="stage">
+    <div class="card"><h3 id="t-cap2"></h3><canvas id="cvFront"></canvas></div>
+    <div class="card"><h3 id="t-cap3"></h3><canvas id="cvTop"></canvas></div>
+  </div>
+</div>
+
+<!-- ═══════════════ B : tiltmeter ═══════════════ -->
+<div class="wrap" id="view-b" style="display:none">
+  <aside class="panel">
+    <h2 id="t-h-rodB"></h2>
+    <div class="readout" id="t-rodB"></div>
+    <button id="btnPlaceB"></button>
+
+    <h2 id="t-h-screw"></h2>
+    <div class="readout" id="t-jognote"></div>
+    <div class="readout" id="stateB">—</div>
+
+    <h2 id="t-h-rulerB"></h2>
+    <label class="chk"><input type="checkbox" id="rulerB" checked><span id="t-rulerB"></span></label>
+    <p class="note" id="t-noteB"></p>
+  </aside>
+  <div class="stage">
+    <div class="brow">
+      <div class="card"><h3 id="t-cap4"></h3><canvas id="cvTilt"></canvas></div>
+      <div class="card"><h3 id="t-caphead"></h3><canvas id="cvHead"></canvas></div>
+    </div>
+    <div class="card"><h3 id="t-cap5"></h3><canvas id="cvTopB"></canvas></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ══════════════════════════════════════════════════════════════
+   0.  i18n
+   ══════════════════════════════════════════════════════════════ */
+const T={
+ko:{
+ title:"IPhO 2017 E2 — 평행 쌍극자선(PDL) 자기 트랩",
+ sub:"가상 실험대 · 테슬라미터와 자, 스톱워치만 제공됩니다",
+ tabA1:"Part A1 · 자화 (A.1–A.4)", tabA2:"Part A2 · 부양과 진동 (A.5–A.12)", tabB:"Part B · 경사계 (B.1–B.5)",
+
+ hMeter:"테슬라미터", meterOn:"전원 켜기", field:"자기장",
+ magnet:"자석", hallLbl:"홀 센서\n(기판 위)",
+ rulerLbl:"자 (mm) · 영점은 자석 표면", graphite:"흑연",
+ dyLbl:"Δy (mm)", refLbl:"기준선", headLbl:"나사 머리", capHead:"나사 머리 (위에서 본 모습)", centre:"중심", cm:"cm",
+ magon:"자석을 레일에 올림", zero:"영점 오프셋  B0  기록   (A.1)", zeroNone:"B0 미기록", settling:"안정화 중 …", overRange:"측정 범위 초과",
+ hProbe:"탐침과 자석", ruler:"자석 표면부터의 자 눈금 (mm)",
+ phi:"자석 회전 (그림 6a) — 읽는 값이 최대가 될 때까지 돌린다",
+ warn:"",
+ hRec:"공책", rec:"적어 둔다", del:"지운다", newpage:"새 쪽", csv:"이 쪽을 CSV 로 내보낸다",
+ note1:"",
+ cap1:"실험 배치 단면 (그림 5a, 6)", cap1b:"측정 표",
+ thN:"i", thRuler:"자 눈금 (mm)", thX:"x (mm)", thB:"B_raw (mT)",
+
+ hRod:"흑연 막대", len:"길이 (mm)",
+ place:"트랩에 막대를 떨어뜨린다", remove:"막대를 꺼낸다",
+ hRuler:"삽입 자", insruler:"삽입 자를 자석 위에 누른다",
+ rulerhint:"",
+ hOsc:"이쑤시개", amp:"z 방향으로 밀어낼 거리 (mm)", push:"밀었다가 놓는다",
+ hSw:"스톱워치", sw:"경과", swStart:"시작", swStop:"정지",
+ lap:"랩 기록", swReset:"초기화",
+ note2:"",
+ cap2:"트랩 정면 (단면)", cap3:"트랩을 위에서 본 모습 (눈금 mm)",
+
+ hRodB:"흑연 막대", rodB:"HB/0.5,  l = 8 mm", placeB:"가운데에 막대를 떨어뜨린다",
+ hScrew:"수평 조절 나사", out:"← 풀기", inw:"조이기 →",
+ jognote:"",
+ ringing:"막대가 아직 흔들립니다 — 기다리세요", endIn:"나사가 끝까지 조여졌습니다 — 더 들어가지 않습니다.", endOut:"나사가 끝까지 풀렸습니다 — 더 나오지 않습니다.", hRulerB:"자", rulerB:"플랫폼 옆에 자를 놓는다",
+ noteB:"",
+ hTilt:"경사 조절 나사",
+ tiltsetup:"두 나사 사이 거리 D = 22.0 cm  ·  샤프심 HB/0.5, 길이 8 mm",
+ turn:"나사 회전수 N (turn)", level:"수평으로 되돌린다",
+ hRead:"막대 위치", dz:"변위 Δz", recB:"현재 값 기록", delB:"마지막 줄 삭제",
+ note3:"",
+ cap4:"플랫폼 측면 (기울기는 20배로 그림)", cap5:"트랩을 위에서 본 모습 (플랫폼에 인쇄된 눈금, mm)",
+ thTurn:"N (회전)", thDz:"Δz (mm)",
+ lapN:"n", lapT:"t (s)", lapD:"Δt (s)"
+},
+en:{
+ title:"IPhO 2017 E2 — Parallel Dipole Line Magnetic Trap",
+ sub:"virtual bench · you get a Teslameter, a ruler and a stopwatch, nothing else",
+ tabA1:"Part A1 · magnetization (A.1–A.4)", tabA2:"Part A2 · levitation and oscillation (A.5–A.12)", tabB:"Part B · tiltmeter (B.1–B.5)",
+
+ hMeter:"Teslameter", meterOn:"power on", field:"field",
+ magnet:"magnet", hallLbl:"Hall sensor\non the board",
+ rulerLbl:"ruler (mm), zero on the magnet surface", graphite:"graphite",
+ dyLbl:"Δy (mm)", refLbl:"reference", headLbl:"screw head", capHead:"screw head (from above)", centre:"centre", cm:"cm",
+ magon:"magnet on the rail", zero:"record the zero offset  B0   (A.1)", zeroNone:"B0 not recorded", settling:"settling ...", overRange:"over range",
+ hProbe:"Probe and magnet", ruler:"ruler reading from the magnet surface (mm)",
+ phi:"magnet rotation (Fig. 6a) — rotate until the reading is a maximum",
+ warn:"",
+ hRec:"Note book", rec:"write down", del:"erase", newpage:"new page", csv:"export the page as CSV",
+ note1:"",
+ cap1:"cross section of the set-up (Fig. 5a, 6)", cap1b:"data table",
+ thN:"i", thRuler:"ruler (mm)", thX:"x (mm)", thB:"B_raw (mT)",
+
+ hRod:"Graphite rod", len:"length (mm)",
+ place:"drop the rod into the trap", remove:"take the rod out",
+ hRuler:"insert ruler", insruler:"press the insert ruler onto the magnets",
+ rulerhint:"",
+ hOsc:"Toothpick", amp:"displacement along z (mm)", push:"displace and release",
+ hSw:"stopwatch", sw:"elapsed", swStart:"start", swStop:"stop",
+ lap:"lap", swReset:"reset",
+ note2:"",
+ cap2:"front view of the trap (cross section)", cap3:"top view of the trap (scale in mm)",
+
+ hRodB:"Graphite rod", rodB:"HB/0.5,  l = 8 mm", placeB:"drop the rod in at the centre",
+ hScrew:"Levelling screw", out:"← out", inw:"in →",
+ jognote:"",
+ ringing:"the rod is still swinging — wait", endIn:"the screw is all the way in — it will not go further.", endOut:"the screw is all the way out — it will not go further.", hRulerB:"Ruler", rulerB:"lay the ruler beside the platform",
+ noteB:"",
+ hTilt:"adjustment screw",
+ tiltsetup:"distance between the screws D = 22.0 cm  ·  HB/0.5 lead, 8 mm long",
+ turn:"screw turns N", level:"return to level",
+ hRead:"rod position", dz:"displacement Δz", recB:"record this reading", delB:"delete last row",
+ note3:"",
+ cap4:"side view of the platform (tilt drawn 20x)", cap5:"top view of the trap (scale printed on the platform, mm)",
+ thTurn:"N (turn)", thDz:"Δz (mm)",
+ lapN:"n", lapT:"t (s)", lapD:"Δt (s)"
+}};
+let lang = (new URLSearchParams(location.search).get("lang")==="en") ? "en" : "ko";
+
+/* ══════════════════════════════════════════════════════════════
+   1.  PHYSICS  —  transcribed from the Python bench
+   ══════════════════════════════════════════════════════════════ */
+const MU0=1.257e-6, R=3.2e-3, LMAG=25.4e-3, GM=1.5e-3, A_PDL=R+GM/2;
+const RHO=1680.0, GRAV=9.8, C1=198.6;
+const X_OFFSET=4.0e-3, METER_FS=0.300;
+const ROD_D={"HB/0.3":0.38e-3,"HB/0.5":0.56e-3,"HB/0.7":0.70e-3,"HB/0.9":0.90e-3};
+const M_TRUE=1.10e6, CHI_TRUE=-1.45e-4;
+const Y0_FINITE=1.06, TAU_A=3.15, TAU_B=29.40;
+const D_TILT=0.220, S_TRUE=0.80e-3, TILT_EXAG=20.0;
+
+const uni=(a,b)=>a+Math.random()*(b-a);
+function norm(mu,sd){let u=0,v=0;while(u===0)u=Math.random();while(v===0)v=Math.random();
+  return mu+sd*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+
+/* field of a diametrically magnetised cylinder, with the finite-length roll-over */
+function bMagnet(x,M){ x=Math.max(x,1e-4);
+  return MU0*M*R*R/(2*x*x)*Math.pow(1+Math.pow(x/LMAG,10),-0.1); }
+const fY=u=>4*u*(3-u*u)*(1-u*u)/Math.pow(1+u*u,5);
+
+function levitationHeight(M,chi){
+  const coef=MU0*M*M*Math.abs(chi)/2*Math.pow(R,4)/Math.pow(A_PDL,5);
+  const target=RHO*GRAV/coef;
+  let uBest=0.5,best=1e9,top=0,fmax=-1;
+  for(let i=0;i<40000;i++){const u=0.02+(0.99-0.02)*i/39999; const f=fY(u);
+    if(f>fmax){fmax=f;top=i;}}
+  for(let i=top;i<40000;i++){const u=0.02+(0.99-0.02)*i/39999;
+    const e=Math.abs(fY(u)-target); if(e<best){best=e;uBest=u;}}
+  return uBest*A_PDL;
+}
+const omegaZ=(chi,M)=>Math.sqrt(-C1*MU0*chi*M*M/RHO);
+function tauDamping(d,l){const r=d*1e3/2, L=l*1e3;
+  return TAU_A+TAU_B*r*r*Math.log(0.607*L/r);}
+
+/* one bench; its small imperfections are drawn once */
+const B={
+  M:M_TRUE*(1+norm(0,0.012)),
+  chi:CHI_TRUE*(1+norm(0,0.02)),
+  B0:norm(0,1.2e-3), drift:norm(0,0.15e-3),
+  tauScale:1+norm(0,0.03), S:S_TRUE*(1+norm(0,0.04)), D:D_TILT
+};
+B.y0 = levitationHeight(B.M,B.chi)*Y0_FINITE*(1+norm(0,0.02));
+B.omega = omegaZ(B.chi,B.M);
+const benchTau=(d,l)=>tauDamping(d,l)*B.tauScale;
+const teslaTrue=(x,phiDeg)=>bMagnet(x,B.M)*Math.cos(2*phiDeg*Math.PI/180)+B.B0+B.drift;
+
+/* ══════════════════════════════════════════════════════════════
+   2.  STATE
+   ══════════════════════════════════════════════════════════════ */
+const S={
+  tab:"a1", rulerB:true, zB:0, vzB:0, jit:0, ringing:false, limitMsg:false,
+  meterOn:false, magOn:true, shown:0, settling:false, ruler:8.0, phi:25, zeroRec:null, rows:[], reading:0,
+  rodKey:"HB/0.5", rodLen:8, placed:false, insRuler:false,
+  amp:3.0, oscT0:null, simT:0,
+  swRun:false, swT0:0, swVal:0, laps:[],
+  turns:0, rowsB:[]
+};
+const $=id=>document.getElementById(id);
+
+/* ══════════════════════════════════════════════════════════════
+   3.  CANVAS HELPERS
+   ══════════════════════════════════════════════════════════════ */
+function fit(cv,ratio){
+  const dpr=Math.min(devicePixelRatio||1,2), w=cv.clientWidth||700, h=w*ratio;
+  cv.width=Math.round(w*dpr); cv.height=Math.round(h*dpr);
+  cv.style.height=h+"px";
+  const c=cv.getContext("2d"); c.setTransform(dpr,0,0,dpr,0,0);
+  return [c,w,h];
+}
+function grid(c,w,h){ c.fillStyle="#fbfcfd"; c.fillRect(0,0,w,h); }
+
+/* ── A1 : 자석 축에 수직인 단면.  원본 좌표계 그대로:
+       xlim (-9, 47),  ylim (-15.5, 10.5),  등축,  축·눈금 없음
+       자 눈금의 0 은 자석 표면 (x = R = 3.2 mm)                     ── */
+function drawA1(){
+  const cv=$("cvA1"), dpr=Math.min(devicePixelRatio||1,2);
+  const w=cv.clientWidth||760;
+  const X0=-9, X1=47, Y0=-15.5, Y1=10.5;
+  const sc=w/(X1-X0), h=Math.round((Y1-Y0)*sc);
+  cv.width=Math.round(w*dpr); cv.height=Math.round(h*dpr); cv.style.height=h+"px";
+  const c=cv.getContext("2d"); c.setTransform(dpr,0,0,dpr,0,0);
+  c.fillStyle="#fff"; c.fillRect(0,0,w,h);
+  const X=v=>(v-X0)*sc, Y=v=>(Y1-v)*sc;
+
+
+  const Rm=R*1e3, xm=(S.ruler+X_OFFSET*1e3)+Rm;   /* 홀 소자의 x, 자석 중심 기준 */
+  const phi=S.phi*Math.PI/180;
+
+  if(S.magOn){
+    c.beginPath(); c.arc(X(0),Y(0),Rm*sc,0,7);
+    c.fillStyle="#c9ccd1"; c.fill(); c.strokeStyle="#555"; c.lineWidth=1; c.stroke();
+    /* 자화 화살표 : 길이 5.6 mm, 각 phi */
+    const ax=5.6*Math.cos(phi), ay=5.6*Math.sin(phi);
+    c.strokeStyle="#cc0000"; c.lineWidth=2.4; c.beginPath();
+    c.moveTo(X(0),Y(0)); c.lineTo(X(ax),Y(ay)); c.stroke();
+    c.fillStyle="#cc0000"; c.beginPath();
+    const hx=X(ax), hy=Y(ay), ux=Math.cos(phi), uy=-Math.sin(phi);
+    c.moveTo(hx,hy); c.lineTo(hx-8*ux+4*uy, hy-8*uy-4*ux);
+    c.lineTo(hx-8*ux-4*uy, hy-8*uy+4*ux); c.closePath(); c.fill();
+    c.fillStyle="#000"; c.font="8.5px 'DejaVu Sans',sans-serif";
+    c.fillText(T[lang].magnet, X(0), Y(-Rm-2.6));
+  }
+  /* 홀 프로브 : 보드 1.7 x 14, 노란 소자 1.5 x 3.4 */
+  c.fillStyle="#2f4f6f"; c.strokeStyle="#222"; c.lineWidth=0.8;
+  c.fillRect(X(xm), Y(7.0), 1.7*sc, 14.0*sc); c.strokeRect(X(xm),Y(7.0),1.7*sc,14.0*sc);
+  c.fillStyle="#ffcc00";
+  c.fillRect(X(xm-1.5), Y(1.7), 1.5*sc, 3.4*sc); c.strokeRect(X(xm-1.5),Y(1.7),1.5*sc,3.4*sc);
+  c.fillStyle="#000"; c.textAlign="left"; c.font="8.5px 'DejaVu Sans',sans-serif";
+  T[lang].hallLbl.split("\n").forEach((ln,i)=>c.fillText(ln, X(xm+3.2), Y(6.4)+11*i+8));
+
+  /* 자 : 0 이 자석 표면에 오도록 */
+  const xs=Rm;
+  c.strokeStyle="#444";
+  for(let t=0;t<=40;t++){
+    const hgt=(t%5)?1.2:2.2; c.lineWidth=0.7;
+    c.beginPath(); c.moveTo(X(xs+t),Y(-9.5)); c.lineTo(X(xs+t),Y(-9.5+hgt)); c.stroke();
+    if(t%5===0){ c.fillStyle="#000"; c.font="7.5px 'DejaVu Sans',sans-serif";
+      c.textAlign="center"; c.fillText(t, X(xs+t), Y(-12.2)+4); }
+  }
+  c.lineWidth=1; c.beginPath(); c.moveTo(X(xs-2),Y(-9.5)); c.lineTo(X(xs+41),Y(-9.5)); c.stroke();
+  const tip=xm-X_OFFSET*1e3;
+  c.strokeStyle="rgba(192,0,0,.8)"; c.lineWidth=0.9;
+  c.beginPath(); c.moveTo(X(tip),Y(-9.5)); c.lineTo(X(tip),Y(-1.8)); c.stroke();
+  c.fillStyle="#555"; c.font="7.5px 'DejaVu Sans',sans-serif"; c.textAlign="center";
+  c.fillText(T[lang].rulerLbl, X(24), Y(-14.0)+4);
+}
+
+/* ── A2 정면도 : 원본 xlim (-9, 13), ylim (-5.5, 8.2), 등축 ── */
+function drawFront(){
+  const cv=$("cvFront"),dpr=Math.min(devicePixelRatio||1,2);
+  const w=cv.clientWidth||700;
+  const X0=-9,X1=13,Y0=-5.5,Y1=8.2;
+  const sc=w/(X1-X0), h=Math.round((Y1-Y0)*sc);
+  cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);cv.style.height=h+"px";
+  const c=cv.getContext("2d");c.setTransform(dpr,0,0,dpr,0,0);
+  c.fillStyle="#fff";c.fillRect(0,0,w,h);
+  const X=v=>(v-X0)*sc, Y=v=>(Y1-v)*sc;
+
+  const Rm=R*1e3, Am=A_PDL*1e3, y0=B.y0*1e3, d=ROD_D[S.rodKey]*1e3;
+  for(const sx of [-Am,Am]){
+    c.beginPath();c.arc(X(sx),Y(0),Rm*sc,0,7);
+    c.fillStyle="#c9ccd1";c.fill();c.strokeStyle="#555";c.lineWidth=1;c.stroke();
+    c.strokeStyle="#cc0000";c.lineWidth=1.8;
+    c.beginPath();c.moveTo(X(sx-0.4),Y(0));c.lineTo(X(sx+2.2),Y(0));c.stroke();
+    c.fillStyle="#cc0000";c.beginPath();
+    c.moveTo(X(sx+2.2),Y(0));c.lineTo(X(sx+1.4),Y(0)-4);c.lineTo(X(sx+1.4),Y(0)+4);
+    c.closePath();c.fill();
+  }
+  c.fillStyle="#000";c.font="8px 'DejaVu Sans',sans-serif";c.textAlign="center";
+  c.fillText(T[lang].magnet,X(-Am),Y(-Rm-1.7)+3);
+  if(S.placed){
+    c.beginPath();c.arc(X(0),Y(y0),Math.max(d/2*sc,2.2),0,7);
+    c.fillStyle="#202020";c.fill();c.strokeStyle="#000";c.lineWidth=0.6;c.stroke();
+    c.strokeStyle="#666";c.lineWidth=0.7;
+    c.beginPath();c.moveTo(X(0.4),Y(y0+0.25));c.lineTo(X(2.2),Y(6.4));c.stroke();
+    c.fillStyle="#000";c.textAlign="left";
+    c.fillText(T[lang].graphite,X(2.3),Y(6.4));
+  }
+  if(S.insRuler){
+    const xr=8.8;
+    c.strokeStyle="#444";c.lineWidth=1.3;
+    c.beginPath();c.moveTo(X(xr),Y(Rm-5.2));c.lineTo(X(xr),Y(Rm+1.6));c.stroke();
+    for(let k=-1.0;k<=5.001;k+=0.5){
+      const isInt=Math.abs(k-Math.round(k))<1e-6, wdt=isInt?1.7:0.9;
+      c.lineWidth=0.7;
+      c.beginPath();c.moveTo(X(xr),Y(Rm-k));c.lineTo(X(xr-wdt),Y(Rm-k));c.stroke();
+      if(isInt){c.fillStyle="#000";c.font="7px 'DejaVu Sans',sans-serif";
+        c.textAlign="left";c.fillText(k.toFixed(0),X(xr+0.35),Y(Rm-k)+2.5);}
+    }
+    c.font="7px 'DejaVu Sans',sans-serif";c.textAlign="center";
+    c.fillText(T[lang].dyLbl,X(xr-0.2),Y(Rm+2.2));
+    if(S.placed){
+      c.strokeStyle="#c00000";c.setLineDash([2,2]);c.lineWidth=0.9;
+      c.beginPath();c.moveTo(X(0.4),Y(y0));c.lineTo(X(xr-1.8),Y(y0));c.stroke();
+      c.setLineDash([]);
+    }
+  }
+  c.strokeStyle="#bbb";c.setLineDash([4,3]);c.lineWidth=0.7;
+  c.beginPath();c.moveTo(X(-Am-Rm-1),Y(0));c.lineTo(X(Am+Rm+1),Y(0));c.stroke();
+  c.setLineDash([]);
+}
+/* ── 위에서 본 모습 : 원본 xlim (-16, 16), ylim (-8.4, 10.2), 등축 ── */
+function zNow(){
+  if(!S.placed||S.oscT0===null) return 0;
+  const t=S.simT-S.oscT0, tau=benchTau(ROD_D[S.rodKey],S.rodLen*1e-3);
+  return S.amp*Math.exp(-t/tau)*Math.cos(B.omega*t);
+}
+function drawTop(cvId,zVal,titleKey){
+  const cv=$(cvId),dpr=Math.min(devicePixelRatio||1,2);
+  const w=cv.clientWidth||700;
+  const X0=-16,X1=16,Y0=-8.4,Y1=10.2;
+  const sc=w/(X1-X0), h=Math.round((Y1-Y0)*sc);
+  cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);cv.style.height=h+"px";
+  const c=cv.getContext("2d");c.setTransform(dpr,0,0,dpr,0,0);
+  c.fillStyle="#fff";c.fillRect(0,0,w,h);
+  const X=v=>(v-X0)*sc, Y=v=>(Y1-v)*sc;
+  const Rm=R*1e3, Am=A_PDL*1e3, Lm=LMAG*1e3;
+  for(const sx of [-Am,Am]){
+    c.fillStyle="#dcdee2";c.strokeStyle="#888";c.lineWidth=0.8;
+    c.fillRect(X(-Lm/2),Y(sx+Rm),Lm*sc,2*Rm*sc);
+    c.strokeRect(X(-Lm/2),Y(sx+Rm),Lm*sc,2*Rm*sc);
+  }
+  c.strokeStyle="#444";
+  for(let k=-10;k<=10;k++){
+    const hgt=(k%5)?1.0:1.9; c.lineWidth=0.8;
+    c.beginPath();c.moveTo(X(k),Y(7.8));c.lineTo(X(k),Y(7.8-hgt));c.stroke();
+    if(k%5===0){c.fillStyle="#000";c.font="7.5px 'DejaVu Sans',sans-serif";
+      c.textAlign="center";c.fillText(k,X(k),Y(8.3)-1);}
+  }
+  c.lineWidth=1;c.beginPath();c.moveTo(X(-10.5),Y(7.8));c.lineTo(X(10.5),Y(7.8));c.stroke();
+  if(S.placed){
+    const l=S.rodLen;
+    c.strokeStyle="#101010";c.lineWidth=6;c.lineCap="butt";
+    c.beginPath();c.moveTo(X(zVal-l/2),Y(0));c.lineTo(X(zVal+l/2),Y(0));c.stroke();
+  }
+}
+
+/* ── B : 플랫폼 측면.  원본 py 의 도면을 그대로 옮겼다.
+       xlim (-52, D+56), ylim (-40, 116), 등축, TILT_EXAG = 20
+       아래판 / 왼쪽 나사에 경첩된 위판 / 두 개의 조절 나사 /
+       트랩 프레임 / 중심선 / Δz 화살표 / D 치수선 / 눕힌 자      ── */
+function drawTilt(zmm){
+  const cv=$("cvTilt"),dpr=Math.min(devicePixelRatio||1,2);
+  const Dmm=B.D*1e3;
+  const X0=-52, X1=Dmm+56, Y0=-40, Y1=116;
+  const w=cv.clientWidth||700, sc=w/(X1-X0), h=Math.round((Y1-Y0)*sc);
+  cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);cv.style.height=h+"px";
+  const c=cv.getContext("2d");c.setTransform(dpr,0,0,dpr,0,0);
+  c.fillStyle="#fff";c.fillRect(0,0,w,h);
+  const X=v=>(v-X0)*sc, Y=v=>(Y1-v)*sc;
+  const P=(p)=>[X(p[0]),Y(p[1])];
+
+  const theta=S.turns*B.S/B.D, ang=theta*TILT_EXAG;
+  const ca=Math.cos(ang), sa=Math.sin(ang), PT=5.0, x0=0, x1=Dmm;
+  const lift=Dmm*Math.tan(ang);
+  const onTop=(px,py)=>[x0+(px-x0)*ca-py*sa, 14.0+(px-x0)*sa+py*ca];
+  const poly=(pts,fill,stroke,lw)=>{
+    c.beginPath(); pts.forEach((p,i)=>{const q=P(p); i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1]);});
+    c.closePath(); if(fill){c.fillStyle=fill;c.fill();}
+    if(stroke){c.strokeStyle=stroke;c.lineWidth=lw||1;c.stroke();}
+  };
+  const line=(p,q,col,lw,dash)=>{
+    c.strokeStyle=col;c.lineWidth=lw||1; if(dash)c.setLineDash(dash);
+    const A=P(p),Bq=P(q); c.beginPath();c.moveTo(A[0],A[1]);c.lineTo(Bq[0],Bq[1]);c.stroke();
+    c.setLineDash([]);
+  };
+  const arrow=(from,to,col,lw)=>{
+    const A=P(from),Bq=P(to);
+    c.strokeStyle=col;c.lineWidth=lw||1;
+    c.beginPath();c.moveTo(A[0],A[1]);c.lineTo(Bq[0],Bq[1]);c.stroke();
+    const an=Math.atan2(Bq[1]-A[1],Bq[0]-A[0]);
+    c.fillStyle=col;c.beginPath();c.moveTo(Bq[0],Bq[1]);
+    c.lineTo(Bq[0]-7*Math.cos(an-0.4),Bq[1]-7*Math.sin(an-0.4));
+    c.lineTo(Bq[0]-7*Math.cos(an+0.4),Bq[1]-7*Math.sin(an+0.4));
+    c.closePath();c.fill();
+  };
+  const txt=(p,t,size,align,col)=>{
+    c.fillStyle=col||"#000"; c.font=(size||9)+"px 'DejaVu Sans',sans-serif";
+    c.textAlign=align||"center"; c.textBaseline="middle";
+    const q=P(p); c.fillText(t,q[0],q[1]);
+  };
+
+  /* 아래판 */
+  poly([[-40,-PT],[Dmm+40,-PT],[Dmm+40,0],[-40,0]],"#d5d8dc","#333",1.0);
+  /* 위판 */
+  poly([onTop(-34,0),onTop(Dmm+34,0),onTop(Dmm+34,PT),onTop(-34,PT)],"#e9ecef","#333",1.1);
+  /* 두 나사 : 몸통, 뾰족한 끝, 머리 */
+  for(const [xs,ext] of [[x0,0.0],[x1,lift]]){
+    const top=onTop(xs,PT);
+    line(top,[xs,0.0],"#5d6369",2.6);
+    poly([[xs-1.8,1.6],[xs+1.8,1.6],[xs,-0.4]],"#8d939a","#444",0.7);
+    poly([[top[0]-5.0,top[1]+0.6],[top[0]+5.0,top[1]+0.6],
+          [top[0]+5.0,top[1]+3.2],[top[0]-5.0,top[1]+3.2]],"#9aa0a6","#444",0.8);
+  }
+  /* θ : 들린 쪽 끝에 (그림 9) */
+  if(Math.abs(lift)>0.6){
+    const xe=Dmm+22, pe=onTop(xe,0.0);
+    arrow([pe[0],0.0],pe,"#222",0.9); arrow(pe,[pe[0],0.0],"#222",0.9);
+    txt([pe[0]-3,(pe[1]+0.0)/2],"\u03b8",12,"right");
+  }
+  /* 트랩 프레임 */
+  const cxp=Dmm/2, HW=30.0, HT=62.0;
+  for(const dzf of [-HW, HW-3.0]){
+    poly([onTop(cxp+dzf,PT),onTop(cxp+dzf,PT+HT),
+          onTop(cxp+dzf+3.0,PT+HT),onTop(cxp+dzf+3.0,PT)],"#e4e7ea","#333",1.1);
+  }
+  for(const hy of [PT+12.0, PT+52.0]) line(onTop(cxp-HW,hy),onTop(cxp+HW,hy),"#333",1.4);
+  const pm=onTop(cxp+14.0,PT+23.0), pml=onTop(cxp+HW+30.0,PT+HT-14.0);
+  line(pml,pm,"#333",0.8); txt([pml[0]+2,pml[1]],T[lang].magnet,9,"left");
+  /* 중심선과 Δz */
+  const pc0=onTop(cxp,PT+4.0), pc1=onTop(cxp,PT+HT+3.0);
+  line(pc0,pc1,"#333",0.9,[6,3,2,3]);
+  txt([pc1[0],pc1[1]+5.0],T[lang].centre,9);
+  const dzmm=(zmm===undefined)?0:zmm;
+  const pz0=onTop(cxp,PT+33.0), pz1=onTop(cxp-17.0,PT+33.0);
+  arrow(pz0,pz1,"#333",1.0);
+  txt(onTop(cxp-8.5,PT+38.0),"\u0394z",10);
+  /* 흑연 막대 (옆에서 본 모습) */
+  if(S.placed){
+    const rl=8.0/2;
+    const q0=onTop(cxp+dzmm-rl,PT+22.0), q1=onTop(cxp+dzmm+rl,PT+22.0);
+    c.strokeStyle="#303030";c.lineWidth=6;c.lineCap="butt";
+    const A=P(q0),Bq=P(q1); c.beginPath();c.moveTo(A[0],A[1]);c.lineTo(Bq[0],Bq[1]);c.stroke();
+    const pgl=onTop(cxp-HW-30.0,PT+HT-14.0);
+    line(pgl,onTop(cxp-11.0,PT+22.0),"#333",0.8);
+    txt([pgl[0]-2,pgl[1]],T[lang].graphite,9,"right");
+  }
+  /* D 치수선 */
+  const pd0=onTop(x0,PT+9.0), pd1=onTop(x1,PT+9.0);
+  arrow(pd1,pd0,"#222",1.1); arrow(pd0,pd1,"#222",1.1);
+  const pdl=onTop(cxp-HW-26.0,PT+17.0);
+  c.fillStyle="#000";c.font="italic 15px 'DejaVu Sans',sans-serif";
+  c.textAlign="center";c.textBaseline="alphabetic";
+  const dq=P(pdl); c.fillText("D",dq[0],dq[1]);
+  c.textBaseline="middle";
+  /* 눕힌 자 */
+  if(S.rulerB){
+    const yr=-16.0;
+    line([-14,yr],[Dmm+18,yr],"#444",1.1);
+    for(let k=-10;k<=Dmm+17.1;k+=10){
+      const big=Math.abs(k%50)<1e-6;
+      line([k,yr],[k,yr-(big?4.6:2.4)],"#444",0.8);
+      if(big) txt([k,yr-10.5],(k/10).toFixed(0),7.5);
+    }
+    txt([Dmm/2,yr-18.5],T[lang].cm,8);
+    for(const xs of [x0,x1]) line([xs,-PT],[xs,yr],"#888",0.7,[2,2]);
+  }
+}
+
+/* ── 나사 머리 (위에서 본 모습) : 회전수만큼 지표가 돈다 ── */
+function drawHead(){
+  const cv=$("cvHead"); if(!cv) return;
+  const dpr=Math.min(devicePixelRatio||1,2), w=cv.clientWidth||160;
+  const sc=w/3.0, h=Math.round(3.1*sc);
+  cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);cv.style.height=h+"px";
+  const c=cv.getContext("2d");c.setTransform(dpr,0,0,dpr,0,0);
+  c.fillStyle="#fff";c.fillRect(0,0,w,h);
+  const X=v=>(v+1.5)*sc, Y=v=>(1.6-v)*sc;
+  c.beginPath();c.arc(X(0),Y(0),1.0*sc,0,7);
+  c.fillStyle="#d8dce0";c.fill();c.strokeStyle="#444";c.lineWidth=1.4;c.stroke();
+  c.strokeStyle="#8b9096";c.lineWidth=1;
+  for(let k=0;k<24;k++){const b0=2*Math.PI*k/24;
+    c.beginPath();c.moveTo(X(0.92*Math.cos(b0)),Y(0.92*Math.sin(b0)));
+    c.lineTo(X(1.0*Math.cos(b0)),Y(1.0*Math.sin(b0)));c.stroke();}
+  const ph=2*Math.PI*(-S.turns);
+  c.strokeStyle="#b03030";c.lineWidth=3;c.lineCap="round";
+  c.beginPath();c.moveTo(X(0),Y(0));
+  c.lineTo(X(0.78*Math.sin(ph)),Y(0.78*Math.cos(ph)));c.stroke();
+  c.beginPath();c.arc(X(0),Y(0),0.12*sc,0,7);c.fillStyle="#444";c.fill();
+  c.strokeStyle="#222";c.lineWidth=1.6;
+  c.beginPath();c.moveTo(X(0),Y(1.06));c.lineTo(X(0),Y(1.26));c.stroke();
+  c.fillStyle="#000";c.font="7.5px 'DejaVu Sans',sans-serif";
+  c.fillText(T[lang].refLbl,X(0),Y(1.34));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   4.  TABLES
+   ══════════════════════════════════════════════════════════════ */
+function renderA1(){
+  const d=T[lang];
+  $("tblA1").innerHTML =
+    `<tr><th>${d.thN}</th><th>${d.thRuler}</th><th>${d.thX}</th><th>${d.thB}</th></tr>`+
+    S.rows.map((r,i)=>`<tr><td>${i+1}</td><td>${r.ruler.toFixed(1)}</td>`+
+      `<td>${r.x.toFixed(1)}</td><td>${(r.b*1e3).toFixed(3)}</td></tr>`).join("");
+}
+function renderLaps(){
+  const d=T[lang];
+  $("tblLap").innerHTML =
+    `<tr><th>${d.lapN}</th><th>${d.lapT}</th><th>${d.lapD}</th></tr>`+
+    S.laps.map((v,i)=>`<tr><td>${i+1}</td><td>${v.toFixed(2)}</td>`+
+      `<td>${(v-(i?S.laps[i-1]:0)).toFixed(2)}</td></tr>`).join("");
+}
+function renderB(){
+  const d=T[lang];
+  $("tblB").innerHTML =
+    `<tr><th>${d.thTurn}</th><th>${d.thDz}</th></tr>`+
+    S.rowsB.map(r=>`<tr><td>${r.n.toFixed(3)}</td><td>${r.dz.toFixed(2)}</td></tr>`).join("");
+}
+
+/* ══════════════════════════════════════════════════════════════
+   5.  CONTROLS
+   ══════════════════════════════════════════════════════════════ */
+$("meterOn").onchange=e=>{S.meterOn=e.target.checked;};
+$("magOn").onchange=e=>{S.magOn=e.target.checked;};
+$("ruler").oninput=e=>{S.ruler=parseFloat(e.target.value);};
+$("phi").oninput=e=>{S.phi=parseFloat(e.target.value);};
+/* 원본 PartA1._tick 그대로 : 바늘이 시정수 0.6 s 로 목표값을 따라간다.
+   표시값 = 따라가는 값 + 잡음.  목표와 0.3 mT 넘게 벌어지면 "settling ..." */
+function meterTarget(){
+  return S.magOn ? teslaTrue((S.ruler+X_OFFSET*1e3)*1e-3, S.phi)
+                 : B.B0 + B.drift;
+}
+function meterStep(dt){
+  const target=meterTarget();
+  S.shown += (target-S.shown)*(1-Math.exp(-dt/0.6));
+  S.reading = S.shown + norm(0,0.15e-3);
+  S.settling = Math.abs(target-S.shown) >= 3e-4;
+  return S.reading;
+}
+/* 기록은 지금 바늘이 가리키는 값을 그대로 적는다 (안정 전에 적으면 그 값이 남는다) */
+function readNow(){ return S.reading; }
+$("btnZero").onclick=()=>{
+  if(!S.meterOn) return;
+  S.zeroRec = readNow();
+  $("zeroRead").textContent = `B₀ = ${(S.zeroRec*1e3).toFixed(3)} mT`;
+};
+$("btnRec").onclick=()=>{
+  if(!S.meterOn || !S.magOn) return;
+  S.rows.push({ruler:S.ruler, x:S.ruler+X_OFFSET*1e3, b:readNow()}); renderA1();
+};
+$("btnDel").onclick=()=>{S.rows.pop(); renderA1();};
+$("btnNew").onclick=()=>{S.rows=[]; renderA1();};
+$("btnCsv").onclick=()=>{
+  const csv="ruler_mm,x_mm,B_raw_T\n"+S.rows.map(r=>
+    `${r.ruler.toFixed(1)},${r.x.toFixed(1)},${r.b.toExponential(6)}`).join("\n");
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  a.download="E2_A1_field.csv"; a.click();
+};
+
+function buildRodSeg(){
+  const box=$("rodSeg"); box.innerHTML="";
+  Object.keys(ROD_D).forEach(k=>{
+    const b=document.createElement("button");
+    b.textContent=k.replace("HB/","");
+    if(k===S.rodKey) b.className="on";
+    b.onclick=()=>{S.rodKey=k; S.oscT0=null; buildRodSeg();};
+    box.appendChild(b);
+  });
+}
+$("rodLen").oninput=e=>{S.rodLen=parseFloat(e.target.value); S.oscT0=null; applyLang();};
+$("btnPlace").onclick=()=>{S.placed=true; S.oscT0=null; $("btnPush").disabled=false;};
+$("btnPlaceB").onclick=()=>{S.placed=true; S.turns=0; S.zB=0; S.vzB=0; S.jit=0;};
+$("rulerB").onchange=e=>{S.rulerB=e.target.checked;};
+$("btnRemove").onclick=()=>{S.placed=false; S.oscT0=null; $("btnPush").disabled=true;};
+$("insRuler").onchange=e=>{S.insRuler=e.target.checked;};
+$("amp").oninput=e=>{S.amp=parseFloat(e.target.value); applyLang();};
+$("btnPush").onclick=()=>{ if(S.placed) S.oscT0=S.simT; };
+
+$("btnSw").onclick=()=>{
+  if(S.swRun){ S.swRun=false; }
+  else { S.swRun=true; S.swT0=S.simT-S.swVal; }
+  applyLang();
+};
+$("btnLap").onclick=()=>{
+  if(!S.swRun) return;
+  S.laps.push(S.swVal+norm(0,0.12));   /* the student's reaction time */
+  renderLaps();
+};
+$("btnSwReset").onclick=()=>{S.swRun=false;S.swVal=0;S.laps=[];renderLaps();applyLang();};
+
+/* 조그 슬라이더 : 쓸어 넘기면 그만큼 돌고 손을 떼면 가운데로 돌아온다 (원본과 같음) */
+/* 나사의 행정 한계.
+   수평일 때 위판은 아래판 위 14 mm 에 떠 있고, 나사를 풀면 내려온다.
+   −0.5 바퀴에서 위판 오른끝이 아래판에 닿아 더 내려가지 않고,
+   +2.0 바퀴에서 나사가 끝까지 나와 더 올라가지 않는다.
+   원본은 조그 슬라이더 한 번 쓸기가 0.75 바퀴라 실제로도 이 근처에서 쓴다.
+   이 범위에서 판은 최대 8.3° (20 배 과장) 기울고 Δz 는 +0.7 ~ −2.7 mm 로,
+   트랩의 ±10 mm 눈금 안에서 B.4 의 기울기를 넉넉히 잡을 수 있다.        */
+const TURN_MIN=-0.5, TURN_MAX=2.0;
+function addTurns(d){
+  const before=S.turns;
+  S.turns=Math.min(TURN_MAX,Math.max(TURN_MIN,S.turns+d));
+  const hit = (S.turns!==before+d);
+  S.limitMsg = hit;
+  if(hit) $("stateB").textContent = (S.turns>=TURN_MAX ? T[lang].endIn : T[lang].endOut);
+}
+/* 나사 머리 위에서 휠을 굴려도 돌아간다 */
+function wheelTurn(e){
+  e.preventDefault();
+  const step=e.shiftKey?0.005:0.025;       /* Shift 를 누르면 미세 조정 */
+  addTurns((e.deltaY>0?-1:1)*step);
+}
+
+
+
+/* tabs */
+function setTab(t){
+  S.tab=t;
+  $("view-a1").style.display = t==="a1"?"flex":"none";
+  $("view-a2").style.display = t==="a2"?"flex":"none";
+  $("view-b" ).style.display = t==="b" ?"flex":"none";
+  ["a1","a2","b"].forEach(k=>$("tab-"+k).className = k===t?"on":"");
+}
+$("tab-a1").onclick=()=>setTab("a1");
+$("tab-a2").onclick=()=>setTab("a2");
+$("tab-b" ).onclick=()=>setTab("b");
+
+/* ══════════════════════════════════════════════════════════════
+   6.  LANGUAGE
+   ══════════════════════════════════════════════════════════════ */
+function applyLang(){
+  const d=T[lang];
+  document.documentElement.lang=lang;
+  $("t-title").textContent=d.title; $("t-sub").textContent=d.sub;
+  $("tab-a1").textContent=d.tabA1; $("tab-a2").textContent=d.tabA2; $("tab-b").textContent=d.tabB;
+
+  $("t-h-meter").textContent=d.hMeter; $("t-meteron").textContent=d.meterOn;
+  $("t-field").textContent=d.field;    $("btnZero").textContent=d.zero;
+  if(S.zeroRec===null) $("zeroRead").textContent=d.zeroNone;
+  $("t-h-probe").textContent=d.hProbe;  $("t-magon").textContent=d.magon;
+  $("t-ruler").textContent=`${d.ruler} — ${S.ruler.toFixed(1)}`;
+  $("t-phi").textContent=`${d.phi} — ${S.phi.toFixed(0)}°`;
+  $("t-warn").textContent=d.warn; $("t-warn").style.display=d.warn?"":"none";
+  $("t-h-rec").textContent=d.hRec; $("btnRec").textContent=d.rec;
+  $("btnDel").textContent=d.del; $("btnNew").textContent=d.newpage;   $("btnCsv").textContent=d.csv;
+  $("t-note1").textContent=d.note1; $("t-note1").style.display=d.note1?"":"none";
+  $("t-cap1").textContent=d.cap1;  $("t-cap1b").textContent=d.cap1b;
+
+  $("t-h-rod").textContent=d.hRod;
+  $("t-len").textContent=`${d.len} — ${S.rodLen}`;
+  $("btnPlace").textContent=d.place; $("btnRemove").textContent=d.remove;
+  $("t-h-ruler").textContent=d.hRuler; $("t-insruler").textContent=d.insruler;
+  $("t-rulerhint").textContent=d.rulerhint; $("t-rulerhint").style.display=d.rulerhint?"":"none";
+  $("t-h-osc").textContent=d.hOsc;
+  $("t-amp").textContent=`${d.amp} — ${S.amp.toFixed(1)}`;
+  $("btnPush").textContent=d.push;
+  $("t-h-sw").textContent=d.hSw; $("t-sw").textContent=d.sw;
+  $("btnSw").textContent = S.swRun ? d.swStop : d.swStart;
+  $("btnLap").textContent=d.lap; $("btnSwReset").textContent=d.swReset;
+  $("t-note2").textContent=d.note2; $("t-note2").style.display=d.note2?"":"none";
+  $("t-cap2").textContent=d.cap2; $("t-cap3").textContent=d.cap3;
+
+  $("t-h-rodB").textContent=d.hRodB;   $("t-rodB").textContent=d.rodB;
+  $("btnPlaceB").textContent=d.placeB; $("t-h-screw").textContent=d.hScrew;
+  $("t-jognote").textContent=d.jognote;
+  $("t-h-rulerB").textContent=d.hRulerB;$("t-rulerB").textContent=d.rulerB;
+  $("t-noteB").textContent=d.noteB; $("t-noteB").style.display=d.noteB?"":"none";
+  $("t-cap4").textContent=d.cap4; $("t-cap5").textContent=d.cap5;
+  $("t-caphead").textContent=d.capHead;
+
+  $("lang-ko").className = lang==="ko"?"on":"";
+  $("lang-en").className = lang==="en"?"on":"";
+  buildRodSeg(); renderA1(); renderLaps();
+}
+$("lang-ko").onclick=()=>{lang="ko";applyLang();};
+$("lang-en").onclick=()=>{lang="en";applyLang();};
+
+/* ══════════════════════════════════════════════════════════════
+   7.  MAIN LOOP
+   ══════════════════════════════════════════════════════════════ */
+let last=performance.now();
+function loop(now){
+  const dt=(now-last)/1000; last=now;
+  S.simT+=dt;
+
+  if(S.tab==="a1"){
+    S.mAcc=(S.mAcc||0)+dt;
+    const due = S.mAcc>=0.120;
+    if(S.meterOn && due){
+      meterStep(S.mAcc); S.mAcc=0;
+      const sat = Math.abs(S.reading)>=METER_FS;
+      $("dispB").className="disp";
+      $("dispB").innerHTML=`<small>${T[lang].field}</small>`+
+        (sat?"  O L  ":`${(S.reading*1e3).toFixed(1)} mT`);
+      $("meterState").textContent = sat ? T[lang].overRange
+                                        : (S.settling?T[lang].settling:"");
+    }else if(!S.meterOn){
+      S.mAcc=0;
+      $("dispB").className="disp off";
+      $("dispB").innerHTML=`<small>${T[lang].field}</small>-- OFF --`;
+      $("meterState").textContent=""; S.shown=meterTarget();
+    }
+    drawA1();
+  }
+
+  if(S.tab==="a2"){
+    if(S.swRun) S.swVal=S.simT-S.swT0;
+    $("swDisp").innerHTML=`<small>${T[lang].sw}</small>${S.swVal.toFixed(2)} s`;
+    drawFront(); drawTop("cvTop",zNow(),"cap3");
+  }
+
+  if(S.tab==="b"){
+    /* 원본 PartB._tick : 감쇠 진동을 실제로 적분한다.
+         v' = -w²(z - z_eq) - 2γ v,   γ = 1/τ
+       나사를 돌리면 막대가 곧바로 옮겨가지 않고 새 평형으로 흔들리며 수렴한다.  */
+    if(S.placed && dt>0){
+      const w=B.omega, gam=1.0/benchTau(ROD_D["HB/0.5"],8.0e-3);
+      const zeq=-GRAV*Math.sin(S.turns*B.S/B.D)/(w*w);
+      const nstep=Math.max(1,Math.floor(dt/0.004)+1), hs=Math.min(dt,0.25)/nstep;
+      for(let i=0;i<nstep;i++){
+        S.vzB += (-w*w*(S.zB-zeq) - 2*gam*S.vzB)*hs;
+        S.zB  += S.vzB*hs;
+      }
+      S.jit += (-S.jit/2.0)*dt + norm(0,1.2e-5)*Math.sqrt(Math.max(dt,1e-4));
+      const wasRinging=S.ringing;
+      S.ringing = Math.abs(S.vzB)>3e-5 || Math.abs(S.zB-zeq)>3e-5;
+      if(S.ringing) $("stateB").textContent=T[lang].ringing;
+      else if(wasRinging && !S.limitMsg) $("stateB").textContent="\u2014";
+    }
+    const zmm=S.placed?(S.zB+S.jit)*1e3:0;
+    drawTilt(zmm); drawHead(); drawTop("cvTopB",zmm,"cap5");
+  }
+  requestAnimationFrame(loop);
+}
+
+/* 나사 머리 위에서 휠 */
+(function(){
+  const h=$("cvHead");
+  if(h) h.addEventListener("wheel",wheelTurn,{passive:false});
+})();
+addEventListener("resize",()=>{});
+setTab("a1"); applyLang(); requestAnimationFrame(loop);
+</script>
+</body>
+</html>

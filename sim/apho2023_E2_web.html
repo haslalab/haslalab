@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" type="image/png" href="data:image/png;base64,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">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
+<meta name="theme-color" content="#2E3945">
+<title>APhO 2023 E2 — 열변형된 표면에 의한 간섭 · Interference from a Thermally Deformed Surface · HaslaLab</title>
+<meta name="description" content="APhO 2023 실험 2번을 브라우저에서 실행합니다. 레이저 다이오드 전류를 올려 가열된 표면의 간섭 무늬 차수를 세고, 열변형과 항복을 관찰합니다.">
+<link rel="canonical" href="https://haslalab.org/sim/apho2023_E2_web.html">
+<link rel="alternate" hreflang="ko" href="https://haslalab.org/sim/apho2023_E2_web.html?lang=ko">
+<link rel="alternate" hreflang="en" href="https://haslalab.org/sim/apho2023_E2_web.html?lang=en">
+<link rel="alternate" hreflang="x-default" href="https://haslalab.org/sim/apho2023_E2_web.html">
+<meta property="og:site_name" content="HaslaLab">
+<meta property="og:type" content="article">
+<meta property="og:title" content="APhO 2023 E2 — 열변형된 표면에 의한 간섭 · Interference from a Thermally Deformed Surface">
+<meta property="og:description" content="APhO 2023 실험 2번을 브라우저에서 실행합니다. 레이저 다이오드 전류를 올려 가열된 표면의 간섭 무늬 차수를 세고, 열변형과 항복을 관찰합니다.">
+<meta property="og:url" content="https://haslalab.org/sim/apho2023_E2_web.html">
+<meta property="og:image" content="https://haslalab.org/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://haslalab.org/og.png">
+<style>
+ :root{--ink:#1d2126;--dim:#6b7480;--line:#c9ced6;--panel:#eceae5}
+ *{box-sizing:border-box}
+ body{margin:0;font:14px/1.45 "Segoe UI",Roboto,"Malgun Gothic",
+      "Apple SD Gothic Neo",sans-serif;color:var(--ink);background:#dfe1e4}
+ header{padding:8px 14px;background:#f6f6f4;border-bottom:1px solid var(--line);
+        display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+ header h1{font-size:15px;margin:0}
+ header .serial{color:var(--dim);font-size:12px}
+ #lang{display:flex;border:1px solid var(--line);border-radius:7px;
+   overflow:hidden;background:#fff}
+ #lang button{border:0;background:#fff;font:inherit;font-size:12px;
+   padding:4px 12px;cursor:pointer;color:#4a5058}
+ #lang button.on{background:#3a5a86;color:#fff;font-weight:600}
+ #serial{margin-left:auto}
+ nav{display:flex;gap:2px;padding:6px 14px 0;background:#f6f6f4}
+ nav button{border:1px solid var(--line);border-bottom:none;background:#e2e2df;
+   padding:6px 16px;cursor:pointer;font:inherit;border-radius:5px 5px 0 0}
+ nav button.on{background:#fff;font-weight:600}
+ main{padding:12px 14px 24px}
+ .page{display:none}
+ .page.on{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+ .col{display:flex;flex-direction:column;gap:8px}
+ fieldset{border:1px solid var(--line);border-radius:6px;margin:0;
+   padding:6px 10px 8px;background:var(--panel)}
+ legend{font-size:12px;color:var(--dim);padding:0 4px}
+ canvas{display:block;border-radius:3px;touch-action:none}
+ .row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+ button.k{border:1px solid #a9a9a6;background:#e8e8e6;border-radius:4px;
+   padding:3px 10px;cursor:pointer;font:inherit}
+ button.k:active{background:#d8d8d6}
+ .read{font:13px/1.5 ui-monospace,Consolas,monospace}
+ .hint{color:var(--dim);font-size:12px;max-width:560px}
+ .warn{color:#a12626;font-size:12px;min-height:1.2em}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="h1"></h1>
+  <span id="lang"><button id="btn-ko">한국어</button><button id="btn-en">English</button></span>
+  <span class="serial" id="serial"></span>
+</header>
+
+<nav>
+  <button id="tab0" class="on"></button>
+  <button id="tab1"></button>
+</nav>
+
+<main>
+<section id="page0" class="page on">
+  <div class="col">
+    <canvas id="bench" width="560" height="434"></canvas>
+    <canvas id="ctrl" width="560" height="210"></canvas>
+    <fieldset><legend id="lg-stand"></legend>
+      <div class="row"><span id="tx-slide"></span>
+        <button class="k" id="sL">&#9664;</button>
+        <button class="k" id="sU">&#9650;</button>
+        <button class="k" id="sD">&#9660;</button>
+        <button class="k" id="sR">&#9654;</button>
+        <span class="read" id="spot"></span></div>
+    </fieldset>
+    <fieldset><legend id="lg-notes"></legend>
+      <div class="hint" id="tx-notes"></div>
+    </fieldset>
+  </div>
+  <div class="col">
+    <canvas id="screen" width="560" height="560"></canvas>
+    <div class="hint" id="ruler" style="max-width:560px"></div>
+  </div>
+</section>
+
+<section id="page1" class="page">
+  <div class="col">
+    <canvas id="wire" width="1010" height="560"></canvas>
+    <div class="warn" id="wwarn"></div>
+  </div>
+</section>
+</main>
+
+<script>
+"use strict";
+/* ====================================================================
+   APhO 2023 - Experimental Problem 2
+   INTERFERENCE FROM A THERMALLY DEFORMED SURFACE
+
+   A direct port of Apho2023_E2_sim_KO.py.  Every class of the desktop
+   program has its counterpart here and the optical model is the same
+   arithmetic, checked against the Python original to 5e-14 relative
+   over a grid of drive currents and screen positions.
+
+   Nothing is computed for you.  The meters read a current and a
+   voltage, the rail carries a centimetre scale and the screen carries a
+   ruler; the power, the angles and the height of the bump are yours to
+   work out.
+
+   One deliberate departure from the desktop program: there the pattern
+   is blown up with PhotoImage.zoom(2), which puts it on the glass at
+   21 px/cm while the ruler beside it is graduated at 12.25 px/cm, so
+   every radius read off it comes out 1.714x too small.  Here the image
+   spans exactly the same 490 px the ruler does.
+   ==================================================================== */
+
+/* ------------------------- language ------------------------------- */
+const I18N = {
+  title:   ["APhO 2023 \u2014 Experimental Problem 2 \u2014 interference from a thermally deformed surface",
+            "APhO 2023 \u2014 실험 문제 2 \u2014 열변형 표면에 의한 간섭"],
+  tab0:    ["Optical bench and screen", "광학대와 스크린"],
+  tab1:    ["Cabling", "배선"],
+  plate:   ["PMMA plate", "PMMA 판"],
+  stand:   ["adjustable stand", "조절 스탠드"],
+  slide:   ["slide the plate:", "판 이동:"],
+  spot:    ["spot", "지점"],
+  notes:   ["Notes", "안내"],
+  notetext:["Turn the current knob with the mouse wheel over it, or click "
+            + "its left and right half.  Click the centre of the knob to "
+            + "switch between the coarse and the fine step.",
+            "전류 노브는 마우스 휠로 돌리거나 좌우 절반을 클릭하세요.  "
+            + "노브 중앙을 누르면 거친 스텝과 미세 스텝이 바뀝니다."],
+  rulhint: ["Drag the 30 cm plastic ruler onto the pattern and read the "
+            + "fringes off its own millimetre scale.  Roll the wheel over "
+            + "it to swing it round, so it can be laid across a diameter. "
+            + " The fringes show through it, a little dimmed.",
+            "30 cm 플라스틱 자를 끌어서 무늬 위에 놓고, 자의 눈금으로 직접 "
+            + "재세요.  자 위에서 마우스 휠을 굴리면 자가 회전하므로 지름을 "
+            + "가로질러 놓을 수 있습니다.  자를 통해서도 무늬는 보이지만 "
+            + "조금 어두워집니다."],
+  /* text printed on the drawings */
+  benchcm: ["optical bench, cm", "광학대, cm"],
+  laser:   ["laser", "레이저"],
+  scrhole: ["screen (hole)", "스크린 (구멍)"],
+  target:  ["PMMA target", "PMMA 시료"],
+  draghint:["drag the screen or the target along the rail",
+            "스크린이나 시료를 레일 위에서 끌어 옮기세요"],
+  pfront:  ["PMMA, front", "PMMA, 정면"],
+  psurf:   ["PMMA surface, 0.25 mm", "PMMA 표면, 0.25 mm"],
+  lifesize:["life\nsize", "실물\n크기"],
+  ctrlbox: ["CONTROL BOX", "컨트롤 박스"],
+  power:   ["POWER", "전원"],
+  fine:    ["fine step", "미세 스텝"],
+  coarse:  ["coarse step", "거친 스텝"],
+  multim:  ["multimeter", "멀티미터"],
+  dcA:     ["DC current", "직류 전류"],
+  dcV:     ["DC voltage", "직류 전압"],
+  adaptor: ["adaptor  7", "어댑터  7"],
+  diode:   ["laser diode head  1", "레이저 다이오드 헤드  1"],
+  shorted: ["the ammeter is across the laser and has shorted it out",
+            "전류계가 레이저에 병렬로 물려 단락되었습니다"],
+  wirehint:["Click a terminal, then click the one it goes to.  Click a lead "
+            + "to pull it out, right-click to cancel.",
+            "단자를 클릭한 뒤 연결할 단자를 클릭하세요.  리드를 클릭하면 "
+            + "빠지고, 우클릭하면 취소됩니다."],
+};
+/* the index page hands the language over in the query string; that wins,
+   then whatever was stored here, then the browser's own setting */
+let LANG = new URLSearchParams(location.search).get("lang");
+if (LANG !== "ko" && LANG !== "en") LANG = localStorage.getItem("aphoLang");
+if (LANG !== "ko" && LANG !== "en")
+  LANG = (navigator.language || "").slice(0, 2) === "ko" ? "ko" : "en";
+function tr(k){ const e = I18N[k]; return e ? (LANG === "ko" ? e[1] : e[0]) : k; }
+
+/* ------------------------- constants ------------------------------ */
+const LAMBDA = 650.0e-9;
+const R_BASE_LAMBDA = 167.82;
+const P_THRESHOLD = 287.0;
+const N_SLOPE = 0.4632;
+const P_YIELD_NOM = 363.6;
+
+/* ------------------------- randomness ----------------------------- */
+function mulberry(seed){
+  return function(){ seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+}
+function gauss(rng){                                     /* Box-Muller */
+  let u = 0, v = 0;
+  while (!u) u = rng(); while (!v) v = rng();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+
+/* ==================================================================
+   ThermoModel  -  laser diode -> PMMA surface -> reflected pattern
+
+     height of the bump    h      = m_max * lambda / 2
+     number of fringes     m_max  = 0.4632 (P - 287)      [official fit]
+     dark fringe           R_base sin(alpha_m) = m lambda
+                           R_base = 167.82 lambda
+   The two innermost orders are hidden inside the bright central spot,
+   so the order you can actually count is m' = m - 2.  Above the yield
+   power the surface melts and the deformation is frozen in.
+   ================================================================== */
+class ThermoModel {
+  constructor(rng){
+    this.rng = rng;
+    this.R_base_lam = R_BASE_LAMBDA * (1 + 0.015 * gauss(rng));
+    this.P_th = P_THRESHOLD * (1 + 0.004 * gauss(rng));
+    this.slope = N_SLOPE * (1 + 0.03 * gauss(rng));
+    this.P_yield = P_YIELD_NOM * (1 + 0.02 * gauss(rng));
+    this.hidden = 2.0 + 0.10 * gauss(rng);
+    this.iv_a = 0.35928;
+    this.iv_b = 0.73823 * (1 + 0.004 * gauss(rng));
+    this.spot_key = "0,0";
+    this.spots = new Map();
+    this.melted = false;
+    this.melt_extra = 0.0;
+    this.m_frozen = 0.0;
+    this.dirty = Math.abs(0.35 * gauss(rng));      /* contamination */
+    this.ellipticity = 1.0 + Math.abs(0.012 * gauss(rng));
+    this.tilt = rng() * Math.PI;
+  }
+  diode_voltage(mA){
+    if (mA <= 1.0) return 0.0;
+    return this.iv_a + this.iv_b * Math.log(mA);
+  }
+  read_meters(mA){                     /* two multimeters, with noise */
+    const i = mA + 0.12 * gauss(this.rng);
+    const v = this.diode_voltage(mA) + 0.004 * gauss(this.rng);
+    return [Math.round(i * 10) / 10, Math.round(v * 100) / 100];
+  }
+  power_true(mA){ return mA * this.diode_voltage(mA); }
+
+  m_max(mA){
+    const P = this.power_true(mA);
+    const n_th = Math.max(this.slope * (P - this.P_th), 0.0);
+    if (P > this.P_yield){
+      this.melted = true;
+      /* the plastic part takes over from the thermal one, so nothing
+         jumps as the surface starts to yield */
+      this.m_frozen = Math.max(this.m_frozen, n_th);
+    }
+    if (this.melted) return Math.max(n_th, this.m_frozen);
+    return n_th;
+  }
+  height_lambda(mA){ return this.m_max(mA) / 2.0; }
+
+  intensity(nu, mmax){
+    const core = 1.35 * Math.exp(-Math.pow(nu / 1.55, 2));
+    const env = 0.80 * Math.exp(-0.85 * Math.pow(nu / Math.max(mmax, 1.0), 2));
+    const cutoff = 0.5 * (1.0 - Math.tanh((nu - mmax) / 0.55));
+    const s = Math.sin(Math.PI * nu);
+    let ring = env * cutoff * s * s;
+    ring *= 0.5 * (1.0 + Math.tanh((nu - this.hidden) / 0.55));
+    return core + ring;
+  }
+
+  /* one point of the pattern, in cm on the screen, before the speckle */
+  pixel(mA, L_cm, X, Y, mmax, Pw){
+    const ca = Math.cos(this.tilt), sa = Math.sin(this.tilt);
+    const Xr = X * ca + Y * sa, Yr = -X * sa + Y * ca;
+    const Rr = Math.hypot(Xr / this.ellipticity, Yr * this.ellipticity);
+    const nu = this.R_base_lam * Math.sin(Math.atan2(Rr, L_cm));
+    let img = (mmax > 0.4) ? this.intensity(nu, mmax)
+                           : 1.35 * Math.exp(-Math.pow(nu / 1.55, 2));
+    /* brightness follows the drive: below the fringe threshold the knob
+       still does something visible, as it does on the bench */
+    img *= Math.min(Math.max(Pw / 300.0, 0.0), 1.6);
+    if (this.dirty > 0.25)
+      img *= 1.0 + 0.05 * this.dirty * Math.cos(4.0 * Math.atan2(Yr, Xr));
+    return img;
+  }
+
+  /* The stand slides the plate across the beam.  Every spot keeps its
+     own history, so a shot that has been melted is still melted when
+     you wind the stand back to it. */
+  goto_spot(key){
+    this.spots.set(this.spot_key, [this.melted, this.melt_extra,
+                                   this.R_base_lam, this.m_frozen]);
+    this.spot_key = key;
+    if (this.spots.has(key)){
+      const s = this.spots.get(key);
+      this.melted = s[0]; this.melt_extra = s[1];
+      this.R_base_lam = s[2]; this.m_frozen = s[3];
+    } else {
+      this.melted = false;
+      this.melt_extra = 0.0;
+      this.m_frozen = 0.0;
+      this.R_base_lam = R_BASE_LAMBDA * (1 + 0.015 * gauss(this.rng));
+    }
+  }
+}
+
+/* the deep red of a 650 nm diode.  numpy casts the ramp with
+   astype(uint8), which truncates, so this truncates too */
+const LASER_STOPS = [[0.00, 0, 0, 0], [0.18, 42, 0, 0], [0.40, 139, 0, 8],
+                     [0.62, 224, 16, 32], [0.82, 255, 90, 85],
+                     [1.00, 255, 233, 230]];
+function laser_rgb(v, d, k){
+  const x = Math.min(Math.max(v / 1.35, 0), 1);
+  for (let i = 0; i < LASER_STOPS.length - 1; i++){
+    const a = LASER_STOPS[i], b = LASER_STOPS[i + 1];
+    if (x >= a[0] && x <= b[0]){
+      const f = (x - a[0]) / (b[0] - a[0]);
+      d[k]     = (a[1] + f * (b[1] - a[1])) | 0;
+      d[k + 1] = (a[2] + f * (b[2] - a[2])) | 0;
+      d[k + 2] = (a[3] + f * (b[3] - a[3])) | 0;
+      return;
+    }
+  }
+  d[k] = 255; d[k + 1] = 233; d[k + 2] = 230;
+}
+
+/* ==================================================================
+   The 30 cm clear plastic ruler from the apparatus list.
+
+   It is an object lying on the screen, not a read-out: drag it where
+   you want it, roll the wheel over it to swing it round, and read the
+   fringe positions off its own millimetre scale.  Nothing anywhere
+   prints a radius for you.
+   ================================================================== */
+class Ruler {
+  constructor(){
+    this.LEN = 30.0;      /* cm, the printed scale runs 0 .. 30 */
+    this.WID = 3.0;
+    this.TRANS = 0.86;    /* two air/acrylic surfaces, ~8% lost at each */
+    this.x = 0.0; this.y = 13.0; this.ang = 0.0;
+  }
+  local(X, Y){                       /* screen cm -> ruler cm (u, v) */
+    const ca = Math.cos(-this.ang), sa = Math.sin(-this.ang);
+    const dx = X - this.x, dy = Y - this.y;
+    return [dx * ca - dy * sa, dx * sa + dy * ca];
+  }
+  contains(X, Y){
+    const [u, v] = this.local(X, Y);
+    return Math.abs(u) <= this.LEN / 2 && Math.abs(v) <= this.WID / 2;
+  }
+  /* What the ruler looks like lying on the screen, as colour.  Clear
+     acrylic transmits most of the light and reflects the rest, so the
+     fringes stay visible through it but dimmed - that part is still the
+     laser's deep red.  What the ruler itself shows is not: the bevelled
+     edges pipe light along their length and the engraved graduations
+     scatter it, and both come back neutral. */
+  shade(u, v, I, out){
+    laser_rgb(Math.min(Math.max(I * this.TRANS, 0), 1.6), out, 0);
+    let r = out[0] + 11, g = out[1] + 13, b = out[2] + 17;
+    const e = Math.exp(-Math.pow((Math.abs(v) - this.WID / 2) / 0.085, 2));
+    r += 54 * e; g += 62 * e; b += 72 * e;
+    out[0] = Math.min(255, r) | 0;
+    out[1] = Math.min(255, g) | 0;
+    out[2] = Math.min(255, b) | 0;
+  }
+  /* The engraved millimetre scale, as segments in screen cm.  These are
+     drawn rather than sampled into the image: a millimetre is only about
+     1.2 screen pixels, so putting the marks into the pixel grid turned
+     them into an aliased hash instead of a scale you could read. */
+  ticks(){
+    const ca = Math.cos(this.ang), sa = Math.sin(this.ang);
+    const half = this.WID / 2, out = [];
+    for (let k = 0; k <= 300; k++){
+      const u = k * 0.1 - this.LEN / 2;
+      const tl = (k % 10 === 0) ? 0.66 : ((k % 5 === 0) ? 0.42 : 0.22);
+      const v0 = half, v1 = half - tl;
+      out.push([this.x + u * ca - v0 * sa, this.y + u * sa + v0 * ca,
+                this.x + u * ca - v1 * sa, this.y + u * sa + v1 * ca,
+                k % 10 === 0, k % 5 === 0]);
+    }
+    return out;
+  }
+}
+
+/* ==================================================================
+   application state  (class App of the desktop program)
+   ================================================================== */
+const seed = (Math.random() * 1e9) | 0;
+const app = {
+  seed: seed,
+  rng: mulberry(seed),
+  model: null,
+  on: false,          /* the mechanical switch on the box */
+  lit: false,         /* whether the circuit actually lights the diode */
+  cur: 40.0,
+  fine: false,
+  knob_a: 0.0,
+  reading: [0.0, 0.0],
+  x_target: 0.0,
+  x_screen: 49.2,
+  ruler: null,
+  L(){ return this.x_screen - this.x_target; },
+};
+app.model = new ThermoModel(app.rng);
+app.ruler = new Ruler();
+
+/* ==================================================================
+   the cabling page  (class WiringPage)
+   ================================================================== */
+const WP = {
+  W: 1010, H: 560, R: 9,
+  FACE: "#4fa6dc", BODY: "#2e3134", NAVY: "#16324f",
+  links: new Set(), held: null, mouse: [0, 0],
+  T: {
+    adaptor:  {x: 150, y: 470, col: "#2b6fa8", lab: ""},
+    box_dc:   {x: 356, y: 470, col: "#2b6fa8", lab: ""},
+    box_lp:   {x: 356, y: 150, col: "#c02020", lab: ""},
+    box_ln:   {x: 356, y: 250, col: "#2b2e32", lab: ""},
+    amp_in:   {x: 560, y:  96, col: "#c02020", lab: ""},
+    amp_com:  {x: 560, y: 176, col: "#2b2e32", lab: ""},
+    volt_in:  {x: 800, y:  96, col: "#c02020", lab: ""},
+    volt_com: {x: 800, y: 176, col: "#2b2e32", lab: ""},
+    laser_p:  {x: 620, y: 330, col: "#c02020", lab: "+"},
+    laser_n:  {x: 620, y: 410, col: "#2b2e32", lab: "\u2212"},
+  },
+  /* only these pairs can be joined - including the classic mistakes,
+     which are allowed precisely so that they can be made */
+  ALLOWED: new Set(["adaptor|box_dc", "amp_in|box_lp", "amp_com|laser_p",
+                    "box_ln|laser_n", "laser_p|volt_in", "laser_n|volt_com",
+                    "box_lp|laser_p", "amp_in|laser_p", "amp_com|laser_n",
+                    "box_lp|volt_in", "box_ln|volt_com"]),
+  MULTI: new Set(["laser_p", "laser_n", "box_lp", "box_ln"]),
+};
+const key2 = (a, b) => [a, b].sort().join("|");
+const linked = (a, b) => WP.links.has(key2(a, b));
+
+function wireState(){
+  const powered = linked("adaptor", "box_dc");
+  const series = linked("box_lp", "amp_in") && linked("amp_com", "laser_p")
+              && linked("laser_n", "box_ln");
+  const direct = linked("box_lp", "laser_p") && linked("laser_n", "box_ln");
+  const shorted = linked("amp_in", "laser_p") && linked("amp_com", "laser_n");
+  /* the POWER switch is part of the circuit too: with it off the box
+     passes nothing, so there is no beam anywhere */
+  const lit = app.on && powered && (series || direct) && !shorted;
+  return {powered: powered, lit: lit, shorted: shorted,
+          amp: series && lit,
+          volt: linked("volt_in", "laser_p") && linked("volt_com", "laser_n")
+                && lit};
+}
+
+function readMeters(){
+  const st = wireState();
+  let i = 0.0, v = 0.0;
+  if (st.lit){ const r = app.model.read_meters(app.cur); i = r[0]; v = r[1]; }
+  /* an unconnected meter shows nothing at all, not a zero */
+  app.reading = [st.amp ? i : null, st.volt ? v : null];
+  app.lit = st.lit;
+}
+
+function wireAt(x, y){
+  for (const k in WP.T){
+    const d = WP.T[k];
+    if (Math.hypot(x - d.x, y - d.y) <= WP.R + 7) return k;
+  }
+  return null;
+}
+function bezPoint(a, b, f){
+  return [a.x + (b.x - a.x) * f,
+          a.y + (b.y - a.y) * f + 24 * Math.sin(Math.PI * f)];
+}
+function cableAt(x, y){
+  for (const lk of WP.links){
+    const [a, b] = lk.split("|");
+    for (let n = 0; n <= 43; n++){
+      const p = bezPoint(WP.T[a], WP.T[b], n / 43);
+      if (Math.hypot(x - p[0], y - p[1]) < 7) return lk;
+    }
+  }
+  return null;
+}
+function plug(a, b){
+  for (const end of [a, b]){
+    if (WP.MULTI.has(end)) continue;
+    for (const lk of [...WP.links]) if (lk.split("|").includes(end))
+      WP.links.delete(lk);
+  }
+  WP.links.add(key2(a, b));
+}
+
+/* ==================================================================
+   drawing helpers
+   ================================================================== */
+function ctxOf(id){
+  const cv = document.getElementById(id);
+  const g = cv.getContext("2d");
+  const dpr = window.devicePixelRatio || 1;
+  const w = cv.width, h = cv.height;
+  if (cv.dataset.fitted !== String(dpr)){
+    cv.dataset.fitted = String(dpr);
+    cv.style.width = w + "px"; cv.style.height = h + "px";
+    cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+    cv.dataset.w = w; cv.dataset.h = h;
+  }
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return g;
+}
+function txt(g, x, y, s, col, px, bold, anchor){
+  g.fillStyle = col;
+  g.font = (bold ? "bold " : "") + (px || 11) + "px "
+         + '"Segoe UI",Roboto,"Malgun Gothic","Apple SD Gothic Neo",sans-serif';
+  g.textAlign = anchor || "center";
+  g.textBaseline = "middle";
+  const lines = String(s).split("\n");
+  const lh = (px || 11) * 1.2;
+  lines.forEach((ln, i) =>
+    g.fillText(ln, x, y + (i - (lines.length - 1) / 2) * lh));
+}
+function mono(g, x, y, s, col, px, anchor){
+  g.fillStyle = col;
+  g.font = "bold " + px + "px ui-monospace,Consolas,monospace";
+  g.textAlign = anchor || "center";
+  g.textBaseline = "middle";
+  g.fillText(s, x, y);
+}
+function rect(g, x0, y0, x1, y1, fill, out, w){
+  if (fill){ g.fillStyle = fill; g.fillRect(x0, y0, x1 - x0, y1 - y0); }
+  if (out){ g.strokeStyle = out; g.lineWidth = w || 1;
+            g.strokeRect(x0, y0, x1 - x0, y1 - y0); }
+}
+function oval(g, x0, y0, x1, y1, fill, out, w, dash){
+  g.save();
+  if (dash) g.setLineDash(dash);
+  g.beginPath();
+  g.ellipse((x0 + x1) / 2, (y0 + y1) / 2, (x1 - x0) / 2, (y1 - y0) / 2,
+            0, 0, 7);
+  if (fill){ g.fillStyle = fill; g.fill(); }
+  if (out){ g.strokeStyle = out; g.lineWidth = w || 1; g.stroke(); }
+  g.restore();
+}
+function line(g, pts, col, w, dash){
+  g.save();
+  if (dash) g.setLineDash(dash);
+  g.strokeStyle = col; g.lineWidth = w || 1;
+  g.lineCap = "round"; g.lineJoin = "round";
+  g.beginPath(); g.moveTo(pts[0], pts[1]);
+  for (let i = 2; i < pts.length; i += 2) g.lineTo(pts[i], pts[i + 1]);
+  g.stroke(); g.restore();
+}
+
+/* ==================================================================
+   THE OPTICAL BENCH  (class BenchCanvas)
+   ================================================================== */
+const BW = 560, BH = 434;
+const X_LASER = 72.0, X_FRONT = 66.0;
+const bpx = cm => 40 + cm * (BW - 90) / 80.0;
+const bcm = px => (px - 40) * 80.0 / (BW - 90);
+
+function plateViews(g, x0, y0){
+  /* The PMMA plate itself, not a graph: the face you shoot at, and the
+     same plate seen edge on so that the swelling can be judged.  The
+     bump is a few tens of wavelengths on a 3 mm plate, so at life size
+     it is a third of a pixel: the edge view therefore shows a 0.25 mm
+     square of the surface, at a stated scale. */
+  const m = app.model;
+  const h = app.lit ? m.height_lambda(app.cur) : 0.0;
+  const hot = h > 0.05;
+  const SLICE_M = 250e-6;
+  const rise = Math.min(h * LAMBDA / SLICE_M * 60.0, 34.0);
+  const base = m.R_base_lam * LAMBDA / SLICE_M * 60.0;
+
+  rect(g, x0 - 30, y0 - 30, x0 + 30, y0 + 30, "#dff0f5", "#7fa3ad", 2);
+  oval(g, x0 - 2, y0 - 2, x0 + 2, y0 + 2, hot ? "#ff9a3c" : "#d9c4b0");
+  txt(g, x0, y0 + 42, tr("pfront"), "#5c6169", 10);
+
+  const ex = x0 + 128, ey = y0;
+  const half = Math.max(base, 6.0);
+  g.beginPath();
+  g.moveTo(ex - 22, ey - 30); g.lineTo(ex - 22, ey + 30);
+  for (let k = 0; k <= 60; k++){
+    const u = 1.0 - k / 30.0;
+    g.lineTo(ex + 22 + rise * Math.exp(-Math.pow(u * 30.0 / half, 2)),
+             ey + 30 * u);
+  }
+  g.closePath();
+  g.fillStyle = "#dff0f5"; g.fill();
+  g.strokeStyle = "#7fa3ad"; g.lineWidth = 2; g.stroke();
+  line(g, [ex + 22, ey - 30, ex + 22, ey + 30], "#b7ced6", 1, [3, 3]);
+  txt(g, ex, ey + 42, tr("psurf"), "#5c6169", 10);
+  txt(g, x0 - 44, ey, tr("lifesize"), "#8b8f96", 10);
+}
+
+function drawBench(){
+  const g = ctxOf("bench");
+  g.clearRect(0, 0, BW, BH);
+  g.fillStyle = "#e9e7e2"; g.fillRect(0, 0, BW, BH);
+  g.strokeStyle = "#999"; g.lineWidth = 1; g.strokeRect(0.5, 0.5, BW - 1, BH - 1);
+
+  const yb = 290;
+  rect(g, 24, yb, BW - 24, yb + 16, "#b9bcc2", "#8b8f96", 1);
+  for (let cm = 0; cm <= 80; cm += 5){
+    const x = bpx(cm);
+    line(g, [x, yb, x, yb - 6], "#6b7076", 1);
+    txt(g, x, yb - 13, String(cm), "#6b7076", 10);
+  }
+  txt(g, BW - 28, yb + 26, tr("benchcm"), "#6b7076", 10, false, "right");
+
+  const xs = bpx(app.x_screen), xt = bpx(app.x_target), xl = bpx(X_LASER);
+  const beam_y = 190;
+
+  rect(g, xl - 6, yb - 40, xl + 6, yb, "#7d848c", "#5c6169", 1);
+  rect(g, xl - 26, beam_y - 13, xl + 30, beam_y + 13, "#4a5059", "#2f343a", 1);
+  rect(g, xl - 34, beam_y - 6, xl - 26, beam_y + 6, "#2f343a");
+  txt(g, xl + 2, beam_y - 22, tr("laser"), "#4a5059", 11);
+
+  rect(g, xs - 3, beam_y - 96, xs + 3, yb, "#dcdcd4", "#9a9a92", 1);
+  rect(g, xs - 4, beam_y - 5, xs + 4, beam_y + 5, "#e9e7e2");
+  txt(g, xs, beam_y - 104, tr("scrhole"), "#5c6169", 11);
+
+  rect(g, xt - 5, beam_y - 60, xt + 5, beam_y + 60, "#cfe0e6", "#7fa3ad", 2);
+  rect(g, xt - 10, yb - 34, xt + 10, yb, "#7d848c", "#5c6169", 1);
+  txt(g, xt, beam_y - 72, tr("target"), "#4d707a", 11);
+
+  if (app.lit && app.cur > 2.0){
+    const bw = 1 + Math.floor(3.0 * Math.min(
+      app.model.power_true(app.cur) / 380.0, 1.0));
+    line(g, [xl - 26, beam_y, xt + 5, beam_y], "#e02020", bw);
+    for (const dy of [-1, 1])
+      line(g, [xt + 5, beam_y, xs - 3, beam_y + dy * 78], "#e02020", 1);
+  }
+  /* the distance the student has to quote */
+  line(g, [xt, beam_y + 78, xs, beam_y + 78], "#30507a", 1);
+  for (const [x, s] of [[xt, 1], [xs, -1]]){
+    g.fillStyle = "#30507a"; g.beginPath();
+    g.moveTo(x, beam_y + 78);
+    g.lineTo(x + s * 7, beam_y + 74); g.lineTo(x + s * 7, beam_y + 82);
+    g.closePath(); g.fill();
+  }
+  txt(g, (xt + xs) / 2, beam_y + 89, "L", "#30507a", 12, true);
+  txt(g, 12, 14, tr("draghint"), "#8b8f96", 11, false, "left");
+  plateViews(g, 100, 360);
+}
+
+/* dragging the screen and the target along the rail */
+(function(){
+  const cv = document.getElementById("bench");
+  let drag = null;
+  const at = ev => {
+    const b = cv.getBoundingClientRect();
+    return [(ev.clientX - b.left) * BW / b.width,
+            (ev.clientY - b.top) * BH / b.height];
+  };
+  cv.addEventListener("pointerdown", ev => {
+    const [x, y] = at(ev);
+    for (const [name, cm] of [["screen", app.x_screen], ["target", app.x_target]])
+      if (Math.abs(x - bpx(cm)) < 14 && y > 60 && y < 235){
+        drag = name; cv.setPointerCapture(ev.pointerId); return;
+      }
+  });
+  cv.addEventListener("pointermove", ev => {
+    if (!drag) return;
+    const [x] = at(ev);
+    const cm = Math.max(0.0, Math.min(X_FRONT, bcm(x)));
+    if (drag === "screen")
+      app.x_screen = Math.min(Math.max(cm, app.x_target + 5.0), X_FRONT);
+    else
+      app.x_target = Math.min(cm, app.x_screen - 5.0);
+    refresh();
+  });
+  const stop = () => { drag = null; };
+  cv.addEventListener("pointerup", stop);
+  cv.addEventListener("pointercancel", stop);
+})();
+
+/* ==================================================================
+   THE CONTROL BOX AND THE TWO MULTIMETERS  (class ControlCanvas)
+   ================================================================== */
+const CW = 560, CH = 210;
+const KX = 150, KY = 108, KR = 34;
+const SX = 40, SY = 78, SW = 62, SH = 30;
+
+function drawCtrl(){
+  const g = ctxOf("ctrl");
+  g.clearRect(0, 0, CW, CH);
+  g.fillStyle = "#e9e7e2"; g.fillRect(0, 0, CW, CH);
+
+  rect(g, 20, 30, 300, 190, "#2f6fa8", "#1d4a72", 2);
+  txt(g, 30, 44, tr("ctrlbox"), "#dbe8f4", 12, true, "left");
+
+  rect(g, SX, SY, SX + SW, SY + SH, app.on ? "#3fbf5f" : "#8b3030",
+       "#123", 2);
+  txt(g, SX + SW / 2, SY + SH / 2, app.on ? "ON" : "OFF", "#ffffff", 12, true);
+  txt(g, SX + SW / 2, SY - 10, tr("power"), "#dbe8f4", 10);
+
+  /* the knurled current knob.  Its pointer accumulates as you turn it,
+     exactly as the desktop one does: it is not an absolute dial, or you
+     could read the current off the knob instead of off the meter */
+  oval(g, KX - KR, KY - KR, KX + KR, KY + KR, "#d9dde2", "#8b8f96", 2);
+  oval(g, KX - 10, KY - 10, KX + 10, KY + 10, "#b6bcc4", "#8b8f96", 1);
+  const a = app.knob_a;
+  line(g, [KX + (KR - 6) * Math.sin(a), KY - (KR - 6) * Math.cos(a),
+           KX + 10 * Math.sin(a), KY - 10 * Math.cos(a)], "#c02020", 3);
+  txt(g, KX, KY + KR + 12, "CURRENT  Adjust", "#dbe8f4", 11);
+  txt(g, KX, KY + KR + 24, tr(app.fine ? "fine" : "coarse"), "#a9c4dc", 10);
+
+  txt(g, 232, 76, "LASER", "#dbe8f4", 11);
+  oval(g, 222, 86, 242, 106,
+       (app.lit && app.cur > 2.0) ? "#ff4030" : "#603030", "#123", 1);
+  txt(g, 232, 120, "DC 12 V", "#dbe8f4", 10);
+
+  const [i, v] = app.reading;
+  [["DC mA", i, "mA"], ["DC V", v, "V"]].forEach((row, k) => {
+    const [lab, val, unit] = row;
+    const X = 330 + k * 118;
+    rect(g, X, 30, X + 104, 190, "#b5443f", "#7d2b28", 2);
+    rect(g, X + 10, 46, X + 94, 86, "#101810", "#0a0d0a", 1);
+    const s = (val === null) ? "  . "
+            : (unit === "mA" ? val.toFixed(1) : val.toFixed(2));
+    mono(g, X + 88, 66, s, "#7dff9d", 15, "right");
+    txt(g, X + 52, 98, lab, "#f3dedd", 11, true);
+    oval(g, X + 40, 120, X + 64, 144, "#8d3733", "#5c1f1c", 1);
+    txt(g, X + 52, 176, tr("multim"), "#f3dedd", 10);
+  });
+}
+
+function turnKnob(s){
+  app.knob_a += s * 0.35;
+  /* set_current of the desktop program: 0.1 mA resolution, and the
+     diode's own limit at 115 mA */
+  const v = app.cur + s * (app.fine ? 0.1 : 1.0);
+  app.cur = Math.max(0.0, Math.min(115.0, Math.round(v * 10) / 10));
+  readMeters();
+  refresh();
+}
+(function(){
+  const cv = document.getElementById("ctrl");
+  const at = ev => {
+    const b = cv.getBoundingClientRect();
+    return [(ev.clientX - b.left) * CW / b.width,
+            (ev.clientY - b.top) * CH / b.height];
+  };
+  cv.addEventListener("click", ev => {
+    const [x, y] = at(ev);
+    if (x >= SX && x <= SX + SW && y >= SY && y <= SY + SH){
+      app.on = !app.on; readMeters(); refresh(); return;
+    }
+    const d = Math.hypot(x - KX, y - KY);
+    if (d <= KR + 5){
+      if (d < 11){ app.fine = !app.fine; refresh(); }
+      else turnKnob(x > KX ? 1 : -1);
+    }
+  });
+  cv.addEventListener("wheel", ev => {
+    const [x, y] = at(ev);
+    if (Math.hypot(x - KX, y - KY) > KR + 5) return;
+    ev.preventDefault();
+    turnKnob(ev.deltaY < 0 ? 1 : -1);
+  }, {passive: false});
+})();
+
+/* ==================================================================
+   THE SCREEN  (class ScreenCanvas)
+   ================================================================== */
+const SCW = 560, HALF = 20.0, NGRID = 420;
+const spx = cm => SCW / 2 + cm * (SCW - 70) / (2 * HALF);
+const scm = px => (px - SCW / 2) * 2 * HALF / (SCW - 70);
+const offc = document.createElement("canvas");
+offc.width = NGRID; offc.height = NGRID;
+const offg = offc.getContext("2d");
+
+function drawScreen(){
+  const g = ctxOf("screen");
+  g.clearRect(0, 0, SCW, SCW);
+  g.fillStyle = "#20211f"; g.fillRect(0, 0, SCW, SCW);
+
+  const im = offg.createImageData(NGRID, NGRID);
+  const d = im.data;
+  const live = app.lit && app.cur > 2.0;
+  const Ical = new Float32Array(NGRID * NGRID);
+  if (live){
+    const m = app.model, L = app.L();
+    const mmax = m.m_max(app.cur);          /* this is where it can melt */
+    const Pw = m.power_true(app.cur);
+    const rg = mulberry(7);                 /* the speckle is fixed */
+    for (let j = 0; j < NGRID; j++){
+      const Y = -HALF + 2 * HALF * j / (NGRID - 1);
+      for (let i2 = 0; i2 < NGRID; i2++){
+        const X = -HALF + 2 * HALF * i2 / (NGRID - 1);
+        let I = m.pixel(app.cur, L, X, Y, mmax, Pw);
+        /* the speckle scales with the light that is actually there: a
+           flat dither would put false minima in the black background
+           outside the pattern and make the ring count ambiguous */
+        I += 0.030 * Math.sqrt(Math.max(I, 0)) * (rg() - 0.5) + 0.0015 * rg();
+        I = Math.max(0, Math.min(1.6, I));
+        Ical[j * NGRID + i2] = I;
+        const k = (j * NGRID + i2) * 4;
+        laser_rgb(I, d, k);
+        d[k + 3] = 255;
+      }
+    }
+  } else {
+    for (let k = 3; k < d.length; k += 4) d[k] = 255;
+  }
+  /* the ruler, composited into the pixels it actually covers */
+  const R = app.ruler, px4 = new Uint8ClampedArray(4);
+  for (let j = 0; j < NGRID; j++){
+    const Y = -HALF + 2 * HALF * j / (NGRID - 1);
+    for (let i2 = 0; i2 < NGRID; i2++){
+      const X = -HALF + 2 * HALF * i2 / (NGRID - 1);
+      const [u, v] = R.local(X, Y);
+      if (Math.abs(u) > R.LEN / 2 || Math.abs(v) > R.WID / 2) continue;
+      const k = (j * NGRID + i2) * 4;
+      R.shade(u, v, Ical[j * NGRID + i2], px4);
+      d[k] = px4[0]; d[k + 1] = px4[1]; d[k + 2] = px4[2]; d[k + 3] = 255;
+    }
+  }
+  offg.putImageData(im, 0, 0);
+  /* the image spans exactly the pixels the geometry does, so a length
+     read off the ruler is the length the model used */
+  const x0 = spx(-HALF), span = spx(HALF) - spx(-HALF);
+  g.imageSmoothingEnabled = true;
+  g.drawImage(offc, x0, x0, span, span);
+
+  /* the printed scale, drawn crisp on top of the plastic */
+  for (const t of R.ticks()){
+    if (Math.max(Math.abs(t[0]), Math.abs(t[1])) > HALF) continue;
+    line(g, [spx(t[0]), spx(t[1]), spx(t[2]), spx(t[3])],
+         t[4] ? "#eef3f8" : (t[5] ? "#d6dee6" : "#9fadb8"), 1);
+  }
+
+  /* the numbers printed on the ruler */
+  const rca = Math.cos(R.ang), rsa = Math.sin(R.ang);
+  g.save(); g.textAlign = "center"; g.textBaseline = "middle";
+  g.font = "10px \"Segoe UI\",Roboto,sans-serif";
+  for (let cmv = 0; cmv <= 30; cmv += 5){
+    const uu = cmv - R.LEN / 2, vv = R.WID / 2 - 1.02;
+    const X = R.x + uu * rca - vv * rsa, Y = R.y + uu * rsa + vv * rca;
+    if (Math.abs(X) > HALF || Math.abs(Y) > HALF) continue;
+    g.save(); g.translate(spx(X), spx(Y)); g.rotate(R.ang);
+    g.fillStyle = "#dfe6ec"; g.fillText(String(cmv), 0, 0); g.restore();
+  }
+  {
+    const uu = R.LEN / 2 - 2.6, vv = -R.WID / 2 + 0.75;
+    const X = R.x + uu * rca - vv * rsa, Y = R.y + uu * rsa + vv * rca;
+    if (Math.abs(X) <= HALF && Math.abs(Y) <= HALF){
+      g.save(); g.translate(spx(X), spx(Y)); g.rotate(R.ang);
+      g.fillStyle = "#b9c4cd"; g.fillText("cm", 0, 0); g.restore();
+    }
+  }
+  g.restore();
+
+  /* the hole the incoming beam goes through */
+  oval(g, SCW / 2 - 5, SCW / 2 - 5, SCW / 2 + 5, SCW / 2 + 5,
+       null, "#8090a0", 1, [2, 2]);
+
+}
+
+(function(){
+  const cv = document.getElementById("screen");
+  let drag = null;
+  const at = ev => {
+    const b = cv.getBoundingClientRect();
+    return [scm((ev.clientX - b.left) * SCW / b.width),
+            scm((ev.clientY - b.top) * SCW / b.height)];
+  };
+  cv.addEventListener("pointerdown", ev => {
+    const [X, Y] = at(ev);
+    if (app.ruler.contains(X, Y)){
+      drag = [X - app.ruler.x, Y - app.ruler.y];
+      cv.setPointerCapture(ev.pointerId);
+    }
+  });
+  cv.addEventListener("pointermove", ev => {
+    if (!drag) return;
+    const [X, Y] = at(ev);
+    app.ruler.x = X - drag[0];
+    app.ruler.y = Y - drag[1];
+    drawScreen();
+  });
+  const stop = () => { drag = null; };
+  cv.addEventListener("pointerup", stop);
+  cv.addEventListener("pointercancel", stop);
+  /* swing it round, so it can be laid across a diameter */
+  cv.addEventListener("wheel", ev => {
+    const [X, Y] = at(ev);
+    if (!app.ruler.contains(X, Y)) return;
+    ev.preventDefault();
+    app.ruler.ang += (ev.deltaY < 0 ? 1 : -1) * Math.PI / 90;
+    drawScreen();
+  }, {passive: false});
+})();
+
+/* ==================================================================
+   the cabling page, drawn
+   ================================================================== */
+function wireMeter(g, x0, y0, title, value, unit, live){
+  rect(g, x0, y0, x0 + 210, y0 + 190, "#b5443f", "#7d2b28", 2);
+  rect(g, x0 + 16, y0 + 22, x0 + 194, y0 + 74, "#101810", "#0a0d0a", 1);
+  mono(g, x0 + 186, y0 + 48, live ? value : "  . ", "#7dff9d", 17, "right");
+  txt(g, x0 + 105, y0 + 92, title, "#f3dedd", 12, true);
+  oval(g, x0 + 80, y0 + 108, x0 + 130, y0 + 158, "#8d3733", "#5c1f1c", 2);
+  txt(g, x0 + 105, y0 + 133, unit, "#f3dedd", 11, true);
+}
+
+function drawWire(){
+  const g = ctxOf("wire");
+  g.clearRect(0, 0, WP.W, WP.H);
+  g.fillStyle = "#41454a"; g.fillRect(0, 0, WP.W, WP.H);
+  g.strokeStyle = "#22252a"; g.lineWidth = 1;
+  g.strokeRect(0.5, 0.5, WP.W - 1, WP.H - 1);
+
+  const st = wireState();
+  const [i, v] = app.reading;
+
+  rect(g, 300, 60, 420, 520, WP.BODY, "#1b1d1f", 2);
+  rect(g, 312, 74, 408, 506, WP.FACE, "#3d8ec0", 1);
+  txt(g, 320, 100, "\u25c4 LASER +", "#c02020", 11, true, "left");
+  txt(g, 320, 214, "\u25c4 LASER \u2212", WP.NAVY, 11, true, "left");
+  oval(g, 346, 118, 374, 146, st.lit ? "#ff4030" : "#603030", "#7a1218", 1);
+  rect(g, 300, 300, 360, 350, app.on ? "#3fbf5f" : "#8b3030", "#123", 2);
+  txt(g, 330, 325, app.on ? "ON" : "OFF", "#ffffff", 12, true);
+  txt(g, 330, 364, tr("power"), WP.NAVY, 10, true);
+  txt(g, 320, 440, "\u25c4 DC 12V", WP.NAVY, 11, true, "left");
+  txt(g, 360, 490, tr("ctrlbox"), WP.NAVY, 11, true);
+
+  rect(g, 96, 446, 180, 494, "#3b3f44", "#1b1d1f", 2);
+  rect(g, 104, 454, 148, 466, "#d8dade");
+  txt(g, 138, 512, tr("adaptor"), "#c9ccd1", 11);
+
+  wireMeter(g, 452, 60, tr("dcA"), i !== null ? i.toFixed(1) : "", "mA", st.amp);
+  wireMeter(g, 692, 60, tr("dcV"), v !== null ? v.toFixed(2) : "", "V", st.volt);
+
+  rect(g, 560, 330, 700, 412, "#7d848c", "#4a4f55", 2);
+  rect(g, 700, 356, 730, 386, "#2b2e32", "#1b1d1f", 1);
+  txt(g, 630, 434, tr("diode"), "#c9ccd1", 11);
+  if (st.lit){
+    const bw = 1 + Math.floor(4.0 * Math.min(
+      app.model.power_true(app.cur) / 380.0, 1.0));
+    line(g, [730, 371, 800, 371], "#ff5040", bw);
+  }
+
+  for (const lk of [...WP.links].sort()){
+    const [a, b] = lk.split("|");
+    const pts = [];
+    for (let n = 0; n <= 25; n++)
+      pts.push(...bezPoint(WP.T[a], WP.T[b], n / 25));
+    line(g, pts, WP.T[a].col, 3);
+  }
+  if (WP.held !== null){
+    const d = WP.T[WP.held];
+    line(g, [d.x, d.y, WP.mouse[0], WP.mouse[1]], d.col, 3, [6, 4]);
+  }
+  for (const k in WP.T){
+    const d = WP.T[k];
+    let used = false;
+    for (const lk of WP.links) if (lk.split("|").includes(k)) used = true;
+    const rr = WP.R + (k === WP.held ? 3 : 0);
+    oval(g, d.x - rr, d.y - rr, d.x + rr, d.y + rr,
+         used ? d.col : "#f4f4f0",
+         k === WP.held ? "#e03030" : d.col, k === WP.held ? 3 : 2);
+    if (d.lab) txt(g, d.x + 16, d.y, d.lab, "#e6e8ea", 12, true, "left");
+  }
+  txt(g, 20, 24, tr("wirehint"), "#aeb4ba", 11, false, "left");
+  document.getElementById("wwarn").textContent = st.shorted ? tr("shorted") : "";
+}
+
+(function(){
+  const cv = document.getElementById("wire");
+  const at = ev => {
+    const b = cv.getBoundingClientRect();
+    return [(ev.clientX - b.left) * WP.W / b.width,
+            (ev.clientY - b.top) * WP.H / b.height];
+  };
+  cv.addEventListener("click", ev => {
+    const [x, y] = at(ev);
+    if (x >= 300 && x <= 360 && y >= 300 && y <= 350){    /* ON / OFF */
+      app.on = !app.on; readMeters(); refresh(); return;
+    }
+    const k = wireAt(x, y);
+    if (k !== null){
+      if (WP.held === null || WP.held === k)
+        WP.held = (WP.held === k) ? null : k;
+      else if (WP.ALLOWED.has(key2(WP.held, k))){
+        plug(WP.held, k); WP.held = null; readMeters(); refresh(); return;
+      } else WP.held = k;
+      drawWire(); return;
+    }
+    const c = cableAt(x, y);
+    if (c !== null){
+      WP.links.delete(c); WP.held = null; readMeters(); refresh(); return;
+    }
+    WP.held = null; drawWire();
+  });
+  cv.addEventListener("mousemove", ev => {
+    WP.mouse = at(ev);
+    if (WP.held !== null) drawWire();
+  });
+  cv.addEventListener("contextmenu", ev => {
+    ev.preventDefault(); WP.held = null; drawWire();
+  });
+})();
+
+/* ==================================================================
+   the stand, the tabs, and the language switch
+   ================================================================== */
+function moveStand(dx, dy){
+  const p = app.model.spot_key.split(",").map(Number);
+  app.model.goto_spot((p[0] + dx) + "," + (p[1] + dy));
+  refresh();
+}
+[["sL", -1, 0], ["sU", 0, 1], ["sD", 0, -1], ["sR", 1, 0]].forEach(b =>
+  document.getElementById(b[0]).addEventListener(
+    "click", () => moveStand(b[1], b[2])));
+
+function spotLabel(){
+  const k = app.model.spot_key.split(",").map(Number);
+  const sg = n => (n >= 0 ? "+" : "") + n;
+  document.getElementById("spot").textContent =
+    tr("spot") + " " + sg(k[0]) + ", " + sg(k[1]);
+  document.getElementById("serial").textContent =
+    tr("plate") + " " + app.seed;
+}
+
+function refresh(){
+  drawWire();
+  drawCtrl();
+  drawScreen();        /* this is where the plate can melt */
+  spotLabel();
+  drawBench();
+}
+
+function showTab(i){
+  for (let k = 0; k < 2; k++){
+    document.getElementById("page" + k).className = "page" + (k === i ? " on" : "");
+    document.getElementById("tab" + k).className = (k === i ? "on" : "");
+  }
+  refresh();
+}
+document.getElementById("tab0").addEventListener("click", () => showTab(0));
+document.getElementById("tab1").addEventListener("click", () => showTab(1));
+
+function applyLang(){
+  document.documentElement.lang = LANG;
+  document.title = tr("title");
+  document.getElementById("h1").textContent = tr("title");
+  document.getElementById("tab0").textContent = tr("tab0");
+  document.getElementById("tab1").textContent = tr("tab1");
+  document.getElementById("lg-stand").textContent = tr("stand");
+  document.getElementById("lg-notes").textContent = tr("notes");
+  document.getElementById("tx-slide").textContent = tr("slide");
+  document.getElementById("tx-notes").textContent = tr("notetext");
+  document.getElementById("ruler").textContent = tr("rulhint");
+  document.getElementById("btn-en").className = LANG === "en" ? "on" : "";
+  document.getElementById("btn-ko").className = LANG === "ko" ? "on" : "";
+  refresh();
+}
+function setLang(l){ LANG = l; localStorage.setItem("aphoLang", l); applyLang(); }
+document.getElementById("btn-ko").addEventListener("click", () => setLang("ko"));
+document.getElementById("btn-en").addEventListener("click", () => setLang("en"));
+
+window.addEventListener("resize", () => refresh());
+
+readMeters();
+applyLang();
+</script>
+</body>
+</html>
