@@ -201,18 +201,12 @@ section{padding:58px 0}
   display:flex;flex-direction:column;cursor:pointer;transition:.16s;position:relative}
 .comp:hover{border-color:var(--rail);transform:translateY(-2px);
             box-shadow:0 14px 30px -22px rgba(22,33,46,.55)}
-.comps{--lbox:clamp(58px,8.1vw,96px)}           /* how tall a logo may grow */
-@media(max-width:820px){.comps{--lbox:clamp(62px,16vw,110px)}}
-.comp .chead{display:flex;align-items:center;gap:16px}
+.comps{--lcap:clamp(13px,1.62vw,19px)}          /* lettering height in every logo */
+@media(max-width:820px){.comps{--lcap:clamp(15px,4.4vw,21px)}}
+.comp .chead{display:flex;align-items:center;gap:16px;min-height:52px}
 .comp .chead .abbr{margin:0;flex:none}
-/* The logo claims the space left beside the wordmark and fills it on its own
-   terms.  height:auto lets each one keep its natural proportions, so a wide
-   lockup spends the space on width and stops short vertically, while a square
-   emblem such as IPhO 2026 grows tall instead of sitting tiny in the middle.
-   max-height is the only ceiling, so no card is forced to match another. */
-.clogo{flex:1 1 auto;min-width:0;width:100%;max-width:340px;
-       height:auto;max-height:var(--lbox);display:block;margin-left:auto;
-       object-fit:contain;object-position:right center}
+.clogo{width:auto;flex:none;object-fit:contain;display:block;border-radius:3px;
+       margin-left:auto}                         /* sits at the card's right edge */
 .comp .abbr{font-size:1.5rem;font-weight:650;letter-spacing:-.03em}
 .comp .full{font-size:12.5px;color:var(--graphite);margin-top:2px;min-height:2.6em}
 .comp dl{display:flex;gap:22px;margin:15px 0 0;padding-top:13px;border-top:1px dashed var(--grid-bold);
@@ -623,7 +617,21 @@ const DATA={
   full:{ko:"아시아물리올림피아드",en:"Asian Physics Olympiad"},
   scope:{ko:"아시아",en:"Asia"},
   years:[
-   {y:2026,host:{ko:"대한민국 · 부산",en:"Busan, South Korea"},cc:"kr",problems:wip("Water Clock Experiment","Estimation of Unknown Resistance")},
+   {y:2026,host:{ko:"대한민국 · 부산",en:"Busan, South Korea"},cc:"kr",
+    problems:[
+      {id:"E1", en:"Water Clock Experiment", ko:"물시계 실험", state:"wip", hold:true,
+       files:{sim:"sim/apho2026_E1_web.html",
+              exe:{ko:REL+"v1.0/APhO2026_E1_sim_KO.exe", en:REL+"v1.0/APhO2026_E1_sim_EN.exe"},
+              src:{ko:"src/apho2026_E1_sim_KO.py", en:"src/apho2026_E1_sim_EN.py"},
+              pdf:{ko:"pdf/APhO_2026_E1_KO.pdf", en:"pdf/APhO_2026_E1_EN.pdf"},
+              sol:"pdf/APhO_2026_S1.pdf"}},
+      {id:"E2", en:"Estimation of Unknown Resistance", ko:"미지 저항의 추정", state:"wip", hold:true,
+       files:{sim:"sim/apho2026_E2_web.html",
+              exe:{ko:REL+"v1.0/APhO2026_E2_sim_KO.exe", en:REL+"v1.0/APhO2026_E2_sim_EN.exe"},
+              src:{ko:"src/apho2026_E2_sim_KO.py", en:"src/apho2026_E2_sim_EN.py"},
+              pdf:{ko:"pdf/APhO_2026_E2_KO.pdf", en:"pdf/APhO_2026_E2_EN.pdf"},
+              sol:"pdf/APhO_2026_S2.pdf"}}
+    ]},
    {y:2025,host:{ko:"사우디아라비아 · 다란",en:"Dhahran, Saudi Arabia"},cc:"sa",
     problems:[
       {id:"E1", en:"Physics of Induction Cooking", ko:"인덕션 조리의 물리", state:"wip", hold:true,
@@ -849,7 +857,13 @@ const flagImg = (cc,cls="flag",org=null) =>
 /* Bump LOGO_V after replacing anything in logo/.  Browsers hang on to an old
    image for a long time, on file:// as much as on Pages, and a stale copy is
    indistinguishable from a bad export. */
-const LOGO_V = 2;
+const LOGO_V = 3;
+/* Every lockup gives a different share of its box to the lettering — IPhO
+   spends 30% of its height on "PhO", RMPh 76% on "PMΦ" — so scaling them all
+   to one height makes the words wildly different sizes.  Each is scaled to
+   bring its own lettering to --lcap instead.  Measured from the artwork. */
+const LOGO_TEXT = {ipho:0.297, apho:0.640, eupho:0.686, nbpho:0.435,
+                   ispho:0.468, rmph:0.760};
 function logoFallback(img){
   if((img.dataset.try||"png")==="png"){
     img.dataset.try="svg";
@@ -859,6 +873,7 @@ function logoFallback(img){
 }
 const compLogo = key =>
   `<img class="clogo" loading="lazy" decoding="async" alt=""
+     style="height:calc(var(--lcap)/${LOGO_TEXT[key]||0.5})"
      src="logo/${key}.png?v=${LOGO_V}" onerror="logoFallback(this)">`;
 
 const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
