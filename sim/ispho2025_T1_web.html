@@ -209,7 +209,7 @@ function initC(L){
    STATE
    ══════════════════════════════════════════════════════════════ */
 const S={task:"B", alpha:0.5, beta:100, b:0.04, Tspan:20, L:150,
-         frames:null, times:null, n:0, cur:NFRAMES-1, busy:false, par:null};
+         frames:null, times:null, n:0, cur:NFRAMES-1, busy:false, par:null, done:null};
 const $=id=>document.getElementById(id);
 
 /* ══════════════════════════════════════════════════════════════
@@ -364,6 +364,7 @@ $("run").onclick=()=>{
       S.frames=frames; S.times=times; S.n=n; S.cur=frames.length-1; S.busy=false;
       $("run").disabled=false; $("run").textContent=T[lang].run;
       $("prog").style.width="100%";
+      S.done={steps,ms};
       $("status").textContent=`${T[lang].doneA}${steps}${T[lang].doneB}${ms}${T[lang].doneC}`;
       $("tval").disabled=false; $("seek").disabled=false; $("csv").disabled=false;
       $("tval").value=S.times[S.cur].toFixed(2);
@@ -403,13 +404,14 @@ function applyLang(){
   $("t-b").textContent=d.b;         $("v-b").textContent=S.b.toFixed(3);
   $("t-T").textContent=d.Tspan;     $("v-T").textContent=S.Tspan.toFixed(0);
   $("t-L").textContent=d.L;         $("v-L").textContent=S.L.toFixed(0);
-  if(!S.busy) $("run").textContent=d.run;
+  $("run").textContent = S.busy ? d.running : d.run;
   $("t-h-view").textContent=d.hView; $("t-t").textContent=d.t;
   $("v-t").textContent = S.times ? S.times[S.cur].toFixed(3) : "—";
   $("seek").textContent=d.seek; $("csv").textContent=d.csv;
   $("t-cap1").textContent=d.cap1;
   $("t-note").textContent=d.note;
   if(!S.frames) $("status").textContent=d.idle;
+  else if(S.done) $("status").textContent=`${d.doneA}${S.done.steps}${d.doneB}${S.done.ms}${d.doneC}`;
   $("t-taskdesc").textContent = S.task==="B" ? d.descB : d.descC;
   $("lang-ko").className = lang==="ko"?"on":"";
   $("lang-en").className = lang==="en"?"on":"";

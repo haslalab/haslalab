@@ -104,7 +104,7 @@
   <aside class="panel">
     <h2 id="t-h-meter"></h2>
     <label class="chk"><input type="checkbox" id="meterOn"><span id="t-meteron"></span></label>
-    <div class="disp off" id="dispB"><small id="t-field"></small>-- OFF --</div>
+    <div class="disp off" id="dispB"><small id="t-field"></small><span id="dispBval">-- OFF --</span></div>
     <div class="readout" id="meterState" style="min-height:1.7em"></div>
     <button id="btnZero"></button>
     <div class="readout" id="zeroRead">—</div>
@@ -152,7 +152,7 @@
     <button id="btnPush" disabled></button>
 
     <h2 id="t-h-sw"></h2>
-    <div class="disp" id="swDisp"><small id="t-sw"></small>0.00 s</div>
+    <div class="disp" id="swDisp"><small id="t-sw"></small><span id="swVal">0.00 s</span></div>
     <button id="btnSw"></button>
     <button id="btnLap"></button>
     <button id="btnSwReset"></button>
@@ -174,7 +174,6 @@
 
     <h2 id="t-h-screw"></h2>
     <div class="readout" id="t-jognote"></div>
-    <div class="readout" id="stateB">—</div>
 
     <h2 id="t-h-rulerB"></h2>
     <label class="chk"><input type="checkbox" id="rulerB" checked><span id="t-rulerB"></span></label>
@@ -226,8 +225,8 @@ ko:{
 
  hRodB:"흑연 막대", rodB:"HB/0.5,  l = 8 mm", placeB:"가운데에 막대를 떨어뜨린다",
  hScrew:"수평 조절 나사", out:"← 풀기", inw:"조이기 →",
- jognote:"",
- ringing:"막대가 아직 흔들립니다 — 기다리세요", endIn:"나사가 끝까지 조여졌습니다 — 더 들어가지 않습니다.", endOut:"나사가 끝까지 풀렸습니다 — 더 나오지 않습니다.", hRulerB:"자", rulerB:"플랫폼 옆에 자를 놓는다",
+ jognote:"나사 머리 위에서 마우스 휠을 굴려 돌립니다. Shift 를 누르면 미세 조절.",
+ hRulerB:"자", rulerB:"플랫폼 옆에 자를 놓는다",
  noteB:"",
  hTilt:"경사 조절 나사",
  tiltsetup:"두 나사 사이 거리 D = 22.0 cm  ·  샤프심 HB/0.5, 길이 8 mm",
@@ -268,8 +267,8 @@ en:{
 
  hRodB:"Graphite rod", rodB:"HB/0.5,  l = 8 mm", placeB:"drop the rod in at the centre",
  hScrew:"Levelling screw", out:"← out", inw:"in →",
- jognote:"",
- ringing:"the rod is still swinging — wait", endIn:"the screw is all the way in — it will not go further.", endOut:"the screw is all the way out — it will not go further.", hRulerB:"Ruler", rulerB:"lay the ruler beside the platform",
+ jognote:"Roll the mouse wheel over the screw head to turn it. Hold Shift for fine steps.",
+ hRulerB:"Ruler", rulerB:"lay the ruler beside the platform",
  noteB:"",
  hTilt:"adjustment screw",
  tiltsetup:"distance between the screws D = 22.0 cm  ·  HB/0.5 lead, 8 mm long",
@@ -340,6 +339,8 @@ const S={
   turns:0, rowsB:[]
 };
 const $=id=>document.getElementById(id);
+/* 요소가 없어도 언어 전환이 중간에 멈추지 않도록 */
+const $t=(id,v)=>{const e=$(id); if(e) e.textContent=v; return e;};
 
 /* ══════════════════════════════════════════════════════════════
    3.  CANVAS HELPERS
@@ -686,7 +687,7 @@ function readNow(){ return S.reading; }
 $("btnZero").onclick=()=>{
   if(!S.meterOn) return;
   S.zeroRec = readNow();
-  $("zeroRead").textContent = `B₀ = ${(S.zeroRec*1e3).toFixed(3)} mT`;
+  $t("zeroRead",`B₀ = ${(S.zeroRec*1e3).toFixed(3)} mT`);
 };
 $("btnRec").onclick=()=>{
   if(!S.meterOn || !S.magOn) return;
@@ -747,7 +748,6 @@ function addTurns(d){
   S.turns=Math.min(TURN_MAX,Math.max(TURN_MIN,S.turns+d));
   const hit = (S.turns!==before+d);
   S.limitMsg = hit;
-  if(hit) $("stateB").textContent = (S.turns>=TURN_MAX ? T[lang].endIn : T[lang].endOut);
 }
 /* 나사 머리 위에서 휠을 굴려도 돌아간다 */
 function wheelTurn(e){
@@ -776,42 +776,42 @@ $("tab-b" ).onclick=()=>setTab("b");
 function applyLang(){
   const d=T[lang];
   document.documentElement.lang=lang;
-  $("t-title").textContent=d.title; $("t-sub").textContent=d.sub;
-  $("tab-a1").textContent=d.tabA1; $("tab-a2").textContent=d.tabA2; $("tab-b").textContent=d.tabB;
+  $t("t-title",d.title); $t("t-sub",d.sub);
+  $t("tab-a1",d.tabA1); $t("tab-a2",d.tabA2); $t("tab-b",d.tabB);
 
-  $("t-h-meter").textContent=d.hMeter; $("t-meteron").textContent=d.meterOn;
-  $("t-field").textContent=d.field;    $("btnZero").textContent=d.zero;
-  if(S.zeroRec===null) $("zeroRead").textContent=d.zeroNone;
-  $("t-h-probe").textContent=d.hProbe;  $("t-magon").textContent=d.magon;
-  $("t-ruler").textContent=`${d.ruler} — ${S.ruler.toFixed(1)}`;
-  $("t-phi").textContent=`${d.phi} — ${S.phi.toFixed(0)}°`;
-  $("t-warn").textContent=d.warn; $("t-warn").style.display=d.warn?"":"none";
-  $("t-h-rec").textContent=d.hRec; $("btnRec").textContent=d.rec;
-  $("btnDel").textContent=d.del; $("btnNew").textContent=d.newpage;   $("btnCsv").textContent=d.csv;
-  $("t-note1").textContent=d.note1; $("t-note1").style.display=d.note1?"":"none";
-  $("t-cap1").textContent=d.cap1;  $("t-cap1b").textContent=d.cap1b;
+  $t("t-h-meter",d.hMeter); $t("t-meteron",d.meterOn);
+  $t("t-field",d.field);    $t("btnZero",d.zero);
+  if(S.zeroRec===null) $t("zeroRead",d.zeroNone);
+  $t("t-h-probe",d.hProbe);  $t("t-magon",d.magon);
+  $t("t-ruler",`${d.ruler} — ${S.ruler.toFixed(1)}`);
+  $t("t-phi",`${d.phi} — ${S.phi.toFixed(0)}°`);
+  $t("t-warn",d.warn); $("t-warn").style.display=d.warn?"":"none";
+  $t("t-h-rec",d.hRec); $t("btnRec",d.rec);
+  $t("btnDel",d.del); $t("btnNew",d.newpage);   $t("btnCsv",d.csv);
+  $t("t-note1",d.note1); $("t-note1").style.display=d.note1?"":"none";
+  $t("t-cap1",d.cap1);  $t("t-cap1b",d.cap1b);
 
-  $("t-h-rod").textContent=d.hRod;
-  $("t-len").textContent=`${d.len} — ${S.rodLen}`;
-  $("btnPlace").textContent=d.place; $("btnRemove").textContent=d.remove;
-  $("t-h-ruler").textContent=d.hRuler; $("t-insruler").textContent=d.insruler;
-  $("t-rulerhint").textContent=d.rulerhint; $("t-rulerhint").style.display=d.rulerhint?"":"none";
-  $("t-h-osc").textContent=d.hOsc;
-  $("t-amp").textContent=`${d.amp} — ${S.amp.toFixed(1)}`;
-  $("btnPush").textContent=d.push;
-  $("t-h-sw").textContent=d.hSw; $("t-sw").textContent=d.sw;
-  $("btnSw").textContent = S.swRun ? d.swStop : d.swStart;
-  $("btnLap").textContent=d.lap; $("btnSwReset").textContent=d.swReset;
-  $("t-note2").textContent=d.note2; $("t-note2").style.display=d.note2?"":"none";
-  $("t-cap2").textContent=d.cap2; $("t-cap3").textContent=d.cap3;
+  $t("t-h-rod",d.hRod);
+  $t("t-len",`${d.len} — ${S.rodLen}`);
+  $t("btnPlace",d.place); $t("btnRemove",d.remove);
+  $t("t-h-ruler",d.hRuler); $t("t-insruler",d.insruler);
+  $t("t-rulerhint",d.rulerhint); $("t-rulerhint").style.display=d.rulerhint?"":"none";
+  $t("t-h-osc",d.hOsc);
+  $t("t-amp",`${d.amp} — ${S.amp.toFixed(1)}`);
+  $t("btnPush",d.push);
+  $t("t-h-sw",d.hSw); $t("t-sw",d.sw);
+  $t("btnSw",S.swRun ? d.swStop : d.swStart);
+  $t("btnLap",d.lap); $t("btnSwReset",d.swReset);
+  $t("t-note2",d.note2); $("t-note2").style.display=d.note2?"":"none";
+  $t("t-cap2",d.cap2); $t("t-cap3",d.cap3);
 
-  $("t-h-rodB").textContent=d.hRodB;   $("t-rodB").textContent=d.rodB;
-  $("btnPlaceB").textContent=d.placeB; $("t-h-screw").textContent=d.hScrew;
-  $("t-jognote").textContent=d.jognote;
-  $("t-h-rulerB").textContent=d.hRulerB;$("t-rulerB").textContent=d.rulerB;
-  $("t-noteB").textContent=d.noteB; $("t-noteB").style.display=d.noteB?"":"none";
-  $("t-cap4").textContent=d.cap4; $("t-cap5").textContent=d.cap5;
-  $("t-caphead").textContent=d.capHead;
+  $t("t-h-rodB",d.hRodB);   $t("t-rodB",d.rodB);
+  $t("btnPlaceB",d.placeB); $t("t-h-screw",d.hScrew);
+  $t("t-jognote",d.jognote); $("t-jognote").style.display=d.jognote?"":"none";
+  $t("t-h-rulerB",d.hRulerB);$t("t-rulerB",d.rulerB);
+  $t("t-noteB",d.noteB); $("t-noteB").style.display=d.noteB?"":"none";
+  $t("t-cap4",d.cap4); $t("t-cap5",d.cap5);
+  $t("t-caphead",d.capHead);
 
   $("lang-ko").className = lang==="ko"?"on":"";
   $("lang-en").className = lang==="en"?"on":"";
@@ -835,22 +835,21 @@ function loop(now){
       meterStep(S.mAcc); S.mAcc=0;
       const sat = Math.abs(S.reading)>=METER_FS;
       $("dispB").className="disp";
-      $("dispB").innerHTML=`<small>${T[lang].field}</small>`+
-        (sat?"  O L  ":`${(S.reading*1e3).toFixed(1)} mT`);
+      $t("dispBval",sat?"  O L  ":`${(S.reading*1e3).toFixed(1)} mT`);
       $("meterState").textContent = sat ? T[lang].overRange
                                         : (S.settling?T[lang].settling:"");
     }else if(!S.meterOn){
       S.mAcc=0;
       $("dispB").className="disp off";
-      $("dispB").innerHTML=`<small>${T[lang].field}</small>-- OFF --`;
-      $("meterState").textContent=""; S.shown=meterTarget();
+      $t("dispBval","-- OFF --");
+      $t("meterState",""); S.shown=meterTarget();
     }
     drawA1();
   }
 
   if(S.tab==="a2"){
     if(S.swRun) S.swVal=S.simT-S.swT0;
-    $("swDisp").innerHTML=`<small>${T[lang].sw}</small>${S.swVal.toFixed(2)} s`;
+    $t("swVal",`${S.swVal.toFixed(2)} s`);
     drawFront(); drawTop("cvTop",zNow(),"cap3");
   }
 
@@ -867,10 +866,7 @@ function loop(now){
         S.zB  += S.vzB*hs;
       }
       S.jit += (-S.jit/2.0)*dt + norm(0,1.2e-5)*Math.sqrt(Math.max(dt,1e-4));
-      const wasRinging=S.ringing;
       S.ringing = Math.abs(S.vzB)>3e-5 || Math.abs(S.zB-zeq)>3e-5;
-      if(S.ringing) $("stateB").textContent=T[lang].ringing;
-      else if(wasRinging && !S.limitMsg) $("stateB").textContent="\u2014";
     }
     const zmm=S.placed?(S.zB+S.jit)*1e3:0;
     drawTilt(zmm); drawHead(); drawTop("cvTopB",zmm,"cap5");
