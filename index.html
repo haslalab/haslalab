@@ -196,21 +196,38 @@ section{padding:58px 0}
 
 /* ═══════ competition cards ═══════ */
 .comps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-@media(max-width:820px){.comps{grid-template-columns:1fr}}
+/* three columns get too cramped for the figures before the single-column
+   breakpoint arrives, so drop to two on the way down */
+@media(max-width:1100px){.comps{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:780px){.comps{grid-template-columns:1fr}}
 .comp{background:#fff;border:1px solid var(--grid-bold);border-radius:10px;padding:20px;
   display:flex;flex-direction:column;cursor:pointer;transition:.16s;position:relative}
 .comp:hover{border-color:var(--rail);transform:translateY(-2px);
             box-shadow:0 14px 30px -22px rgba(22,33,46,.55)}
 .comps{--lcap:clamp(13px,1.62vw,19px)}          /* lettering height in every logo */
-@media(max-width:820px){.comps{--lcap:clamp(15px,4.4vw,21px)}}
+@media(max-width:780px){.comps{--lcap:clamp(15px,3.6vw,21px)}}
 .comp .chead{display:flex;align-items:center;gap:16px;min-height:52px}
 .comp .chead .abbr{margin:0;flex:none}
 .clogo{width:auto;flex:none;object-fit:contain;display:block;border-radius:3px;
        margin-left:auto}                         /* sits at the card's right edge */
 .comp .abbr{font-size:1.5rem;font-weight:650;letter-spacing:-.03em}
 .comp .full{font-size:12.5px;color:var(--graphite);margin-top:2px;min-height:2.6em}
-.comp dl{display:flex;gap:22px;margin:15px 0 0;padding-top:13px;border-top:1px dashed var(--grid-bold);
-  flex-wrap:wrap}
+/* A fixed column count, not flex wrapping.  Left to wrap, each card decided
+   for itself where to break — APhO's scope is just "Asia", so it fitted on one
+   line in English while the other five did not, and it sat out of step.  With
+   a grid every card breaks in the same place, and the figures line up across
+   the row as a bonus.  English needs the last label on a line of its own,
+   since "Experimental problems" is wider than a quarter of the card. */
+.comp dl{display:grid;gap:14px 16px;margin:15px 0 0;padding-top:13px;
+  border-top:1px dashed var(--grid-bold);
+  grid-template-columns:max-content minmax(0,1fr) max-content max-content}
+/* the scope is the only figure with a long value, so it takes what is left
+   over and the numbers stay on their own content width */
+.comps[data-lang="en"] .comp dl{grid-template-columns:max-content minmax(0,1fr) max-content}
+.comps[data-lang="en"] .comp dl>div:last-child{grid-column:1/-1}
+@media(max-width:430px){
+  .comp dl,.comps[data-lang="en"] .comp dl{grid-template-columns:max-content minmax(0,1fr)}
+}
 .comp .full{margin-bottom:auto}
 .comp dt{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--graphite)}
 .comp dd{margin:2px 0 0;font-family:var(--mono);font-size:14px;font-weight:500}
@@ -934,7 +951,7 @@ function viewComps(){
       <h1>${d.hComps}</h1>
       <div class="sub">${d.pComps}</div>
     </div>
-    <div class="comps">
+    <div class="comps" data-lang="${lang}">
       ${Object.entries(DATA).map(([key,c])=>{
         const probs=c.years.reduce((n,y)=>n+y.problems.length,0);
         return `<a class="comp" href="#/${key}">
