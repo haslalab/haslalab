@@ -198,15 +198,26 @@ section{padding:58px 0}
 .comps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 @media(max-width:820px){.comps{grid-template-columns:1fr}}
 .comp{background:#fff;border:1px solid var(--grid-bold);border-radius:10px;padding:20px;
-  display:block;cursor:pointer;transition:.16s;position:relative}
+  display:flex;flex-direction:column;cursor:pointer;transition:.16s;position:relative}
 .comp:hover{border-color:var(--rail);transform:translateY(-2px);
             box-shadow:0 14px 30px -22px rgba(22,33,46,.55)}
-.comp .chead{display:flex;align-items:center;gap:14px;min-height:48px}
+.comps{--lbox:clamp(58px,8.1vw,96px)}           /* how tall a logo may grow */
+@media(max-width:820px){.comps{--lbox:clamp(62px,16vw,110px)}}
+.comp .chead{display:flex;align-items:center;gap:16px}
 .comp .chead .abbr{margin:0;flex:none}
-.clogo{width:auto;flex:none;object-fit:contain;display:block;border-radius:3px}
+/* The logo claims the space left beside the wordmark and fills it on its own
+   terms.  height:auto lets each one keep its natural proportions, so a wide
+   lockup spends the space on width and stops short vertically, while a square
+   emblem such as IPhO 2026 grows tall instead of sitting tiny in the middle.
+   max-height is the only ceiling, so no card is forced to match another. */
+.clogo{flex:1 1 auto;min-width:0;width:100%;max-width:340px;
+       height:auto;max-height:var(--lbox);display:block;margin-left:auto;
+       object-fit:contain;object-position:right center}
 .comp .abbr{font-size:1.5rem;font-weight:650;letter-spacing:-.03em}
 .comp .full{font-size:12.5px;color:var(--graphite);margin-top:2px;min-height:2.6em}
-.comp dl{display:flex;gap:22px;margin:15px 0 0;padding-top:13px;border-top:1px dashed var(--grid-bold)}
+.comp dl{display:flex;gap:22px;margin:15px 0 0;padding-top:13px;border-top:1px dashed var(--grid-bold);
+  flex-wrap:wrap}
+.comp .full{margin-bottom:auto}
 .comp dt{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--graphite)}
 .comp dd{margin:2px 0 0;font-family:var(--mono);font-size:14px;font-weight:500}
 .comp .go{position:absolute;right:18px;bottom:16px;font-family:var(--mono);font-size:16px;
@@ -723,7 +734,7 @@ const DATA={
  ispho:{
   abbr:"ISPhO", since:2023,
   full:{ko:"국제과학물리올림피아드",en:"International Scientific Physics Olympiad"},
-  scope:{ko:"국제 · MIPT 주관",en:"International · run by MIPT"},
+  scope:{ko:"국제",en:"International"},
   note:{ko:"MIPT가 주최합니다. 실험 라운드 외에, 주최측이 시뮬레이터를 함께 배포한 이론 문제도 T로 표시해 함께 실었습니다.",
         en:"Run by MIPT. Alongside the experimental round, theory problems that shipped with their own simulator are listed here too, marked T."},
   years:[
@@ -835,25 +846,20 @@ const flagImg = (cc,cls="flag",org=null) =>
    logo/ipho.svg, logo/apho.svg, and so on.  .svg is tried first, then .png;
    if neither is there the image removes itself and the card falls back to
    the wordmark alone, exactly as it looked before. */
-/* Every lockup devotes a different share of its height to the lettering —
-   IPhO spends 30% of its box on "PhO", RMPh spends 81% on "PMΦ".  Scaling
-   them all to one height therefore makes the words wildly different sizes,
-   so each is scaled to bring its own lettering to LOGO_CAP px instead.
-   The fractions below are measured from the artwork in logo/. */
-const LOGO_CAP = 13.5;
-const LOGO_TEXT = {ipho:0.297, apho:0.640, eupho:0.686, nbpho:0.435,
-                   ispho:0.468, rmph:0.760};
+/* Bump LOGO_V after replacing anything in logo/.  Browsers hang on to an old
+   image for a long time, on file:// as much as on Pages, and a stale copy is
+   indistinguishable from a bad export. */
+const LOGO_V = 2;
 function logoFallback(img){
   if((img.dataset.try||"png")==="png"){
-    img.dataset.try="svg"; img.src=img.src.replace(/\.png$/,".svg"); return;
+    img.dataset.try="svg";
+    img.src=img.src.replace(/\.png(\?|$)/,".svg$1"); return;
   }
   img.remove();
 }
-const compLogo = key => {
-  const h=Math.round(LOGO_CAP/(LOGO_TEXT[key]||0.5));
-  return `<img class="clogo" loading="lazy" decoding="async" alt=""
-     style="height:${h}px" src="logo/${key}.png" onerror="logoFallback(this)">`;
-};
+const compLogo = key =>
+  `<img class="clogo" loading="lazy" decoding="async" alt=""
+     src="logo/${key}.png?v=${LOGO_V}" onerror="logoFallback(this)">`;
 
 const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
