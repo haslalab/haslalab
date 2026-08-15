@@ -391,7 +391,7 @@ footer{border-top:1px solid var(--grid-bold);padding:30px 0 44px;margin-top:26px
 
 /* Windows builds live in GitHub Releases, not in the repository —
    a PyInstaller .exe is far past the 100 MB limit for repository files. */
-const REL = "https://github.com/haslalab/haslalab/releases/download/";
+const REL = "https://github.com/haslalab/haslalab.github.io/releases/download/";
 
 /* ── copy ── */
 const UI={
@@ -581,8 +581,8 @@ const DATA={
       files:{
         sim:"sim/apho2023_E1_web.html",
         exe:{ko:REL+"v1.0/APhO2023_E1_sim_KO.exe", en:REL+"v1.0/APhO2023_E1_sim_EN.exe"},
-        src:{ko:"src/apho2023_E1_sim_KO.py", en:"src/Apho2023_E1_sim_EN.py"},
-        pdf:{ko:"src/Apho2023_E1_KO.pdf", en:"src/Apho2023_E1_EN.pdf"},
+        src:{ko:"src/apho2023_E1_sim_KO.py", en:"src/apho2023_E1_sim_EN.py"},
+        pdf:{en:"pdf/APhO_2023_E1_EN.pdf"},
         sol:"pdf/APhO_2023_S1.pdf"
       }},
      {id:"E2",
@@ -594,7 +594,7 @@ const DATA={
         sim:"sim/apho2023_E2_web.html",
         exe:{ko:REL+"v1.0/APhO2023_E2_sim_KO.exe", en:REL+"v1.0/APhO2023_E2_sim_EN.exe"},
         src:{ko:"src/apho2023_E2_sim_KO.py", en:"src/apho2023_E2_sim_EN.py"},
-        pdf:{ko:"src/Apho2023_E2_KO.pdf", en:"src/Apho2023_E2_EN.pdf"},
+        pdf:{en:"pdf/APhO_2023_E2_EN.pdf"},
         sol:"pdf/APhO_2023_S2.pdf"
       }}]},
    {y:2022,host:{ko:"인도 · 데라둔, 온라인",en:"Dehradun, India, online"},cc:"in",problems:wip("Magnetic Black Box","Acoustic Black Box")},
@@ -693,6 +693,7 @@ const DATA={
               exe:{ko:REL+"v1.0/ISPhO2025_T1_sim_KO.exe", en:REL+"v1.0/ISPhO2025_T1_sim_EN.exe"},
               src:{ko:"src/ispho2025_T1_ferro_sim_KO.py", en:"src/ispho2025_T1_ferro_sim_EN.py"},
               pdf:{ko:"pdf/ISPhO_2025_T_KO.pdf", en:"pdf/ISPhO_2025_T_EN.pdf"},
+              sol:"pdf/ISPhO_2025_S_T.pdf"}}
     ]},
    {y:2024,host:{ko:"러시아 · 한티만시스크, MIPT",en:"Khanty-Mansiysk, Russia · MIPT"},cc:"ru",
     problems:[
