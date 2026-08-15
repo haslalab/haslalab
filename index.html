@@ -752,6 +752,7 @@ const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&g
    VIEWS
    ══════════════════════════════════════════════════════════════ */
 function viewHome(){
+  pickHero();
   const d=UI[lang];
   let years=0, probs=0, live=0;
   for(const c of Object.values(DATA)){
@@ -767,15 +768,15 @@ function viewHome(){
         <h1>${d.headline}</h1>
         <p class="lede">${d.lede}</p>
         <div class="cta">
-          <a class="btn" href="sim/ipho2017_E1_web.html?lang=${lang}">${d.ctaRun}<span class="mono">IPhO 2017 E1</span></a>
+          <a class="btn" href="${heroPick.sim}?lang=${lang}">${d.ctaRun}<span class="mono">${heroPick.tag}</span></a>
           <a class="btn ghost" href="#/comps">${d.ctaBrowse}</a>
         </div>
       </div>
       <figure class="screen">
         <canvas id="deflect" role="img" aria-label="Laser deflectogram forming on millimetre paper"></canvas>
         <figcaption>
-          <span>${d.figLeft}</span>
-          <span>${d.figT} <b class="mono" id="figClock">00:00</b></span>
+          <span id="figL">${heroPick.capL[lang]}</span>
+          <span><span id="figR">${heroPick.capR[lang]}</span> <b class="mono" id="figClock">&mdash;</b></span>
         </figcaption>
       </figure>
     </div>
@@ -985,68 +986,325 @@ function buildRails(){
 }
 
 /* ══════════════════════════════════════════════════════════════
-   THE SIGNATURE — a real deflectogram from the calibrated
-   IPhO 2017 E1 model, forming over thirty minutes.
+   THE SIGNATURES — one per published experiment, each drawn from
+   the same physics the simulator itself runs.  Nothing here is a
+   result: they are raw instrument outputs, as the bench gives them.
+   One is picked at random every time the home page is drawn.
    ══════════════════════════════════════════════════════════════ */
-let animId=null;
-function startHero(){
-  const cv=document.getElementById("deflect"); if(!cv) return;
-  const ctx=cv.getContext("2d");
-  const SS=30.0, CELL_D=0.8, GRAMS=28.0;
-  const Z0=10.4, Z=53.4, MAG=(Z0+CELL_D+Z)/Z0;
-  const C0=GRAMS/150, D=2.29e-5-5.25e-5*C0, DNDC=0.2036-0.420*C0;
-  const H_INT=1.5, XI_MID=10.5, THETA=45;
-  const dpr=Math.min(devicePixelRatio||1,2);
+let animId=null, heroPick=null;
 
-  function fit(){
-    const w=cv.clientWidth||660;
-    cv.width=Math.round(w*dpr); cv.height=Math.round(w*.74*dpr);
-    cv.style.height=(w*.74)+"px"; ctx.setTransform(dpr,0,0,dpr,0,0);
-  }
-  function paint(t){
-    const w=cv.clientWidth, h=w*.74, pad=10;
+const PEN=(c,col,w)=>{c.strokeStyle=col;c.lineWidth=w;c.lineJoin="round";c.lineCap="round";};
+function frame(c,w,h,pad){ c.fillStyle="#fff"; c.fillRect(0,0,w,h);
+  return {X:(u,a,b)=>pad+(u-a)/(b-a)*(w-2*pad), Y:(v,a,b)=>h-pad-(v-a)/(b-a)*(h-2*pad)}; }
+function mmss(s){return String(Math.floor(s/60)).padStart(2,"0")+":"+String(Math.floor(s%60)).padStart(2,"0");}
+
+/* ── IPhO 2017 E1 · laser deflectogram on millimetre paper ────── */
+const SIG_I17E1={
+  sim:"sim/ipho2017_E1_web.html", tag:"IPhO 2017 E1", span:2100,
+  capL:{ko:"모눈종이 30 × 30 cm · 편향도",en:"Millimetre paper 30 × 30 cm · deflectogram"},
+  capR:{ko:"경과",en:"elapsed"},
+  read:t=>mmss(Math.min(t,1800)),
+  paint(c,w,h,t){
+    const SS=30.0, CELL_D=0.8, GRAMS=28.0;
+    const Z0=10.4, Z=53.4, MAG=(Z0+CELL_D+Z)/Z0;
+    const C0=GRAMS/150, D=2.29e-5-5.25e-5*C0, DNDC=0.2036-0.420*C0;
+    const H_INT=1.5, XI_MID=10.5, THETA=45, pad=10;
     const sx=(w-2*pad)/SS, sy=(h-2*pad)/SS;
     const X=x=>pad+x*sx, Y=y=>h-pad-y*sy;
-    ctx.clearRect(0,0,w,h); ctx.fillStyle="#fff"; ctx.fillRect(0,0,w,h);
-    ctx.strokeStyle="#DCE7F0"; ctx.lineWidth=.4; ctx.beginPath();
-    for(let k=0;k<=SS+1e-6;k+=.5){ctx.moveTo(X(k),Y(0));ctx.lineTo(X(k),Y(SS));
-                                  ctx.moveTo(X(0),Y(k));ctx.lineTo(X(SS),Y(k));}
-    ctx.stroke();
-    ctx.strokeStyle="#B4CADC"; ctx.lineWidth=.85; ctx.beginPath();
-    for(let k=0;k<=SS+1e-6;k+=5){ctx.moveTo(X(k),Y(0));ctx.lineTo(X(k),Y(SS));
-                                 ctx.moveTo(X(0),Y(k));ctx.lineTo(X(SS),Y(k));}
-    ctx.stroke();
+    c.fillStyle="#fff"; c.fillRect(0,0,w,h);
+    PEN(c,"#DCE7F0",.4); c.beginPath();
+    for(let k=0;k<=SS+1e-6;k+=.5){c.moveTo(X(k),Y(0));c.lineTo(X(k),Y(SS));
+                                  c.moveTo(X(0),Y(k));c.lineTo(X(SS),Y(k));}
+    c.stroke();
+    PEN(c,"#B4CADC",.85); c.beginPath();
+    for(let k=0;k<=SS+1e-6;k+=5){c.moveTo(X(k),Y(0));c.lineTo(X(k),Y(SS));
+                                 c.moveTo(X(0),Y(k));c.lineTo(X(SS),Y(k));}
+    c.stroke();
     const half=SS/2, cot=1/Math.tan(THETA*Math.PI/180);
-    const te=Math.max(t,1), s=2*Math.sqrt(D*te), pre=C0/(s*Math.sqrt(Math.PI));
-    ctx.strokeStyle="#98A6B4"; ctx.lineWidth=1; ctx.setLineDash([4,4]);
-    ctx.beginPath(); ctx.moveTo(X(half-half*cot),Y(0)); ctx.lineTo(X(half+half*cot),Y(SS));
-    ctx.stroke(); ctx.setLineDash([]);
-    ctx.strokeStyle="#E02424"; ctx.lineWidth=2.6; ctx.lineJoin="round"; ctx.lineCap="round";
-    ctx.beginPath(); let first=true;
+    const te=Math.max(Math.min(t,1800),1), s=2*Math.sqrt(D*te), pre=C0/(s*Math.sqrt(Math.PI));
+    PEN(c,"#98A6B4",1); c.setLineDash([4,4]);
+    c.beginPath(); c.moveTo(X(half-half*cot),Y(0)); c.lineTo(X(half+half*cot),Y(SS));
+    c.stroke(); c.setLineDash([]);
+    PEN(c,"#E02424",2.6); c.beginPath(); let first=true;
     for(let i=0;i<900;i++){
       const xi=XI_MID-half+SS*i/899, x=half+(xi-XI_MID)*cot;
       if(x<0||x>SS) continue;
       const Yv=xi/MAG;
       const y=half+(xi-XI_MID)-Z*CELL_D*DNDC*(pre*Math.exp(-Math.pow((H_INT-Yv)/s,2)));
-      first?(ctx.moveTo(X(x),Y(y)),first=false):ctx.lineTo(X(x),Y(y));
+      first?(c.moveTo(X(x),Y(y)),first=false):c.lineTo(X(x),Y(y));
     }
-    ctx.stroke();
+    c.stroke();
+  }};
+
+/* ── IPhO 2017 E2 · levitating graphite rod, damped vertical ring ─ */
+const SIG_I17E2={
+  sim:"sim/ipho2017_E2_web.html", tag:"IPhO 2017 E2", span:26,
+  capL:{ko:"반자성 흑연봉 · 수직 변위",en:"Diamagnetic rod · vertical displacement"},
+  capR:{ko:"경과",en:"elapsed"},
+  read:t=>t.toFixed(1)+" s",
+  paint(c,w,h,t){
+    const MU0=1.257e-6, RHO=1680.0, C1=198.6;
+    const M=1.10e6, CHI=-1.45e-4;
+    const OM=Math.sqrt(-C1*MU0*CHI*M*M/RHO);
+    const r=0.56/2, L=8.0, TAU=3.15+29.40*r*r*Math.log(0.607*L/r);
+    const A=0.42, TMAX=26, pad=16;
+    const F=frame(c,w,h,pad);
+    PEN(c,"#DCE7F0",.5); c.beginPath();
+    for(let k=0;k<=TMAX;k+=2){c.moveTo(F.X(k,0,TMAX),pad);c.lineTo(F.X(k,0,TMAX),h-pad);}
+    for(let v=-.5;v<=.5001;v+=.125){c.moveTo(pad,F.Y(v,-.5,.5));c.lineTo(w-pad,F.Y(v,-.5,.5));}
+    c.stroke();
+    PEN(c,"#B4CADC",1); c.beginPath();
+    c.moveTo(pad,F.Y(0,-.5,.5)); c.lineTo(w-pad,F.Y(0,-.5,.5)); c.stroke();
+    PEN(c,"#98A6B4",1); c.setLineDash([3,4]); c.beginPath();
+    for(let i=0;i<=400;i++){const x=TMAX*i/400; const e=A*Math.exp(-x/TAU);
+      i?c.lineTo(F.X(x,0,TMAX),F.Y(e,-.5,.5)):c.moveTo(F.X(x,0,TMAX),F.Y(e,-.5,.5));}
+    c.stroke(); c.beginPath();
+    for(let i=0;i<=400;i++){const x=TMAX*i/400; const e=-A*Math.exp(-x/TAU);
+      i?c.lineTo(F.X(x,0,TMAX),F.Y(e,-.5,.5)):c.moveTo(F.X(x,0,TMAX),F.Y(e,-.5,.5));}
+    c.stroke(); c.setLineDash([]);
+    const tt=Math.min(t,TMAX), N=1400;
+    PEN(c,"#2c6f9b",2.2); c.beginPath();
+    for(let i=0;i<=N;i++){const x=tt*i/N;
+      const z=A*Math.exp(-x/TAU)*Math.cos(OM*x);
+      i?c.lineTo(F.X(x,0,TMAX),F.Y(z,-.5,.5)):c.moveTo(F.X(x,0,TMAX),F.Y(z,-.5,.5));}
+    c.stroke();
+    const zN=A*Math.exp(-tt/TAU)*Math.cos(OM*tt);
+    c.fillStyle="#2c6f9b"; c.beginPath();
+    c.arc(F.X(tt,0,TMAX),F.Y(zN,-.5,.5),3.2,0,7); c.fill();
+  }};
+
+/* ── APhO 2023 E1 · the contact gate on the oscilloscope ──────── */
+const SIG_A23E1={
+  sim:"sim/apho2023_E1_web.html", tag:"APhO 2023 E1", span:12,
+  capL:{ko:"오실로스코프 · 접촉 게이트 CH2",en:"Oscilloscope · contact gate CH2"},
+  capR:{ko:"시간축",en:"timebase"},
+  read:()=>"50 \u00B5s/div",
+  paint(c,w,h,t){
+    /* the two steel balls of the official kit, and the Hertz contact time
+       the bench itself uses:  tau = 2.755 (mu^2 / R* E'^2 v)^(1/5)      */
+    const m1=131.48e-3, m2=67.55e-3, R1=31.75e-3/2, R2=25.42e-3/2;
+    const E_RED=1/(2*(1-0.30*0.30)/200e9), E_C=E_RED*1.1220;
+    const mu=m1*m2/(m1+m2), Rs=R1*R2/(R1+R2);
+    /* successive collisions are slower, so each contact lasts a little
+       longer — the swing decays over the span */
+    const v=0.42*Math.exp(-(t%this.span)/9)+0.06;
+    const tau=2.755*Math.pow(mu*mu/(Rs*E_C*E_C*v),0.2);
+    const NX=14, NY=8, V_LOW=-0.1, VHI=4.0, TDIV=50e-6;
+    const WIN=NX*TDIV, rise=2e-6, a=WIN/2-tau/2, b=a+tau;
+    const pad=12, gw=w-2*pad, gh=h-2*pad;
+    c.fillStyle="#101418"; c.fillRect(0,0,w,h);
+    PEN(c,"#17331a",1); c.beginPath();
+    for(let i=1;i<NX;i++){const x=pad+gw*i/NX;c.moveTo(x,pad);c.lineTo(x,h-pad);}
+    for(let j=1;j<NY;j++){const y=pad+gh*j/NY;c.moveTo(pad,y);c.lineTo(w-pad,y);}
+    c.stroke();
+    PEN(c,"#245c2a",1.2); c.beginPath();
+    c.moveTo(pad+gw/2,pad); c.lineTo(pad+gw/2,h-pad);
+    c.moveTo(pad,pad+gh/2); c.lineTo(w-pad,pad+gh/2); c.stroke();
+    const N=1400, VPD=1.0, ZERO=1.6;      /* 1 V/div, ground 1.6 div up */
+    let sd=(Math.floor(t*3)%97)+7;
+    const rnd=()=>{sd=(sd*1103515245+12345)&0x7fffffff; return sd/0x7fffffff;};
+    PEN(c,"#e060b0",1.9); c.beginPath();
+    for(let i=0;i<=N;i++){
+      const tt=WIN*i/N;
+      let v2=V_LOW;
+      if(tt>a-rise&&tt<b+rise){
+        const up=0.5*(1+Math.tanh((tt-a)/(0.35*rise)));
+        const dn=0.5*(1-Math.tanh((tt-b)/(0.35*rise)));
+        v2=V_LOW+(VHI-V_LOW)*up*dn;
+      }
+      v2+=0.012*(rnd()-0.5);
+      const x=pad+gw*i/N, y=h-pad-gh*((v2/VPD)+ZERO)/NY;
+      i?c.lineTo(x,y):c.moveTo(x,y);
+    }
+    c.stroke();
+    c.fillStyle="#7d8a72"; c.font="10px ui-monospace,Consolas,monospace";
+    c.fillText("CH2  1.00V   50.0us",pad+6,h-pad-7);
+  }};
+
+/* ── APhO 2023 E2 · interference from the heated surface ───────── */
+const SIG_A23E2={
+  sim:"sim/apho2023_E2_web.html", tag:"APhO 2023 E2", span:14,
+  capL:{ko:"스크린 위 간섭무늬",en:"Interference pattern on the screen"},
+  capR:{ko:"레이저 전류",en:"laser current"},
+  read(t){const mA=250+58*(0.5-0.5*Math.cos(2*Math.PI*t/this.span));
+          return mA.toFixed(1)+" mA";},
+  paint(c,w,h,t){
+    const P_TH=287.0, SLOPE=0.4632, HIDDEN=2.0, R_BASE=167.82, L_CM=42.0;
+    const mA=250+58*(0.5-0.5*Math.cos(2*Math.PI*t/this.span));
+    const V=(mA<=1)?0:(0.35928+0.73823*Math.log(mA)), Pw=mA*V;
+    const mmax=Math.max(SLOPE*(Pw-P_TH),0.0);
+    const NW=190, NH=Math.max(1,Math.round(NW*h/w));
+    if(!this._id||this._id.width!==NW||this._id.height!==NH){
+      this._buf=document.createElement("canvas");
+      this._buf.width=NW; this._buf.height=NH;
+      this._bc=this._buf.getContext("2d");
+      this._id=this._bc.createImageData(NW,NH);
+    }
+    const d=this._id.data, HALF=4.6;          /* half-width of view, cm */
+    for(let j=0;j<NH;j++){
+      const Yc=(j/(NH-1)-0.5)*2*HALF*h/w;
+      for(let i=0;i<NW;i++){
+        const Xc=(i/(NW-1)-0.5)*2*HALF;
+        const Rr=Math.hypot(Xc,Yc);
+        const nu=R_BASE*Math.sin(Math.atan2(Rr,L_CM));
+        let img;
+        if(mmax>0.4){
+          const core=1.35*Math.exp(-Math.pow(nu/1.55,2));
+          const env=0.80*Math.exp(-0.85*Math.pow(nu/Math.max(mmax,1.0),2));
+          const cut=0.5*(1.0-Math.tanh((nu-mmax)/0.55));
+          const sn=Math.sin(Math.PI*nu);
+          let ring=env*cut*sn*sn;
+          ring*=0.5*(1.0+Math.tanh((nu-HIDDEN)/0.55));
+          img=core+ring;
+        } else img=1.35*Math.exp(-Math.pow(nu/1.55,2));
+        img*=Math.min(Math.max(Pw/300.0,0.0),1.6);
+        const g=Math.min(Math.max(img,0),1.35)/1.35;
+        const o=4*(j*NW+i);
+        d[o]=Math.round(26+198*Math.pow(g,1.05));
+        d[o+1]=Math.round(8+46*Math.pow(g,1.9));
+        d[o+2]=Math.round(12+44*Math.pow(g,2.1));
+        d[o+3]=255;
+      }
+    }
+    this._bc.putImageData(this._id,0,0);
+    c.fillStyle="#120406"; c.fillRect(0,0,w,h);
+    c.imageSmoothingEnabled=true; c.drawImage(this._buf,0,0,w,h);
+    PEN(c,"rgba(255,255,255,.30)",1);          /* the screen's own scale */
+    const pxcm=(w/(2*HALF));
+    c.beginPath();
+    for(let k=-4;k<=4;k++){const x=w/2+k*pxcm;
+      c.moveTo(x,h-10);c.lineTo(x,h-(k%2?16:22));}
+    c.moveTo(8,h-10); c.lineTo(w-8,h-10); c.stroke();
+  }};
+
+/* ── ISPhO 2025 T1 · the domain wall on the spin chain ─────────── */
+const SIG_S25T1={
+  sim:"sim/ispho2025_T1_web.html", tag:"ISPhO 2025 T1", span:20,
+  capL:{ko:"스핀 사슬 200칸 · 자화 성분",en:"Spin chain, 200 cells · magnetisation"},
+  capR:{ko:"시간",en:"time"},
+  read:t=>"t = "+t.toFixed(1),
+  paint(c,w,h,t){
+    /* beta = 100, K_easy = 1 -> the wall is sqrt(beta/K) cells wide, and
+       a field b drives it along the chain at a steady rate */
+    const N=200, BETA=100, ALPHA=0.5, B=0.04;
+    const wd=Math.sqrt(BETA), v=B/ALPHA*Math.sqrt(BETA)/(1+ALPHA*ALPHA);
+    const x0=40+v*t*0.55, pad=16;
+    const F=frame(c,w,h,pad);
+    PEN(c,"#DCE7F0",.5); c.beginPath();
+    for(let k=0;k<=N;k+=25){c.moveTo(F.X(k,0,N),pad);c.lineTo(F.X(k,0,N),h-pad);}
+    for(let vv=-1;vv<=1.001;vv+=.5){c.moveTo(pad,F.Y(vv,-1.15,1.15));c.lineTo(w-pad,F.Y(vv,-1.15,1.15));}
+    c.stroke();
+    PEN(c,"#B4CADC",1); c.beginPath();
+    c.moveTo(pad,F.Y(0,-1.15,1.15)); c.lineTo(w-pad,F.Y(0,-1.15,1.15)); c.stroke();
+    const draw=(f,col,lw)=>{PEN(c,col,lw); c.beginPath();
+      for(let i=0;i<=N;i++){const u=(i-x0)/wd; const y=f(u);
+        i?c.lineTo(F.X(i,0,N),F.Y(y,-1.15,1.15)):c.moveTo(F.X(i,0,N),F.Y(y,-1.15,1.15));}
+      c.stroke();};
+    draw(u=>-Math.tanh(u),"#2c6f9b",2.4);          /* m_z */
+    draw(u=>1/Math.cosh(u),"#e02424",2.0);         /* m_x */
+    c.font="600 11px ui-monospace,Consolas,monospace";
+    c.fillStyle="#2c6f9b"; c.fillText("m_z",w-pad-46,pad+14);
+    c.fillStyle="#e02424"; c.fillText("m_x",w-pad-46,pad+28);
+  }};
+
+/* ── ISPhO 2026 E1 · the grating's transmission spectrum ───────── */
+const SIG_S26E1={
+  sim:"sim/ispho2026_E1_web.html", tag:"ISPhO 2026 E1", span:24,
+  capL:{ko:"투과 스펙트럼 · 광섬유 브래그 격자",en:"Transmission spectrum · fibre Bragg grating"},
+  capR:{ko:"격자 온도",en:"grating"},
+  read(t){return (25+85*(0.5-0.5*Math.cos(2*Math.PI*t/this.span))).toFixed(0)+" \u00B0C";},
+  paint(c,w,h,t){
+    const N_C=1.444, A_TEMP=6.67e-6, KAPPA0=8.7e-8, Y_OPT=0.45, L_NM=50.0e6;
+    const T=25+85*(0.5-0.5*Math.cos(2*Math.PI*t/this.span));
+    const Lam=536.0*(1+(T-25)*A_TEMP);
+    const kap0=KAPPA0*Math.exp(-Math.pow(0-Y_OPT,2)/8);
+    const LO=1546.5, HI=1549.5, NP=620, pad=16, padL=34;
+    const F={X:u=>padL+(u-LO)/(HI-LO)*(w-padL-pad),
+             Y:v=>h-24-(v+34)/34.6*(h-24-pad)};
+    c.fillStyle="#fff"; c.fillRect(0,0,w,h);
+    PEN(c,"#DCE7F0",.5); c.beginPath();
+    for(let l=LO;l<=HI+1e-9;l+=0.5){c.moveTo(F.X(l),pad);c.lineTo(F.X(l),h-24);}
+    for(let v=-30;v<=0.001;v+=10){c.moveTo(padL,F.Y(v));c.lineTo(w-pad,F.Y(v));}
+    c.stroke();
+    PEN(c,"#B4CADC",1); c.beginPath();
+    c.moveTo(padL,F.Y(0)); c.lineTo(w-pad,F.Y(0));
+    c.moveTo(padL,pad); c.lineTo(padL,h-24); c.stroke();
+    /* |t|^2 for a uniform grating, then straight to dB */
+    const raw=new Float64Array(NP);
+    for(let i=0;i<NP;i++){
+      const wl=LO+(HI-LO)*i/(NP-1);
+      const kap=kap0*(1550/wl);
+      const del=2*Math.PI*N_C/wl-Math.PI/Lam;
+      const q=kap*kap-del*del;
+      if(q>=0){                      /* gamma real  -> the stop band */
+        const g=Math.sqrt(q), gL=Math.min(g*L_NM,60);
+        const ch=Math.cosh(gL), sh=Math.sinh(gL);
+        raw[i]=g*g/(g*g*ch*ch+del*del*sh*sh);
+      } else {                       /* gamma imaginary -> the side lobes */
+        const g=Math.sqrt(-q), gL=g*L_NM;
+        const cs=Math.cos(gL), sn=Math.sin(gL);
+        raw[i]=g*g/(g*g*cs*cs+del*del*sn*sn);
+      }
+      raw[i]=Math.min(raw[i],1.0)+1e-6;
+    }
+    const sm=new Float64Array(NP), R=6;
+    for(let i=0;i<NP;i++){let a=0,ww=0;
+      for(let j=-R;j<=R;j++){let m=i+j; if(m<0)m=0; if(m>=NP)m=NP-1;
+        const k=Math.exp(-0.5*(j/2.4)**2); a+=raw[m]*k; ww+=k;}
+      sm[i]=a/ww;}
+    PEN(c,"#2c6f9b",2.2); c.beginPath();
+    for(let i=0;i<NP;i++){
+      const wl=LO+(HI-LO)*i/(NP-1);
+      const db=Math.max(10*Math.log10(sm[i]),-34);
+      i?c.lineTo(F.X(wl),F.Y(db)):c.moveTo(F.X(wl),F.Y(db));
+    }
+    c.stroke();
+    c.fillStyle="#8A99A8"; c.font="9.5px IBM Plex Mono,ui-monospace,monospace";
+    c.textAlign="center";
+    for(let l=LO+0.5;l<HI;l+=1.0) c.fillText(l.toFixed(1),F.X(l),h-9);
+    c.textAlign="right";
+    for(let v=0;v>=-30;v-=10) c.fillText(v+" dB",padL-5,F.Y(v)+3);
+    c.textAlign="left";
+  }};
+
+const ALL_SIGS=[SIG_I17E1,SIG_I17E2,SIG_A23E1,SIG_A23E2,SIG_S25T1,SIG_S26E1];
+
+/* only the ones the site actually publishes a browser build for */
+function liveSigs(){
+  const have=new Set();
+  for(const k in DATA) for(const y of DATA[k].years)
+    for(const p of (y.problems||[])) if(p.files&&p.files.sim) have.add(p.files.sim);
+  const ok=ALL_SIGS.filter(s=>have.has(s.sim));
+  return ok.length?ok:ALL_SIGS;
+}
+function pickHero(){
+  const ok=liveSigs();
+  heroPick=ok[Math.floor(Math.random()*ok.length)];
+  return heroPick;
+}
+
+function startHero(){
+  const cv=document.getElementById("deflect"); if(!cv||!heroPick) return;
+  const ctx=cv.getContext("2d"), sig=heroPick;
+  const dpr=Math.min(devicePixelRatio||1,2);
+  function fit(){
+    const w=cv.clientWidth||660;
+    cv.width=Math.round(w*dpr); cv.height=Math.round(w*.74*dpr);
+    cv.style.height=(w*.74)+"px"; ctx.setTransform(dpr,0,0,dpr,0,0);
   }
   fit();
   const clock=document.getElementById("figClock");
-  if(matchMedia("(prefers-reduced-motion: reduce)").matches){
-    paint(1800); clock.textContent="30:00"; return;
-  }
+  const show=t=>{ sig.paint(ctx,cv.clientWidth,cv.clientWidth*.74,t);
+                  if(clock) clock.textContent=sig.read(t); };
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches){ show(sig.span); return; }
+  const rate=(sig===SIG_I17E1)?260:1;
   let t0=null;
   (function loop(now){
     if(t0===null)t0=now;
-    const tS=((now-t0)/1000*260)%2100, shown=Math.min(tS,1800);
-    paint(shown);
-    clock.textContent=`${String(Math.floor(shown/60)).padStart(2,"0")}:`+
-                      `${String(Math.floor(shown%60)).padStart(2,"0")}`;
+    show(((now-t0)/1000*rate)%(sig.span*1.18));
     animId=requestAnimationFrame(loop);
   })(performance.now());
-  addEventListener("resize",fit);
+  addEventListener("resize",()=>{fit();});
 }
 
 /* ══════════════════════════════════════════════════════════════
