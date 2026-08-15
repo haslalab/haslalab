@@ -526,7 +526,7 @@ const DATA={
       tags:["광학","확산","곡선맞춤"], tagsEn:["Optics","Diffusion","Curve fit"],
       files:{
         sim:"sim/ipho2017_E1_web.html",
-        exe:{ko:REL+"v1.0/IPhO2017_E1_Sim_KO.exe", en:REL+"v1.0/IPhO2017_E1_Sim_EN.exe"},
+        exe:{ko:REL+"v1.0/IPhO2017_E1_sim_KO.exe", en:REL+"v1.0/IPhO2017_E1_sim_EN.exe"},
         src:{ko:"src/ipho2017_E1_diffusion_sim_KO.py", en:"src/ipho2017_E1_diffusion_sim_EN.py"},
         pdf:{ko:"pdf/IPhO_2017_E1_KO.pdf", en:"pdf/IPhO_2017_E1_EN.pdf"},
         sol:"pdf/IPhO_2017_S1.pdf"
@@ -539,7 +539,7 @@ const DATA={
       tags:["자기학","반자성 부상","감쇠진동"], tagsEn:["Magnetism","Diamagnetic levitation","Damped oscillation"],
       files:{
         sim:"sim/ipho2017_E2_web.html",
-        exe:{ko:REL+"v1.0/IPhO2017_E2_Sim_KO.exe", en:REL+"v1.0/IPhO2017_E2_Sim_EN.exe"},
+        exe:{ko:REL+"v1.0/IPhO2017_E2_sim_KO.exe", en:REL+"v1.0/IPhO2017_E2_sim_EN.exe"},
         src:{ko:"src/ipho2017_E2_pdl_sim_KO.py", en:"src/ipho2017_E2_pdl_sim_EN.py"},
         pdf:{ko:"pdf/IPhO_2017_E2_KO.pdf", en:"pdf/IPhO_2017_E2_EN.pdf"},
         sol:"pdf/IPhO_2017_S2.pdf"
@@ -579,10 +579,10 @@ const DATA={
             en:"Swing two pendulums into each other and read the contact time off a photogate and an oscilloscope to get the Hertz deformation parameters."},
       tags:["역학","충돌","오실로스코프"], tagsEn:["Mechanics","Collisions","Oscilloscope"],
       files:{
-        sim:"sim/Apho2023_E1_sim_web.html",
-        exe:{ko:REL+"v1.1/APhO2023_E1_Sim_KO.exe", en:REL+"v1.1/APhO2023_E1_Sim_EN.exe"},
-        src:{ko:"src/Apho2023_E1_sim_KO.py", en:"src/Apho2023_E1_sim_EN.py"},
-        pdf:{en:"pdf/APhO_2023_E1_EN.pdf"},
+        sim:"sim/apho2023_E1_sim_web.html",
+        exe:{ko:REL+"v1.1/APhO2023_E1_sim_KO.exe", en:REL+"v1.1/APhO2023_E1_sim_EN.exe"},
+        src:{ko:"src/apho2023_E1_sim_KO.py", en:"src/Apho2023_E1_sim_EN.py"},
+        pdf:{ko:"src/Apho2023_E1_KO.pdf", en:"src/Apho2023_E1_EN.pdf"},
         sol:"pdf/APhO_2023_S1.pdf"
       }},
      {id:"E2",
@@ -591,10 +591,10 @@ const DATA={
             en:"Heat a metal surface with a laser and read the tiny bulge it raises from the interference fringes, giving the yield strength and the deformation height."},
       tags:["광학","간섭","열변형"], tagsEn:["Optics","Interference","Thermal deformation"],
       files:{
-        sim:"sim/Apho2023_E2_sim_web.html",
-        exe:{ko:REL+"v1.1/APhO2023_E2_Sim_KO.exe", en:REL+"v1.1/APhO2023_E2_Sim_EN.exe"},
-        src:{ko:"src/Apho2023_E2_sim_KO.py", en:"src/Apho2023_E2_sim_EN.py"},
-        pdf:{en:"pdf/APhO_2023_E2_EN.pdf"},
+        sim:"sim/apho2023_E2_sim_web.html",
+        exe:{ko:REL+"v1.1/APhO2023_E2_sim_KO.exe", en:REL+"v1.1/APhO2023_E2_sim_EN.exe"},
+        src:{ko:"src/apho2023_E2_sim_KO.py", en:"src/apho2023_E2_sim_EN.py"},
+        pdf:{ko:"src/Apho2023_E2_KO.pdf", en:"src/Apho2023_E2_EN.pdf"},
         sol:"pdf/APhO_2023_S2.pdf"
       }}]},
    {y:2022,host:{ko:"인도 · 데라둔, 온라인",en:"Dehradun, India, online"},cc:"in",problems:wip("Magnetic Black Box","Acoustic Black Box")},
@@ -675,7 +675,7 @@ const DATA={
              en:"Write a grating on the virtual FBG-Writer, read the Bragg wavelength and the grating strength off the transmission spectrum, then calibrate it as a thermometer and a force sensor."},
        tags:["광학","광섬유","분광"], tagsEn:["Optics","Fibre","Spectroscopy"],
        files:{sim:"sim/ispho2026_E1_web.html",
-              exe:{ko:REL+"v1.2/ISPhO2026_E1_Sim_KO.exe", en:REL+"v1.2/ISPhO2026_E1_Sim_EN.exe"},
+              exe:{ko:REL+"v1.2/ISPhO2026_E1_sim_KO.exe", en:REL+"v1.2/ISPhO2026_E1_sim_EN.exe"},
               src:{ko:"src/ispho2026_E1_fbg_sim_KO.py", en:"src/ispho2026_E1_fbg_sim_EN.py"},
               pdf:{ko:"pdf/ISPhO_2026_E1_KO.pdf", en:"pdf/ISPhO_2026_E1_EN.pdf"}}}
     ]},
@@ -690,10 +690,9 @@ const DATA={
              en:"Integrate the Landau–Lifshitz–Gilbert equation on a spin chain and watch the wall's width and its motion under an applied field."},
        tags:["자성","자구벽","수치적분"], tagsEn:["Magnetism","Domain wall","Numerics"],
        files:{sim:"sim/ispho2025_T1_web.html",
-              exe:{ko:REL+"v1.2/ISPhO2025_T1_Sim_KO.exe", en:REL+"v1.2/ISPhO2025_T1_Sim_EN.exe"},
+              exe:{ko:REL+"v1.2/ISPhO2025_T1_sim_KO.exe", en:REL+"v1.2/ISPhO2025_T1_sim_EN.exe"},
               src:{ko:"src/ispho2025_T1_ferro_sim_KO.py", en:"src/ispho2025_T1_ferro_sim_EN.py"},
               pdf:{ko:"pdf/ISPhO_2025_T_KO.pdf", en:"pdf/ISPhO_2025_T_EN.pdf"},
-              sol:"pdf/ISPhO_2025_S_T.pdf"}}
     ]},
    {y:2024,host:{ko:"러시아 · 한티만시스크, MIPT",en:"Khanty-Mansiysk, Russia · MIPT"},cc:"ru",
     problems:[
