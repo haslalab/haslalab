@@ -8,8 +8,8 @@
 <meta name="theme-color" content="#2E3945">
 <!-- 링크 미리보기. 사이트 주소를 옮기면 아래 세 줄의 주소도 함께 바꿔야 합니다. -->
 <meta property="og:site_name" content="HaslaLab">
-<meta property="og:title" content="HaslaLab — Physics Olympiad Experimental Simulations">
-<meta property="og:description" content="IPhO, APhO and EuPhO experimental problems, rebuilt as working apparatus. Nothing is computed for you — do it yourself.">
+<meta property="og:title" content="HaslaLab — 물리올림피아드 실험 시뮬레이터 · Physics Olympiad Experimental Simulations">
+<meta property="og:description" content="IPhO · APhO · EuPhO · NBPhO · ISPhO · RMPh 실험 문제를 실제로 조작할 수 있는 장치로 다시 만들었습니다. 계산은 대신 해주지 않습니다.">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="en_US">
 <meta property="og:locale:alternate" content="ko_KR">
@@ -19,12 +19,35 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="HaslaLab — a laser deflectogram on millimetre paper">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="HaslaLab — Physics Olympiad Experimental Simulations">
+<meta name="twitter:title" content="HaslaLab — 물리올림피아드 실험 시뮬레이터">
 <meta name="twitter:description" content="IPhO, APhO and EuPhO experimental problems, rebuilt as working apparatus.">
 <meta name="twitter:image" content="https://haslalab.org/og.png">
-<meta name="description" content="Run IPhO, APhO and EuPhO experimental problems as working apparatus in your browser. 100 experimental problems indexed by year.">
+<meta name="description" content="국제물리올림피아드(IPhO)·아시아물리올림피아드(APhO)·EuPhO·NBPhO·ISPhO·RMPh의 실험 문제 131개를 연도별로 정리하고, 브라우저에서 바로 돌아가는 가상 실험 장치로 다시 만들었습니다. 계기가 보여주는 것만 보여주고 계산은 대신 해주지 않습니다. Physics olympiad experimental problems rebuilt as working apparatus in your browser.">
 <link rel="canonical" href="https://haslalab.org/">
-<title>HaslaLab — Physics Olympiad Experimental Simulations</title>
+<link rel="alternate" hreflang="ko" href="https://haslalab.org/?lang=ko">
+<link rel="alternate" hreflang="en" href="https://haslalab.org/?lang=en">
+<link rel="alternate" hreflang="x-default" href="https://haslalab.org/">
+<title>HaslaLab — 물리올림피아드 실험 시뮬레이터 · Physics Olympiad Experimental Simulations</title>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+ {"@type":"WebSite","@id":"https://haslalab.org/#site","name":"HaslaLab",
+  "alternateName":"하슬라랩","url":"https://haslalab.org/",
+  "inLanguage":["ko-KR","en"],
+  "description":"국제 물리올림피아드 실험 문제를 브라우저에서 돌아가는 가상 실험 장치로 다시 만든 교육용 아카이브",
+  "publisher":{"@id":"https://haslalab.org/#org"},
+  "hasPart":{"@type":"CollectionPage","name":"실험 문제 전체 목록",
+             "url":"https://haslalab.org/problems.html"}},
+ {"@type":"EducationalOrganization","@id":"https://haslalab.org/#org",
+  "name":"HaslaEdu","alternateName":"HaslaLab","url":"https://haslalab.org/",
+  "founder":{"@type":"Person","name":"MinGyuSong","alternateName":"송민규"},
+  "logo":"https://haslalab.org/og.png"},
+ {"@type":"LearningResource","name":"Physics Olympiad experimental simulators",
+  "url":"https://haslalab.org/problems.html",
+  "learningResourceType":"Simulation","educationalLevel":"Secondary, olympiad",
+  "teaches":"Experimental physics, measurement and error analysis",
+  "inLanguage":["ko-KR","en"],"isAccessibleForFree":true,
+  "provider":{"@id":"https://haslalab.org/#org"}}]}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -395,6 +418,31 @@ footer{border-top:1px solid var(--grid-bold);padding:30px 0 44px;margin-top:26px
 </header>
 
 <main id="view"></main>
+
+<!-- Everything on this page is drawn by JavaScript, and the routes are hash
+     fragments, which a crawler cannot hold as separate URLs.  problems.html
+     is a plain, static index of all 131 problems; this block is the path to
+     it for anything that does not run scripts. -->
+<noscript>
+  <div class="shell" style="padding-top:60px;padding-bottom:60px">
+    <h1 style="font-size:1.8rem;margin:0 0 12px">HaslaLab — 물리올림피아드 실험 시뮬레이터</h1>
+    <p style="max-width:60ch;color:#5C6B7A">
+      IPhO · APhO · EuPhO · NBPhO · ISPhO · RMPh의 실험 문제를, 실제 계측기가 보여주는 것만
+      보여주는 가상 실험 장치로 다시 만들었습니다. 이 페이지는 자바스크립트로 그려집니다.
+      전체 목록은 아래 정적 페이지에서 볼 수 있습니다.
+    </p>
+    <p><a href="problems.html">실험 문제 전체 목록</a> ·
+       <a href="problems-en.html">Every experimental problem (English)</a></p>
+    <ul>
+      <li><a href="sim/ipho2017_E1_web.html">IPhO 2017 E1 — 소금 용액의 광학</a></li>
+      <li><a href="sim/ipho2017_E2_web.html">IPhO 2017 E2 — PDL 자기 트랩</a></li>
+      <li><a href="sim/apho2023_E1_web.html">APhO 2023 E1 — 충돌하는 진자의 헤르츠 접촉</a></li>
+      <li><a href="sim/apho2023_E2_web.html">APhO 2023 E2 — 열변형된 표면에 의한 간섭</a></li>
+      <li><a href="sim/ispho2025_T1_web.html">ISPhO 2025 T1 — 강자성 자구벽 동역학</a></li>
+      <li><a href="sim/ispho2026_E1_web.html">ISPhO 2026 E1 — 광섬유 브래그 격자</a></li>
+    </ul>
+  </div>
+</noscript>
 
 <footer><div class="shell frow">
   <span id="footL"></span>
@@ -1486,6 +1534,20 @@ function startHero(){
 /* ══════════════════════════════════════════════════════════════
    ROUTER
    ══════════════════════════════════════════════════════════════ */
+const SITE = "HaslaLab";
+function setDocTitle(first, second){
+  const d=UI[lang], parts=[];
+  if(first==="about")            parts.push(d.hAbout);
+  else if(first==="comps")       parts.push(d.hComps);
+  else if(first && DATA[first]){
+    const c=DATA[first];
+    parts.push(second ? `${c.abbr} ${second}` : `${c.abbr} \u2014 ${c.full[lang]}`);
+  }
+  const tail = lang==="ko" ? "물리올림피아드 실험 시뮬레이터"
+                           : "Physics Olympiad Experimental Simulations";
+  document.title = parts.length ? `${parts[0]} \u00b7 ${SITE}` : `${SITE} \u2014 ${tail}`;
+}
+
 function render(){
   if(animId){cancelAnimationFrame(animId);animId=null;}
   const d=UI[lang];
@@ -1498,6 +1560,8 @@ function render(){
   else if(first && DATA[first]){  html=second?viewYear(first,second):viewComp(first); active="comps"; }
   else {                          html=viewHome();   active="home";  }
   document.getElementById("view").innerHTML=html;
+  document.documentElement.lang = lang;
+  setDocTitle(first, second);
 
   document.getElementById("nav").innerHTML=
     `<a href="#/" class="${active==="home"?"on":""}">${d.navHome}</a>
