@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1b1e24">
+<title>APhO 2026 E2 — Micro:bit ADC로 미지 저항 추정 · Unknown Resistance with the Micro:bit ADC · HaslaLab</title>
+<meta name="description" content="APhO 2026 실험 2번을 브라우저에서 실행합니다. 브레드보드에 저항을 꽂고 micro:bit ADC로 0~1023 값을 읽어 미지 저항을 추정합니다. 계산은 대신 해주지 않습니다.">
+<meta property="og:site_name" content="HaslaLab">
+<meta property="og:type" content="article">
+<meta property="og:title" content="APhO 2026 E2 — Micro:bit ADC로 미지 저항 추정 · Unknown Resistance with the Micro:bit ADC">
+<meta property="og:description" content="APhO 2026 실험 2번을 브라우저에서 실행합니다. 브레드보드에 저항을 꽂고 micro:bit ADC로 0~1023 값을 읽어 미지 저항을 추정합니다.">
+<style>
+  :root{
+    --bg:#1b1e24; --panel:#22262d; --ink:#e8eef2; --muted:#9aa3ab;
+    --line:#33373e; --accent:#f2c14e; --accent-soft:#2b2f36;
+    --deep:#12161b;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,
+         "Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  }
+  .wrap{max-width:1500px;margin:0 auto;padding:14px;display:flex;gap:14px;align-items:flex-start}
+  @media (max-width:1080px){ .wrap{flex-direction:column} }
+
+  /* ── stage ── */
+  .stage{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:12px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px}
+  .card h3{margin:0 0 7px;font-size:13px;font-weight:600;color:var(--muted)}
+  canvas{display:block;width:100%;height:auto;border-radius:6px;touch-action:none}
+  #bench{cursor:crosshair;background:#1b1e24}
+  #bench.dragging{cursor:grabbing}
+
+  /* ── control panel ── */
+  .panel{
+    flex:0 0 300px; background:var(--panel); border:1px solid var(--line);
+    border-radius:10px; padding:12px; position:sticky; top:14px;
+  }
+  @media (max-width:1080px){ .panel{position:static;flex:1 1 auto;width:100%} }
+  .panel h2{
+    font-size:12px; letter-spacing:.04em; text-transform:uppercase;
+    color:var(--accent); margin:15px 0 7px; padding-bottom:5px;
+    border-bottom:1px solid var(--line);
+  }
+  .panel h2:first-of-type{margin-top:0}
+  .chk{display:flex;align-items:center;gap:7px;margin:5px 0;cursor:pointer;font-size:13px}
+  .chk input{accent-color:var(--accent);width:15px;height:15px}
+  .hint{font-size:11.5px;color:#7b838b;line-height:1.55;margin:4px 0 2px}
+  .packlab{font-size:11.5px;color:#aeb6bd;margin:7px 0 3px}
+  .chips{display:flex;flex-wrap:wrap;gap:4px}
+  .chips button{
+    width:62px;padding:5px 2px;margin:0;cursor:pointer;border-radius:4px;
+    background:#8b6d43;color:#fff;border:1px solid #6d5533;
+    font:11px/1.2 ui-monospace,Consolas,monospace;text-align:center;
+  }
+  .chips button.placed{filter:brightness(.55);box-shadow:inset 0 2px 4px rgba(0,0,0,.6)}
+  .chips button:hover:not(.placed){filter:brightness(1.18)}
+  button{
+    width:100%; padding:7px 9px; margin:3px 0; cursor:pointer;
+    background:var(--accent-soft); border:1px solid var(--line); border-radius:6px;
+    font:inherit; font-size:13px; color:var(--ink); text-align:left;
+    transition:background .12s,border-color .12s;
+  }
+  button:hover:not(:disabled){background:#343941;border-color:var(--accent)}
+  .status{
+    font:12.5px/1.6 -apple-system,"Segoe UI","Malgun Gothic",sans-serif;
+    color:var(--accent); background:var(--deep); border:1px solid var(--line);
+    border-radius:6px; padding:8px 9px; margin-top:10px; min-height:120px;
+    white-space:pre-wrap;
+  }
+  .status div + div{margin-top:9px}
+
+  /* ── header ── */
+  header{
+    max-width:1500px;margin:0 auto;padding:16px 14px 0;
+    display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap
+  }
+  header h1{margin:0;font-size:18px;font-weight:650;color:var(--accent)}
+  header p{margin:3px 0 0;font-size:13px;color:var(--muted)}
+  .lang{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;background:var(--panel)}
+  .lang button{
+    width:auto;margin:0;border:0;border-radius:0;padding:7px 15px;
+    font-size:13px;font-weight:600;color:var(--muted);text-align:center;background:transparent
+  }
+  .lang button.on{background:var(--accent);color:#1b1e24}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1 id="t-title"></h1>
+    <p id="t-sub"></p>
+  </div>
+  <div class="lang">
+    <button id="btn-ko" class="on">한국어</button>
+    <button id="btn-en">English</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- ═══════════ STAGE ═══════════ -->
+  <div class="stage">
+    <div class="card">
+      <h3 id="t-benchcap"></h3>
+      <canvas id="bench"></canvas>
+    </div>
+  </div>
+
+  <!-- ═══════════ CONTROLS ═══════════ -->
+  <aside class="panel">
+    <h2 id="t-h-kit"></h2>
+    <label class="chk"><input type="radio" name="dev" value="0" checked><span id="t-dev0"></span></label>
+    <label class="chk"><input type="radio" name="dev" value="1"><span id="t-dev1"></span></label>
+    <label class="chk"><input type="radio" name="dev" value="2"><span id="t-dev2"></span></label>
+    <p class="hint" id="t-kithint"></p>
+
+    <h2 id="t-h-packs"></h2>
+    <div id="packBox"></div>
+
+    <h2 id="t-h-view"></h2>
+    <button id="btnFit"></button>
+    <p class="hint" id="t-viewhint"></p>
+
+    <div class="status" id="status"></div>
+  </aside>
+</div>
+
+<script>
+"use strict";
+
+/* ══════════════════════════════════════════════════════════════
+   0.  i18n  —  language is switched by a button, no page reload
+   ══════════════════════════════════════════════════════════════ */
+const T = {
+  ko:{
+    title:"APhO 2026 실험 2 — Micro:bit ADC로 미지 저항 추정",
+    sub:"가상 실험실 · 브레드보드에 저항을 꽂고 버튼 A를 눌러 값을 읽으세요",
+    benchcap:"실험대 — 좌클릭 집기·꽂기 / 우클릭 뽑기 / 휠 확대·축소 / 드래그 이동",
+    hKit:"Micro:bit 키트", hPacks:"저항 세트", hView:"보기",
+    dev:i=>"Micro:bit "+(i+1)+"번 연결",
+    kithint:"한 번에 한 대만 회로에 연결됩니다.",
+    fit:"화면에 맞추기",
+    viewhint:"휠 확대·축소 / 빈 곳을 끌어 이동 / 우클릭으로 부품을 뽑습니다.",
+    unknown:"미지",
+    packs:{A:"저항 세트 A : 3.3 kΩ 10개",
+           B:"저항 세트 B : 6.8 kΩ, 560 Ω, 미지(초록)",
+           C:"저항 세트 C : 12 kΩ, 미지(파랑), 미지(빨강)",
+           D:"저항 세트 D : 510 kΩ, 미지(검정)"},
+    lead:{vc:"Vc", gnd:"GND", probe:"탐침"},
+    board:"1. 브레드보드",
+    railName:"전원라인",
+    kitCap:n=>"3. Micro:bit 키트 (#"+n+")",
+    btnCap:"버튼 A/B : 측정값 표시",
+    emptyBay:"빈 칸",
+    looseCells:"여분 AAA 건전지 (총 6개, 키트마다 2개씩)",
+    plugHint:"전지 플러그를 확장 보드의 PWR 소켓으로 끌어다 꽂으세요.",
+    carryCell:"AAA 건전지 — 홀더의 빈 칸을 클릭",
+    carryRes:c=>"저항 "+c+" — 첫 구멍을 클릭",
+    carryLead:l=>l+" 점퍼선 — 꽂을 구멍을 클릭",
+    /* status lines */
+    stMiss:s=>"연결되지 않은 점퍼선 : "+s,
+    stCells:(a,b)=>"건전지 "+a+"/2 — 여분 "+b+"개",
+    stPlug:"전지 플러그가 PWR 소켓에 꽂혀 있지 않습니다.",
+    stSwitch:"전지 홀더 스위치 : OFF",
+    stDead:"⚠ 현재 Micro:bit 고장",
+    stCheck:"계통 점검 : 탐침을 GND 마디에 대면 0에 가깝고, Vc 마디에 대면 1023에 가까워야 합니다.",
+    /* transient messages */
+    m:{
+      plugged:"전지 플러그를 PWR 소켓에 꽂았습니다. 스위치를 켜세요.",
+      already:"이미 브레드보드에 꽂혀 있습니다. 우클릭하면 뽑을 수 있습니다.",
+      firstLead:"첫 번째 리드를 꽂을 구멍을 클릭하세요.",
+      swOn:"전지 홀더 스위치를 켰습니다.",
+      swOff:"전지 홀더 스위치를 껐습니다.",
+      cellOut:"건전지를 빼서 실험대에 놓았습니다.",
+      pickFirst:"먼저 실험대의 여분 건전지를 클릭해 집으세요.",
+      cellIn:n=>"건전지를 "+n+"/2 개 넣었습니다.",
+      cellDown:"건전지를 실험대에 내려놓았습니다.",
+      cellHand:"건전지를 집었습니다. 홀더의 빈 칸을 클릭해 넣으세요.",
+      leadHole:l=>T.ko.lead[l]+" 점퍼선을 꽂을 구멍을 클릭하세요.",
+      leadTo:(l,h)=>T.ko.lead[l]+" 점퍼선을 "+nodeName(h)+" 에 연결했습니다.",
+      secondLead:"두 번째 리드를 꽂을 구멍을 클릭하세요.",
+      sameNode:"같은 마디에 두 리드를 꽂으면 저항이 단락됩니다. 다른 마디를 고르세요.",
+      resOut:c=>"저항 "+c+" 을(를) 뽑았습니다.",
+      leadOut:l=>T.ko.lead[l]+" 점퍼선을 뽑았습니다.",
+      needCells:n=>"이 키트의 전지 홀더에 AAA 건전지 2개를 넣어야 합니다 (현재 "+n+"개).",
+      notPlugged:"전지 홀더가 연결되어 있지 않습니다. 플러그를 PWR 소켓에 꽂으세요.",
+      off:"전지 홀더 스위치가 꺼져 있습니다.",
+      nowire:"Vc, GND, 탐침 점퍼선이 모두 연결되어야 측정할 수 있습니다.",
+      dead:"이 Micro:bit는 고장났습니다. 다른 장치를 연결하거나 교체를 요청하세요.",
+      short:"단락! Vc와 GND가 부하 없이 연결되어 장치가 고장났습니다.",
+      spareOnce:"교체 장치는 참가자당 한 번만 제공됩니다.",
+      askSpare:"감독관에게 교체 장치를 요청할까요? (1회만 가능)",
+      gotSpare:"교체 장치를 받았습니다.",
+      swapped:n=>"Micro:bit "+n+"번을 연결했습니다. (동시에 두 대를 연결하면 안 됩니다)"
+    }
+  },
+  en:{
+    title:"APhO 2026 Experiment 2 — Unknown resistance with the Micro:bit ADC",
+    sub:"Virtual laboratory · build the network on the breadboard and press button A",
+    benchcap:"the bench — L-click to pick up and plug in / R-click to pull out / wheel zoom / drag to pan",
+    hKit:"Micro:bit kit", hPacks:"Resistor sets", hView:"View",
+    dev:i=>"connect Micro:bit #"+(i+1),
+    kithint:"only one may be wired at a time",
+    fit:"fit to the window",
+    viewhint:"wheel zooms, dragging bare bench pans, right-click pulls a part out.",
+    unknown:"??",
+    packs:{A:"Set A : ten 3.3 kΩ",
+           B:"Set B : 6.8 kΩ, 560 Ω, unknown (green)",
+           C:"Set C : 12 kΩ, unknown (blue), unknown (red)",
+           D:"Set D : 510 kΩ, unknown (black)"},
+    lead:{vc:"Vc", gnd:"GND", probe:"probe"},
+    board:"1. breadboard",
+    railName:"rail",
+    kitCap:n=>"3. Micro:bit kit (#"+n+")",
+    btnCap:"buttons A/B : reading",
+    emptyBay:"empty",
+    looseCells:"loose AAA cells (six in all, two per kit)",
+    plugHint:"drag the battery plug into the PWR socket of the shield",
+    carryCell:"AAA cell: click an empty bay",
+    carryRes:c=>"resistor "+c+" : click the first hole",
+    carryLead:l=>l+" jumper : click a hole",
+    stMiss:s=>"jumpers not connected : "+s,
+    stCells:(a,b)=>"cells "+a+" of 2 fitted, "+b+" loose",
+    stPlug:"the battery plug is not in the PWR socket",
+    stSwitch:"battery holder switch : OFF",
+    stDead:"⚠ the current micro:bit is damaged",
+    stCheck:"System check: the probe should read ~0 at GND and ~1023 at Vc.",
+    m:{
+      plugged:"Battery plugged into PWR; now switch it on.",
+      already:"Already on the breadboard; right-click it to pull it out.",
+      firstLead:"Click the hole for the first lead.",
+      swOn:"Battery holder switched on.",
+      swOff:"Battery holder switched off.",
+      cellOut:"Cell taken out and put back on the bench.",
+      pickFirst:"Pick a loose cell up from the bench first.",
+      cellIn:n=>n+" of 2 cells fitted.",
+      cellDown:"Cell put back on the bench.",
+      cellHand:"Cell in hand: click an empty bay of the holder.",
+      leadHole:l=>"Click the hole for the "+T.en.lead[l]+" jumper.",
+      leadTo:(l,h)=>T.en.lead[l]+" jumper connected to "+nodeName(h)+".",
+      secondLead:"Click the hole for the second lead.",
+      sameNode:"Both leads in the same node would short the resistor.",
+      resOut:c=>"Resistor "+c+" removed.",
+      leadOut:l=>T.en.lead[l]+" jumper unplugged.",
+      needCells:n=>"This kit needs two AAA cells in its holder (only "+n+" fitted).",
+      notPlugged:"The battery holder is not plugged in: push its plug into PWR.",
+      off:"The battery holder is switched off.",
+      nowire:"Vc, GND and the probe jumper must all be connected.",
+      dead:"This micro:bit is damaged: connect another one or ask for the spare.",
+      short:"Short circuit!  Vc and GND were joined without a load; the kit is damaged.",
+      spareOnce:"Only one replacement per candidate is provided.",
+      askSpare:"Ask the invigilator for the replacement kit? (once only)",
+      gotSpare:"Replacement kit received.",
+      swapped:n=>"Micro:bit #"+n+" is now wired up."
+    }
+  }
+};
+let lang = (new URLSearchParams(location.search).get("lang")==="en") ? "en" : "ko";
+const $ = id => document.getElementById(id);
+
+/* ══════════════════════════════════════════════════════════════
+   1.  APPARATUS  —  identical to the Python constants
+   ══════════════════════════════════════════════════════════════ */
+const VCC=3.0, ADC_RIN=1.0e7, ADC_MAX=1023, R_SHORT=50.0, R_LEAK=1.0e12;
+const PACKS = {
+  A:[1,2,3,4,5,6,7,8,9,10].map(i=>["A"+i,3300.0,"band",null]),
+  B:[["B1",6800.0,"band",null],["B2",560.0,"band",null],["B3",4700.0,"tube","#3aa14d"]],
+  C:[["C1",12000.0,"band",null],["C2",1580.0,"tube","#2f6fd0"],["C3",235.0,"tube","#c8332b"]],
+  D:[["D1",510000.0,"band",null],["D2",680000.0,"tube","#1b1d21"]]
+};
+const DEV_COL=["#23262b","#23262b","#23262b"], DEV_EDGE=["#111417","#111417","#111417"];
+const DEV_NAME=["#1","#2","#3"];
+const TOL=0.001, NCOL=30;
+const ROWS_L="ABCDE", ROWS_R="FGHIJ", RAILS=["T+","T-","B+","B-"];
+
+const C_BG="#1b1e24", C_TXT="#e8eef2", C_ACC="#f2c14e";
+const C_BOARD="#e9e6dd", C_BOARD2="#d6d2c6", C_HOLE="#2a2c2f";
+const C_RED="#cc3b32", C_BLUE="#3363b8";
+const WIRE_SETS=[{probe:"#8b4fd0",vc:"#3fa85a",gnd:"#2f6fd0"},
+                 {probe:"#f5d033",vc:"#8a5a2b",gnd:"#e8862a"},
+                 {probe:"#f5d033",vc:"#e33d2e",gnd:"#23272e"}];
+const CASE_SETS=[{probe:"#4d2a75",vc:"#215c31",gnd:"#1b4079"},
+                 {probe:"#8a6f14",vc:"#4d3116",gnd:"#8a4d13"},
+                 {probe:"#8a6f14",vc:"#8a231a",gnd:"#aeb6bd"}];
+const P=22.0, BX=52.0, BY=452.0;
+const ROW_Y={"T+":0.0,"T-":1.0,A:2.9,B:3.9,C:4.9,D:5.9,E:6.9,
+             F:8.7,G:9.7,H:10.7,I:11.7,J:12.7,"B+":14.6,"B-":15.6};
+const FONT5={
+ "0":["01100","10010","10010","10010","01100"], "1":["00100","01100","00100","00100","01110"],
+ "2":["11100","00010","01100","10000","11110"], "3":["11110","00010","00100","10010","01100"],
+ "4":["00110","01010","10010","11111","00010"], "5":["11111","10000","11110","00001","11110"],
+ "6":["00110","01000","11110","10001","01110"], "7":["11111","00010","00100","01000","10000"],
+ "8":["01110","10001","01110","10001","01110"], "9":["01110","10001","01111","00010","01100"],
+ " ":["00000","00000","00000","00000","00000"], "E":["11111","10000","11110","10000","11111"],
+ "r":["00000","00000","10110","11000","10000"], "o":["00000","01100","10010","10010","01100"],
+ "F":["11111","10000","11110","10000","10000"], "-":["00000","00000","11111","00000","00000"],
+ "?":["01110","10001","00110","00000","00100"]};
+
+/* ── seeded random (replaces random.Random) ── */
+function mulberry32(a){
+  return function(){
+    a|=0; a=a+0x6D2B79F5|0;
+    let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t;
+    return ((t^t>>>14)>>>0)/4294967296;
+  };
+}
+class RNG{
+  constructor(seed){ this.r=mulberry32(seed>>>0); this._sp=null; }
+  uniform(a,b){ return a+this.r()*(b-a); }
+  gauss(mu,sd){
+    if(this._sp!==null){ const v=this._sp; this._sp=null; return mu+sd*v; }
+    let u=0,v=0; while(u===0)u=this.r(); while(v===0)v=this.r();
+    const R=Math.sqrt(-2*Math.log(u));
+    this._sp=R*Math.sin(2*Math.PI*v);
+    return mu+sd*R*Math.cos(2*Math.PI*v);
+  }
+}
+
+/* ── holes and nodes ── */
+function nodeOf(h){ return h[0]==="rail" ? "rail|"+h[1] : h[0]+"|"+h[1]; }
+function holePos(h){
+  return h[0]==="rail" ? [BX+h[2]*P, BY+ROW_Y[h[1]]*P]
+                       : [BX+h[1]*P, BY+ROW_Y[h[2]]*P];
+}
+function sameHole(a,b){
+  if(!a||!b) return false;
+  return a[0]===b[0] && a[1]===b[1] && a[2]===b[2];
+}
+function allHoles(){
+  const out=[];
+  for(let c=1;c<=NCOL;c++){
+    for(const r of ROWS_L) out.push(["L",c,r]);
+    for(const r of ROWS_R) out.push(["R",c,r]);
+    for(const nm of RAILS) out.push(["rail",nm,c]);
+  }
+  return out;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   2.  CIRCUIT  —  nodal analysis (direct transcription)
+   ══════════════════════════════════════════════════════════════ */
+function gauss(A,b){
+  const n=b.length;
+  const M=A.map((row,i)=>row.slice().concat([b[i]]));
+  for(let c=0;c<n;c++){
+    let p=c;
+    for(let r=c;r<n;r++) if(Math.abs(M[r][c])>Math.abs(M[p][c])) p=r;
+    if(Math.abs(M[p][c])<1e-18) return null;
+    const tmp=M[c]; M[c]=M[p]; M[p]=tmp;
+    const pv=M[c][c];
+    for(let r=0;r<n;r++){
+      if(r===c) continue;
+      const f=M[r][c]/pv;
+      if(f){ for(let k=c;k<=n;k++) M[r][k]-=f*M[c][k]; }
+    }
+  }
+  const out=[]; for(let i=0;i<n;i++) out.push(M[i][n]/M[i][i]);
+  return out;
+}
+
+class Circuit{
+  constructor(){ this.res={}; this.lead={}; }
+  nodes(){
+    const s=new Set();
+    for(const k in this.res){ const [h1,h2]=this.res[k]; s.add(nodeOf(h1)); s.add(nodeOf(h2)); }
+    for(const k in this.lead){ const h=this.lead[k]; if(h) s.add(nodeOf(h)); }
+    return Array.from(s).sort();
+  }
+  solve(probeLoaded=true){
+    const hv=this.lead["vc"], hg=this.lead["gnd"];
+    if(!hv||!hg) return null;
+    const nv=nodeOf(hv), ng=nodeOf(hg);
+    if(nv===ng) return "short";
+    const nodes=this.nodes();
+    const idx={}; nodes.forEach((n,i)=>idx[n]=i);
+    const n=nodes.length;
+    const G=[], I=[];
+    for(let i=0;i<n;i++){ G.push(new Array(n).fill(0)); I.push(0); }
+    const stamp=(a,b,g)=>{
+      const ia=idx[a], ib=idx[b];
+      G[ia][ia]+=g; G[ib][ib]+=g; G[ia][ib]-=g; G[ib][ia]-=g;
+    };
+    for(const cid in this.res){
+      const [h1,h2,R]=this.res[cid];
+      const a=nodeOf(h1), b=nodeOf(h2);
+      if(a===b) continue;
+      stamp(a,b,1.0/Math.max(R,1e-9));
+    }
+    const hp=this.lead["probe"];
+    if(hp&&probeLoaded){
+      const a=nodeOf(hp);
+      if(a!==ng) stamp(a,ng,1.0/ADC_RIN);
+    }
+    for(const a of nodes) if(a!==ng) G[idx[a]][idx[a]]+=1.0/R_LEAK;
+    for(const [fixed,val] of [[nv,VCC],[ng,0.0]]){
+      const i=idx[fixed];
+      for(let j=0;j<n;j++) G[i][j]=0.0;
+      G[i][i]=1.0; I[i]=val;
+    }
+    const V=gauss(G,I);
+    if(V===null) return null;
+    const volt={}; nodes.forEach(nd=>volt[nd]=V[idx[nd]]);
+    let isup=0.0;
+    for(const cid in this.res){
+      const [h1,h2,R]=this.res[cid];
+      const a=nodeOf(h1), b=nodeOf(h2);
+      if(a===nv&&b!==nv) isup+=(volt[a]-volt[b])/R;
+      else if(b===nv&&a!==nv) isup+=(volt[b]-volt[a])/R;
+    }
+    if(hp&&probeLoaded&&nodeOf(hp)===nv) isup+=volt[nv]/ADC_RIN;
+    if(isup>VCC/R_SHORT) return "short";
+    const vp = hp ? volt[nodeOf(hp)] : null;
+    return {vp:vp, volt:volt, isup:isup};
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   3.  DEVICE  —  ADC with integral non-linearity and read noise
+   ══════════════════════════════════════════════════════════════ */
+class Device{
+  constructor(k,seed){
+    const rng=new RNG(1000*seed+k);
+    this.k=k;
+    this.gain=1.0+rng.uniform(-0.0012,0.0012);
+    this.off=rng.uniform(-0.45,0.45);
+    this.a=[rng.uniform(-1.6,1.6),rng.uniform(-1.2,1.2),rng.uniform(-0.9,0.9)];
+    this.noise=0.3; this.rng=rng; this.dead=false;
+  }
+  inl(u){
+    return this.a[0]*Math.sin(Math.PI*u)+this.a[1]*Math.sin(2*Math.PI*u)+this.a[2]*Math.sin(3*Math.PI*u);
+  }
+  read(v){
+    const u=Math.max(0,Math.min(1,v/VCC));
+    const x=ADC_MAX*u*this.gain+this.off+this.inl(u)+this.rng.gauss(0,this.noise);
+    return Math.floor(Math.max(0,Math.min(ADC_MAX,Math.floor(x+0.5))));
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   4.  WORLD
+   ══════════════════════════════════════════════════════════════ */
+class World{
+  constructor(seed){
+    seed = (seed===undefined) ? Math.floor(Math.random()*(1<<30)) : seed;
+    this.seed=seed; this.rng=new RNG(seed);
+    this.cir=new Circuit();
+    this.devices=[0,1,2].map(k=>new Device(k,seed));
+    this.active=0;
+    this.cells_free=6; this.cell_hand=0; this.cells=[0,0,0];
+    this.batt_in=[false,false,false]; this.switch=[false,false,false];
+    this.spare_used=false;
+    this.msg=null;
+    this.value={};
+    for(const pk in PACKS) for(const [cid,nom] of PACKS[pk])
+      this.value[cid]=nom*(1.0+this.rng.uniform(-TOL,TOL));
+    this.placed={};
+  }
+  get power(){
+    const k=this.active;
+    return this.cells[k]===2 && this.batt_in[k] && this.switch[k];
+  }
+  get dev(){ return this.devices[this.active]; }
+  unload_cell(k){
+    if(this.cells[k]<=0) return false;
+    this.cells[k]-=1; this.cells_free+=1; return true;
+  }
+  place(cid,h1,h2){ this.placed[cid]=[h1,h2]; this.cir.res[cid]=[h1,h2,this.value[cid]]; }
+  remove(cid){ delete this.placed[cid]; delete this.cir.res[cid]; }
+  set_lead(which,hole){ this.cir.lead[which]=hole; }
+  measure(){
+    if(this.dev.dead) return "dead";
+    if(!this.power) return "off";
+    const r=this.cir.solve();
+    if(r===null) return "nowire";
+    if(r==="short"){ this.dev.dead=true; return "short"; }
+    if(r.vp===null||r.vp===undefined) return "nowire";
+    return this.dev.read(r.vp);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   5.  STATE
+   ══════════════════════════════════════════════════════════════ */
+const w = new World();
+const S = {
+  zoom:1.0, pan:[0,0], carry:null, pending:null, mouse:[0,0],
+  holes:allHoles(), scroll:null, lastReading:null,
+  viewTouched:false, draggingPlug:false, lp0:null,
+  zoneSlot:[], zoneCell:[], zonePin:{}, pinXY:{},
+  zoneSocket:null, zoneSwitch:null, zoneBtnA:null, zoneBtnB:null,
+  plugPx:null, matrixOrg:null
+};
+
+const cv = $("bench");
+const ctx = cv.getContext("2d");
+let CW=0, CH=0, DPR=1;
+
+function layout(){
+  const rect = cv.parentElement.getBoundingClientRect();
+  const cssW = Math.max(320, Math.floor(rect.width-20));
+  const cssH = Math.max(420, Math.min(Math.round(cssW*0.94), Math.round(window.innerHeight*0.86)));
+  DPR = window.devicePixelRatio||1;
+  cv.style.height = cssH+"px";
+  cv.width = Math.round(cssW*DPR);
+  cv.height = Math.round(cssH*DPR);
+  CW=cssW; CH=cssH;
+  fit();
+}
+function fit(force){
+  if(S.viewTouched && !force) return;
+  const x0=24.0, y0=24.0, x1=BX+(NCOL+2.6)*P, y1=BY+18.4*P;
+  S.zoom = Math.min(CW/(x1-x0), CH/(y1-y0))*0.98;
+  S.pan = [(CW-(x1-x0)*S.zoom)/2.0 - x0*S.zoom,
+           (CH-(y1-y0)*S.zoom)/2.0 - y0*S.zoom];
+}
+const SC = (x,y)=>[x*S.zoom+S.pan[0], y*S.zoom+S.pan[1]];
+const INV = (px,py)=>[(px-S.pan[0])/S.zoom, (py-S.pan[1])/S.zoom];
+
+function nearestHole(px,py,rmax){
+  rmax = rmax===undefined ? P*0.62 : rmax;
+  const [x,y]=INV(px,py);
+  let best=null, bd=1e9;
+  for(const h of S.holes){
+    const [hx,hy]=holePos(h);
+    const d=(hx-x)*(hx-x)+(hy-y)*(hy-y);
+    if(d<bd){ best=h; bd=d; }
+  }
+  return bd<=rmax*rmax ? best : null;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   6.  DRAWING
+   ══════════════════════════════════════════════════════════════ */
+function fs(pt){ return Math.max(6, Math.round(pt*S.zoom))*1.33; }
+function setFont(pt,bold,mono){
+  ctx.font = (bold?"bold ":"")+fs(pt).toFixed(1)+"px "+
+             (mono?'ui-monospace,Consolas,monospace':'"Malgun Gothic","Apple SD Gothic Neo",sans-serif');
+}
+function anchorSet(anchor){
+  if(anchor==="center"){ ctx.textAlign="center"; ctx.textBaseline="middle"; }
+  else if(anchor==="e"){ ctx.textAlign="right";  ctx.textBaseline="middle"; }
+  else if(anchor==="w"){ ctx.textAlign="left";   ctx.textBaseline="middle"; }
+  else { ctx.textAlign="left"; ctx.textBaseline="top"; }        /* nw */
+}
+function R(x0,y0,x1,y1,fill,outline,width){
+  const a=SC(x0,y0), b=SC(x1,y1);
+  if(fill){ ctx.fillStyle=fill; ctx.fillRect(a[0],a[1],b[0]-a[0],b[1]-a[1]); }
+  if(outline){ ctx.strokeStyle=outline; ctx.lineWidth=width||1; ctx.strokeRect(a[0],a[1],b[0]-a[0],b[1]-a[1]); }
+}
+function RPX(x0,y0,x1,y1,fill,outline,width){
+  if(fill){ ctx.fillStyle=fill; ctx.fillRect(x0,y0,x1-x0,y1-y0); }
+  if(outline){ ctx.strokeStyle=outline; ctx.lineWidth=width||1; ctx.strokeRect(x0,y0,x1-x0,y1-y0); }
+}
+function TX(x,y,txt,pt,fill,anchor,bold,mono){
+  const a=SC(x,y);
+  setFont(pt||9,bold,mono); anchorSet(anchor);
+  ctx.fillStyle=fill||C_TXT;
+  ctx.fillText(txt,a[0],a[1]);
+}
+function TXPX(px,py,txt,pxsize,fill,anchor,bold){
+  ctx.font=(bold?"bold ":"")+pxsize+'px "Malgun Gothic","Apple SD Gothic Neo",sans-serif';
+  anchorSet(anchor); ctx.fillStyle=fill; ctx.fillText(txt,px,py);
+}
+function LN(pts,stroke,width,round){
+  ctx.beginPath(); ctx.moveTo(pts[0][0],pts[0][1]);
+  for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i][0],pts[i][1]);
+  ctx.strokeStyle=stroke; ctx.lineWidth=width||1;
+  ctx.lineCap=round?"round":"butt"; ctx.lineJoin="round"; ctx.stroke();
+  ctx.lineCap="butt";
+}
+function POLY(pts,fill,outline,width){
+  ctx.beginPath(); ctx.moveTo(pts[0][0],pts[0][1]);
+  for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i][0],pts[i][1]);
+  ctx.closePath();
+  if(fill){ ctx.fillStyle=fill; ctx.fill(); }
+  if(outline){ ctx.strokeStyle=outline; ctx.lineWidth=width||1; ctx.stroke(); }
+}
+function OVAL(x0,y0,x1,y1,fill,outline,width){
+  ctx.beginPath();
+  ctx.ellipse((x0+x1)/2,(y0+y1)/2,Math.abs(x1-x0)/2,Math.abs(y1-y0)/2,0,0,2*Math.PI);
+  if(fill){ ctx.fillStyle=fill; ctx.fill(); }
+  if(outline){ ctx.strokeStyle=outline; ctx.lineWidth=width||1; ctx.stroke(); }
+}
+const wireCol = k => WIRE_SETS[w.active][k];
+const caseCol = k => CASE_SETS[w.active][k];
+const d = () => T[lang];
+
+function nodeName(h){
+  if(h[0]==="rail"){
+    const s = {"T+":"+","T-":"−","B+":"+","B-":"−"}[h[1]];
+    return lang==="ko" ? s+" "+d().railName : s+" "+d().railName;
+  }
+  return h[2]+""+h[1];
+}
+
+function drawBench(){
+  R(24,24,BX+(NCOL+2.6)*P,BY+18.4*P,"#242830","#2f3540",1);
+}
+
+function drawBreadboard(){
+  const x0=BX-1.4*P, y0=BY-1.2*P;
+  const x1=BX+(NCOL+1.4)*P, y1=BY+16.9*P;
+  R(x0,y0,x1,y1,C_BOARD,"#b9b4a6",2);
+  for(const [nm,col] of [["T+",C_RED],["T-",C_BLUE],["B+",C_RED],["B-",C_BLUE]]){
+    const y=BY+ROW_Y[nm]*P;
+    LN([SC(BX-0.9*P,y),SC(BX+(NCOL+0.9)*P,y)],col,Math.max(1,Math.round(1.6*S.zoom)));
+    TX(BX-1.1*P,y, nm.endsWith("+")?"+":"−", 10, col, "e", true);
+  }
+  R(BX-1.2*P,BY+7.6*P,BX+(NCOL+1.2)*P,BY+8.0*P,C_BOARD2,"#b9b4a6",1);
+  const rr=0.3*P;
+  for(const h of S.holes){
+    const [hx,hy]=holePos(h);
+    R(hx-rr,hy-rr,hx+rr,hy+rr,C_HOLE,"#8e8a80",1);
+  }
+  for(let c=1;c<=NCOL;c++){
+    if(c%5===0||c===1){
+      TX(BX+c*P,BY+2.2*P,String(c),8,"#7d786c","center");
+      TX(BX+c*P,BY+13.5*P,String(c),8,"#7d786c","center");
+    }
+  }
+  for(const r of (ROWS_L+ROWS_R)){
+    TX(BX-0.8*P,BY+ROW_Y[r]*P,r,8,"#7d786c","e");
+    TX(BX+(NCOL+0.8)*P,BY+ROW_Y[r]*P,r,8,"#7d786c","w");
+  }
+  TX(BX-1.3*P,y1+0.3*P,d().board,9,"#8d959c");
+  if(S.carry||S.pending){
+    const h=nearestHole(S.mouse[0],S.mouse[1]);
+    if(h){
+      const [hx,hy]=holePos(h);
+      R(hx-0.5*P,hy-0.5*P,hx+0.5*P,hy+0.5*P,null,C_ACC,2);
+      TX(hx,hy-0.85*P,nodeName(h),8,C_ACC,"center",true);
+    }
+  }
+}
+
+function drawMicrobit(){
+  const bx=292.0, by=30.0;
+  R(bx,by,bx+268,by+372,"#2b2f36","#454b54",2);
+  TX(bx+8,by+5,d().kitCap(w.active+1),9,"#aeb6bd");
+  const mx=bx+40, my=by+26, MW=188.0, MH=152.0;
+  R(mx,my,mx+MW,my+MH,DEV_COL[w.active],DEV_EDGE[w.active],2);
+  for(const [xa,xb] of [[0.0,26.0],[MW-26.0,MW]]){
+    const a=SC(mx+xa,my), b=SC(mx+xb,my+22);
+    POLY([[a[0],a[1]],[b[0],a[1]],[xa===0?a[0]:b[0],b[1]]],"#f2b826",null);
+  }
+  for(let k=0;k<3;k++){
+    const a=SC(mx+30+k*20,my), b=SC(mx+46+k*20,my+15);
+    POLY([[a[0],a[1]],[b[0],a[1]],[(a[0]+b[0])/2,b[1]]],"#f2b826",null);
+  }
+  let a=SC(mx+MW/2-17,my+20), b=SC(mx+MW/2+17,my+38);
+  OVAL(a[0],a[1],b[0],b[1],null,"#d8a72a",2);
+  for(const dx of [-8,8]){
+    const c=SC(mx+MW/2+dx,my+29), r=3*S.zoom;
+    OVAL(c[0]-r,c[1]-r,c[0]+r,c[1]+r,"#d8a72a",null);
+  }
+  S.matrixOrg=[mx+MW/2-40,my+46];
+  for(let r_=0;r_<5;r_++) for(let c_=0;c_<5;c_++)
+    R(S.matrixOrg[0]+c_*20, S.matrixOrg[1]+r_*17,
+      S.matrixOrg[0]+c_*20+8, S.matrixOrg[1]+r_*17+12,"#4a2018",null);
+  for(const [lab,dx] of [["A",14],["B",MW-34]]){
+    R(mx+dx,my+62,mx+dx+20,my+82,"#c9ced4","#7d848a",2);
+    R(mx+dx+5,my+67,mx+dx+15,my+77,"#8d949b",null);
+    const p1=SC(mx+dx+2,my+88), p2=SC(mx+dx+18,my+88), p3=SC(mx+dx+10,my+96);
+    POLY([p1,p2,p3],"#f2b826",null);
+    TX(mx+dx+10,my+92,lab,8,DEV_COL[w.active],"center",true);
+  }
+  S.zoneBtnA=[mx+14,my+62,mx+34,my+82];
+  S.zoneBtnB=[mx+MW-34,my+62,mx+MW-14,my+82];
+  R(mx,my+MH-22,mx+MW,my+MH,"#c9a227","#8a6f18",1);
+  for(let k=0;k<28;k++) R(mx+6+k*6.4,my+MH-20,mx+9+k*6.4,my+MH,"#e0bd45",null);
+  ["0","1","2","3V","G"].forEach((lab,k)=>{
+    const cxp=mx+12+k*(MW-24)/4.0;
+    const q1=SC(cxp-9,my+MH-19), q2=SC(cxp+9,my+MH-1);
+    OVAL(q1[0],q1[1],q2[0],q2[1],null,"#8a6f18",2);
+    TX(cxp,my+MH-10,lab,7,"#5c4a10","center");
+  });
+  const sx=bx+16, sy=my+MH, SW=236.0, SH=96.0;
+  R(sx,sy+4,sx+SW,sy+SH,"#efe9dc","#b8b09c",2);
+  R(sx+20,sy,sx+20+MW+8,sy+20,"#15181c","#000",1);
+  TX(sx+4,sy+26,"3a",8,"#6c6553");
+  TX(sx+30,sy+62,"analog",7,"#6c6553","e");
+  for(let k=0;k<17;k++){
+    const px=sx+30+k*11.5;
+    if(k%2===0) TX(px+3,sy+31,String(k),6,"#6c6553","center");
+    ["#e8c02a","#cc3b32","#1b1e22"].forEach((col,r_)=>{
+      R(px,sy+40+r_*12,px+7,sy+49+r_*12,col,"#8d8674",1);
+    });
+  }
+  ["S","V","G"].forEach((lab,r_)=>{ TX(sx+28,sy+45+r_*12,lab,6,"#6c6553","e"); });
+  ["probe","vc","gnd"].forEach((key,i2)=>{
+    const py=sy+45+i2*12;
+    R(sx+8,py-4,sx+22,py+5,wireCol(key),"#0c1218",1);
+    TX(sx+6,py,["3b","3c","3d"][i2],7,"#6c6553","e");
+    S.pinXY[key]=[sx+22,py];
+    S.zonePin[key]=[sx+4,py-7,sx+26,py+8];
+  });
+  const px0=sx+SW-42, py0=sy+SH-26;
+  R(px0,py0,px0+34,py0+18,"#1b1e22","#000",1);
+  TX(px0+17,py0+9,"PWR",6,"#9aa3ab","center");
+  S.zoneSocket=[px0,py0,px0+34,py0+18];
+
+  const hx=bx+30, hy=by+300, k=w.active;
+  R(hx,hy,hx+150,hy+54,"#dfe4e6","#9aa0a6",2);
+  S.zoneSlot=[];
+  for(let c=0;c<2;c++){
+    const cy=hy+10+c*22, loaded=w.cells[k]>c;
+    R(hx+12,cy,hx+108,cy+16, loaded?"#c9c2ad":"#9aa0a6", loaded?"#8d8674":"#6f767c",1);
+    if(loaded){
+      R(hx+108,cy+4,hx+114,cy+12,"#b9b2a0","#8d8674",1);
+      TX(hx+60,cy+8,"AAA  1.5V",6,"#5d574a","center");
+    }else{
+      TX(hx+60,cy+8,d().emptyBay,6,"#e6ecef","center");
+    }
+    S.zoneSlot.push([hx+12,cy,hx+114,cy+16]);
+  }
+  TX(hx+4,hy+58,"3e ("+DEV_NAME[k]+")",8,"#7b838b");
+
+  const tx0=bx+16, ty0=by+352;
+  TX(tx0,ty0-12,d().looseCells,7,"#9aa3ab");
+  S.zoneCell=[];
+  for(let c=0;c<6;c++){
+    const x=tx0+c*40, avail=c<w.cells_free;
+    R(x,ty0,x+34,ty0+14, avail?"#c9c2ad":"#3a4048", avail?"#8d8674":"#2b2f36",1);
+    if(avail) R(x+34,ty0+4,x+39,ty0+10,"#b9b2a0","#8d8674",1);
+    S.zoneCell.push([x,ty0,x+39,ty0+14]);
+  }
+  R(hx+120,hy+14,hx+144,hy+40,"#2b2f36","#11141a",1);
+  const on=w.switch[k];
+  R(hx+123+(on?12:0),hy+17,hx+135+(on?12:0),hy+37, on?"#2f6f3f":"#8d949b","#11141a",1);
+  TX(hx+132,hy+46, on?"ON":"OFF",7, on?"#7dffb0":"#9aa3ab","center");
+  S.zoneSwitch=[hx+120,hy+14,hx+144,hy+40];
+
+  const aa=SC(hx+150,hy+20);
+  let bb, mid;
+  if(w.batt_in[k]){ bb=SC(px0+6,py0+9); mid=SC(hx+190,hy+4); }
+  else            { bb=SC(hx+196,hy+30); mid=SC(hx+180,hy+46); }
+  for(const [col,off] of [["#cc3b32",-3],["#1b1e22",3]]){
+    ctx.beginPath(); ctx.moveTo(aa[0],aa[1]+off);
+    ctx.quadraticCurveTo(mid[0],mid[1]+off,bb[0],bb[1]+off);
+    ctx.strokeStyle=col; ctx.lineWidth=Math.max(2,Math.round(2.4*S.zoom));
+    ctx.lineCap="round"; ctx.stroke(); ctx.lineCap="butt";
+  }
+  const pw=20.0, ph=14.0;
+  const plug=[bb[0]-pw*S.zoom/2, bb[1]-ph*S.zoom/2, bb[0]+pw*S.zoom/2, bb[1]+ph*S.zoom/2];
+  RPX(plug[0],plug[1],plug[2],plug[3], w.batt_in[k]?"#cdd3d6":"#f2f2f0","#8d949b",2);
+  S.plugPx=plug;
+  if(!w.batt_in[k]) TX(hx+150,hy+66,d().plugHint,7,"#e8c02a");
+  TX(bx+260,by+5,d().btnCap,7,"#7b838b","e");
+}
+
+function matrixCells(){
+  const cells=[];
+  for(let i=0;i<5;i++) cells.push([0,0,0,0,0]);
+  if(!S.scroll) return cells;
+  const [txt,t0]=S.scroll;
+  let cols=[];
+  for(const ch of txt){
+    const pat=FONT5[ch]||FONT5["?"];
+    for(let c=0;c<5;c++){
+      const col=[]; for(let r=0;r<5;r++) col.push(pat[r][c]==="1"?1:0);
+      cols.push(col);
+    }
+    cols.push([0,0,0,0,0]);
+  }
+  const blank=()=>[0,0,0,0,0];
+  cols=[blank(),blank(),blank(),blank(),blank()].concat(cols,[blank(),blank(),blank(),blank(),blank()]);
+  const step=0.13;
+  const k=Math.floor((performance.now()/1000-t0)/step);
+  if(k>cols.length-5){ S.scroll=null; return cells; }
+  for(let c=0;c<5;c++){
+    const col=(k+c<cols.length)?cols[k+c]:blank();
+    for(let r=0;r<5;r++) cells[r][c]=col[r];
+  }
+  return cells;
+}
+function drawMatrix(){
+  const org=S.matrixOrg; if(!org) return;
+  const cells=matrixCells();
+  for(let r_=0;r_<5;r_++) for(let c_=0;c_<5;c_++)
+    if(cells[r_][c_])
+      R(org[0]+c_*20,org[1]+r_*17,org[0]+c_*20+8,org[1]+r_*17+12,"#ff3320",null);
+}
+
+function kindOf(cid){
+  for(const pk in PACKS) for(const [c2,nom,kd,cl] of PACKS[pk]) if(c2===cid) return [kd,cl];
+  return [null,null];
+}
+function drawResistors(){
+  for(const cid in w.placed){
+    const [h1,h2]=w.placed[cid];
+    const p1=holePos(h1), p2=holePos(h2);
+    const a=SC(p1[0],p1[1]), b=SC(p2[0],p2[1]);
+    LN([a,b],"#b9bfc6",Math.max(1,Math.round(0.16*P*S.zoom)));
+    const mx=(p1[0]+p2[0])/2, my=(p1[1]+p2[1])/2;
+    const L=Math.hypot(p2[0]-p1[0],p2[1]-p1[1]);
+    const ang=Math.atan2(p2[1]-p1[1],p2[0]-p1[0]);
+    const bl=Math.min(0.62*L,1.5*P), bw=0.34*P;
+    const [kind,col]=kindOf(cid);
+    const pts=[];
+    for(const [dx,dy] of [[-bl/2,-bw/2],[bl/2,-bw/2],[bl/2,bw/2],[-bl/2,bw/2]]){
+      const rx=mx+dx*Math.cos(ang)-dy*Math.sin(ang);
+      const ry=my+dx*Math.sin(ang)+dy*Math.cos(ang);
+      pts.push(SC(rx,ry));
+    }
+    POLY(pts, kind==="tube"?col:"#d9c39a","#5c5347",1);
+    if(kind!=="tube"){
+      for(const f of [-0.28,-0.12,0.06,0.26]){
+        const bx0=mx+f*bl*Math.cos(ang), by0=my+f*bl*Math.sin(ang);
+        const q1=SC(bx0+bw/2*Math.sin(ang), by0-bw/2*Math.cos(ang));
+        const q2=SC(bx0-bw/2*Math.sin(ang), by0+bw/2*Math.cos(ang));
+        LN([q1,q2],"#3a3f46",Math.max(1,Math.round(0.09*P*S.zoom)));
+      }
+    }
+    const t=SC(mx,my-0.62*P);
+    ctx.font=Math.max(6,Math.round(7*S.zoom))*1.33+"px ui-monospace,Consolas,monospace";
+    ctx.textAlign="center"; ctx.textBaseline="middle";
+    ctx.fillStyle="#6b7278"; ctx.fillText(cid,t[0],t[1]);
+  }
+}
+
+function drawWires(){
+  for(const key of ["vc","gnd","probe"]){
+    const h=w.cir.lead[key];
+    if(!h||!S.pinXY[key]) continue;
+    const p0=S.pinXY[key], p1=holePos(h);
+    const a=SC(p0[0],p0[1]), b=SC(p1[0],p1[1]);
+    const mid=SC((p0[0]+p1[0])/2+40,(p0[1]+p1[1])/2+60);
+    const wdt=Math.max(2,Math.round(0.16*P*S.zoom));
+    for(const [col,ww] of [[caseCol(key),wdt+3],[wireCol(key),wdt]]){
+      ctx.beginPath(); ctx.moveTo(a[0],a[1]);
+      ctx.quadraticCurveTo(mid[0],mid[1],b[0],b[1]);
+      ctx.strokeStyle=col; ctx.lineWidth=ww; ctx.lineCap="round"; ctx.stroke();
+      ctx.lineCap="butt";
+    }
+    const r=0.24*P*S.zoom;
+    OVAL(b[0]-r,b[1]-r,b[0]+r,b[1]+r,wireCol(key),"#0c1218",1);
+    ctx.font=Math.max(6,Math.round(7*S.zoom))*1.33+'px "Malgun Gothic",sans-serif';
+    ctx.textAlign="center"; ctx.textBaseline="middle";
+    ctx.fillStyle = key==="gnd"?caseCol(key):wireCol(key);
+    ctx.fillText(d().lead[key], b[0]+14, b[1]-12);
+  }
+}
+
+function drawCarry(){
+  const [px,py]=S.mouse;
+  if(w.cell_hand){
+    RPX(px+8,py-7,px+42,py+7,"#c9c2ad","#8d8674",1);
+    RPX(px+42,py-3,px+47,py+3,"#b9b2a0","#8d8674",1);
+    TXPX(px+8,py-14,d().carryCell,12,C_ACC,"w",true);
+  }
+  if(S.carry&&S.carry[0]==="res")
+    TXPX(px+16,py-14,d().carryRes(S.carry[1]),13,C_ACC,"w",true);
+  else if(S.carry&&S.carry[0]==="lead")
+    TXPX(px+16,py-14,d().carryLead(d().lead[S.carry[1]]),13,C_ACC,"w",true);
+  if(S.pending){
+    const hp=holePos(S.pending), p=SC(hp[0],hp[1]);
+    ctx.setLineDash([4,3]);
+    LN([p,[px,py]],C_ACC,2);
+    ctx.setLineDash([]);
+  }
+}
+
+function draw(){
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  ctx.fillStyle=C_BG; ctx.fillRect(0,0,CW,CH);
+  drawBench();
+  drawBreadboard();
+  drawMicrobit();
+  drawResistors();
+  drawWires();
+  drawMatrix();
+  drawCarry();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   7.  INTERACTION
+   ══════════════════════════════════════════════════════════════ */
+function say(k){ w.msg = k===null ? null : {k:k, a:Array.prototype.slice.call(arguments,1)}; }
+function inside(z,x,y){ return !!z && z[0]<=x && x<=z[2] && z[1]<=y && y<=z[3]; }
+function sz(z){ const a=SC(z[0],z[1]), b=SC(z[2],z[3]); return [a[0],a[1],b[0],b[1]]; }
+
+function mousePos(e){
+  const r=cv.getBoundingClientRect();
+  return [e.clientX-r.left, e.clientY-r.top];
+}
+
+cv.addEventListener("mousemove",e=>{
+  S.mouse=mousePos(e);
+  if(S.draggingPlug){
+    if(inside(sz(S.zoneSocket),S.mouse[0],S.mouse[1])){
+      w.batt_in[w.active]=true; S.draggingPlug=false; say("plugged");
+    }
+  }
+  if(S.lp0){
+    const dx=S.mouse[0]-S.lp0[0], dy=S.mouse[1]-S.lp0[1];
+    if(dx||dy){ S.lp0=S.mouse.slice(); S.viewTouched=true;
+      S.pan=[S.pan[0]+dx,S.pan[1]+dy]; }
+  }
+});
+cv.addEventListener("mouseleave",()=>{ S.lp0=null; S.draggingPlug=false; });
+window.addEventListener("mouseup",()=>{ S.lp0=null; cv.classList.remove("dragging"); });
+
+cv.addEventListener("mousedown",e=>{
+  if(e.button===1){ e.preventDefault(); S.lp0=mousePos(e); cv.classList.add("dragging"); return; }
+  if(e.button!==0) return;
+  const [x,y]=mousePos(e); S.mouse=[x,y];
+  const k=w.active;
+
+  if(inside(sz(S.zoneSwitch),x,y)){
+    w.switch[k]=!w.switch[k];
+    say(w.switch[k]?"swOn":"swOff");
+    return;
+  }
+  for(let c=0;c<S.zoneSlot.length;c++){
+    if(inside(sz(S.zoneSlot[c]),x,y)){
+      if(w.cells[k]>c){ w.unload_cell(k); w.cell_hand=0; say("cellOut"); }
+      else if(!w.cell_hand){ say("pickFirst"); }
+      else { w.cells[k]+=1; w.cell_hand=0; say("cellIn",w.cells[k]); }
+      return;
+    }
+  }
+  for(let c=0;c<S.zoneCell.length;c++){
+    if(!inside(sz(S.zoneCell[c]),x,y)) continue;
+    if(w.cell_hand){ w.cells_free+=1; w.cell_hand=0; say("cellDown"); }
+    else if(w.cells_free>0){ w.cells_free-=1; w.cell_hand=1; say("cellHand"); }
+    return;
+  }
+  if(inside(S.plugPx,x,y)){ S.draggingPlug=true; return; }
+  if(inside(sz(S.zoneBtnA),x,y)||inside(sz(S.zoneBtnB),x,y)){ pressButton(); return; }
+  for(const key in S.zonePin){
+    if(inside(sz(S.zonePin[key]),x,y)){
+      S.carry=["lead",key]; S.pending=null;
+      say("leadHole",key); return;
+    }
+  }
+  const h=nearestHole(x,y);
+  if(S.carry&&S.carry[0]==="lead"){
+    if(h){ w.set_lead(S.carry[1],h); say("leadTo",S.carry[1],h); S.carry=null; }
+    return;
+  }
+  if(S.carry&&S.carry[0]==="res"){
+    if(!h) return;
+    if(S.pending===null){ S.pending=h; say("secondLead"); }
+    else{
+      if(nodeOf(h)===nodeOf(S.pending)){ say("sameNode"); return; }
+      w.place(S.carry[1],S.pending,h);
+      refreshChips();
+      S.carry=null; S.pending=null; say(null);
+    }
+    return;
+  }
+  const cid=resistorAt(x,y);
+  if(cid){ w.remove(cid); refreshChips(); say("resOut",cid); return; }
+  S.lp0=[x,y]; cv.classList.add("dragging");
+});
+
+function resistorAt(px,py){
+  for(const cid in w.placed){
+    const [h1,h2]=w.placed[cid];
+    const p1=holePos(h1), p2=holePos(h2);
+    const m=SC((p1[0]+p2[0])/2,(p1[1]+p2[1])/2);
+    if(Math.abs(m[0]-px)<0.8*P*S.zoom && Math.abs(m[1]-py)<0.5*P*S.zoom) return cid;
+  }
+  return null;
+}
+
+cv.addEventListener("contextmenu",e=>{
+  e.preventDefault();
+  const [x,y]=mousePos(e);
+  if(S.carry||S.pending){ S.carry=null; S.pending=null; return; }
+  const cid=resistorAt(x,y);
+  if(cid){ w.remove(cid); refreshChips(); return; }
+  const h=nearestHole(x,y);
+  if(h){
+    for(const key in w.cir.lead){
+      if(sameHole(w.cir.lead[key],h)){
+        w.cir.lead[key]=null; say("leadOut",key); return;
+      }
+    }
+  }
+});
+
+cv.addEventListener("wheel",e=>{
+  e.preventDefault();
+  const dir = e.deltaY<0 ? 1 : -1;
+  const [x,y]=mousePos(e);
+  S.viewTouched=true;
+  const [x0,y0]=INV(x,y);
+  S.zoom=Math.max(0.5,Math.min(3.0,S.zoom*(dir>0?1.12:1/1.12)));
+  const [x1,y1]=INV(x,y);
+  S.pan[0]+=(x1-x0)*S.zoom;
+  S.pan[1]+=(y1-y0)*S.zoom;
+},{passive:false});
+
+/* touch: one finger pans, tap acts */
+let touchStart=null;
+cv.addEventListener("touchstart",e=>{
+  if(e.touches.length!==1) return;
+  const r=cv.getBoundingClientRect();
+  touchStart=[e.touches[0].clientX-r.left, e.touches[0].clientY-r.top, Date.now()];
+  S.mouse=[touchStart[0],touchStart[1]];
+},{passive:true});
+cv.addEventListener("touchmove",e=>{
+  if(e.touches.length!==1||!touchStart) return;
+  e.preventDefault();
+  const r=cv.getBoundingClientRect();
+  const x=e.touches[0].clientX-r.left, y=e.touches[0].clientY-r.top;
+  S.viewTouched=true;
+  S.pan=[S.pan[0]+(x-S.mouse[0]), S.pan[1]+(y-S.mouse[1])];
+  S.mouse=[x,y];
+  touchStart[3]=true;
+},{passive:false});
+cv.addEventListener("touchend",e=>{
+  if(touchStart && !touchStart[3] && Date.now()-touchStart[2]<400){
+    cv.dispatchEvent(new MouseEvent("mousedown",{
+      button:0, clientX:touchStart[0]+cv.getBoundingClientRect().left,
+      clientY:touchStart[1]+cv.getBoundingClientRect().top}));
+  }
+  touchStart=null;
+},{passive:true});
+
+function pressButton(){
+  const k=w.active;
+  if(w.cells[k]<2){ say("needCells",w.cells[k]); return; }
+  if(!w.batt_in[k]){ say("notPlugged"); return; }
+  const r=w.measure();
+  if(r==="off"){ say("off"); return; }
+  if(r==="nowire"){ say("nowire"); return; }
+  if(r==="dead"){ say("dead"); S.scroll=["Err",performance.now()/1000]; return; }
+  if(r==="short"){
+    S.scroll=["Err",performance.now()/1000];
+    say("short"); askSpare(); return;
+  }
+  S.lastReading=r;
+  S.scroll=[String(r),performance.now()/1000];
+}
+function askSpare(){
+  if(w.spare_used){ alert(d().m.spareOnce); return; }
+  if(confirm(d().m.askSpare)){
+    w.spare_used=true; w.dev.dead=false; say("gotSpare");
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   8.  SIDE PANEL
+   ══════════════════════════════════════════════════════════════ */
+function chipLabel(cid,nom,kind){
+  if(kind==="tube") return d().unknown;
+  if(nom>=1000) return (nom/1000)+" k";
+  return ""+nom;
+}
+function buildPacks(){
+  const box=$("packBox"); box.innerHTML="";
+  for(const key of ["A","B","C","D"]){
+    const lab=document.createElement("div");
+    lab.className="packlab"; lab.textContent=d().packs[key];
+    box.appendChild(lab);
+    const grid=document.createElement("div"); grid.className="chips";
+    for(const [cid,nom,kind,col] of PACKS[key]){
+      const b=document.createElement("button");
+      b.textContent=chipLabel(cid,nom,kind);
+      b.title=cid;
+      b.dataset.cid=cid;
+      if(kind==="tube"&&col) b.style.background=col;
+      b.onclick=()=>takeResistor(cid);
+      grid.appendChild(b);
+    }
+    box.appendChild(grid);
+  }
+  refreshChips();
+}
+function refreshChips(){
+  document.querySelectorAll("#packBox button").forEach(b=>{
+    b.classList.toggle("placed", !!w.placed[b.dataset.cid]);
+  });
+}
+function takeResistor(cid){
+  if(w.placed[cid]){ say("already"); return; }
+  S.carry=["res",cid]; S.pending=null; say("firstLead");
+}
+
+function statusText(){
+  const L=[];
+  const miss=["vc","gnd","probe"].filter(k=>!w.cir.lead[k]).map(k=>d().lead[k]);
+  if(miss.length) L.push(d().stMiss(miss.join(", ")));
+  if(w.cells[w.active]<2) L.push(d().stCells(w.cells[w.active],w.cells_free));
+  else if(!w.batt_in[w.active]) L.push(d().stPlug);
+  else if(!w.switch[w.active]) L.push(d().stSwitch);
+  if(w.dev.dead) L.push(d().stDead);
+  L.push(d().stCheck);
+  if(w.msg){
+    const f=d().m[w.msg.k];
+    L.push("• "+(typeof f==="function" ? f.apply(null,w.msg.a) : f));
+  }
+  return L;
+}
+function renderStatus(){
+  const box=$("status");
+  const L=statusText();
+  box.innerHTML="";
+  for(const line of L){
+    const el=document.createElement("div"); el.textContent=line; box.appendChild(el);
+  }
+}
+
+document.querySelectorAll('input[name="dev"]').forEach(r=>{
+  r.onchange=()=>{
+    w.active=parseInt(r.value,10);
+    say("swapped",w.active+1);
+  };
+});
+$("btnFit").onclick=()=>{ S.viewTouched=false; fit(true); };
+
+/* ══════════════════════════════════════════════════════════════
+   9.  LANGUAGE
+   ══════════════════════════════════════════════════════════════ */
+function applyLang(){
+  const t=d();
+  document.documentElement.lang=lang;
+  $("t-title").textContent=t.title;
+  $("t-sub").textContent=t.sub;
+  $("t-benchcap").textContent=t.benchcap;
+  $("t-h-kit").textContent=t.hKit;
+  $("t-h-packs").textContent=t.hPacks;
+  $("t-h-view").textContent=t.hView;
+  for(let i=0;i<3;i++) $("t-dev"+i).textContent=t.dev(i);
+  $("t-kithint").textContent=t.kithint;
+  $("t-viewhint").textContent=t.viewhint;
+  $("btnFit").textContent=t.fit;
+  $("btn-ko").className = lang==="ko"?"on":"";
+  $("btn-en").className = lang==="en"?"on":"";
+  document.title = lang==="ko"
+    ? "APhO 2026 E2 — Micro:bit ADC로 미지 저항 추정 · HaslaLab"
+    : "APhO 2026 E2 — Unknown Resistance with the Micro:bit ADC · HaslaLab";
+  buildPacks();
+  renderStatus();
+}
+$("btn-ko").onclick=()=>{ lang="ko"; applyLang(); };
+$("btn-en").onclick=()=>{ lang="en"; applyLang(); };
+
+/* ══════════════════════════════════════════════════════════════
+   10.  MAIN LOOP
+   ══════════════════════════════════════════════════════════════ */
+let statusTick=0;
+function tick(){
+  draw();
+  if(++statusTick%6===0) renderStatus();
+  requestAnimationFrame(tick);
+}
+
+window.addEventListener("resize",layout);
+layout(); applyLang(); requestAnimationFrame(tick);
+</script>
+</body>
+</html>

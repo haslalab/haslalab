@@ -789,6 +789,8 @@ $("tab-b" ).onclick=()=>setTab("b");
 function applyLang(){
   const d=T[lang];
   document.documentElement.lang=lang;
+  $("lang-ko").className = lang==="ko"?"on":"";
+  $("lang-en").className = lang==="en"?"on":"";
   $("t-title").textContent=d.title; $("t-sub").textContent=d.sub;
   $("tab-a1").textContent=d.tabA1; $("tab-a2").textContent=d.tabA2; $("tab-b").textContent=d.tabB;
 
@@ -826,8 +828,6 @@ function applyLang(){
   $("t-cap4").textContent=d.cap4; $("t-cap5").textContent=d.cap5;
   $("t-caphead").textContent=d.capHead;
 
-  $("lang-ko").className = lang==="ko"?"on":"";
-  $("lang-en").className = lang==="en"?"on":"";
   buildRodSeg(); renderA1(); renderLaps();
 }
 $("lang-ko").onclick=()=>{lang="ko";applyLang();};
@@ -848,14 +848,14 @@ function loop(now){
       meterStep(S.mAcc); S.mAcc=0;
       const sat = Math.abs(S.reading)>=METER_FS;
       $("dispB").className="disp";
-      $("dispB").innerHTML=`<small>${T[lang].field}</small>`+
+      $("dispB").innerHTML=`<small id="t-field">${T[lang].field}</small>`+
         (sat?"  O L  ":`${(S.reading*1e3).toFixed(1)} mT`);
       $("meterState").textContent = sat ? T[lang].overRange
                                         : (S.settling?T[lang].settling:"");
     }else if(!S.meterOn){
       S.mAcc=0;
       $("dispB").className="disp off";
-      $("dispB").innerHTML=`<small>${T[lang].field}</small>-- OFF --`;
+      $("dispB").innerHTML=`<small id="t-field">${T[lang].field}</small>-- OFF --`;
       $("meterState").textContent=""; S.shown=meterTarget();
     }
     drawA1();
@@ -863,7 +863,7 @@ function loop(now){
 
   if(S.tab==="a2"){
     if(S.swRun) S.swVal=S.simT-S.swT0;
-    $("swDisp").innerHTML=`<small>${T[lang].sw}</small>${S.swVal.toFixed(2)} s`;
+    $("swDisp").innerHTML=`<small id="t-sw">${T[lang].sw}</small>${S.swVal.toFixed(2)} s`;
     drawFront(); drawTop("cvTop",zNow(),"cap3");
   }
 
