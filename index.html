@@ -692,18 +692,28 @@ const DATA={
   years:[
    {y:2026,host:{ko:"대한민국 · 부산",en:"Busan, South Korea"},cc:"kr",
     problems:[
-      {id:"E1", en:"Water Clock Experiment", ko:"물시계 실험", state:"wip", hold:true,
+      {id:"E1",
+       title:{ko:"물시계 실험",en:"Water Clock Experiment"},
+       desc:{ko:"탱크와 받침대를 직접 조립해 수평을 맞추고, 사이펀 펌프로 물을 채운 뒤 수위가 내려가는 시간을 스톱워치로 재어 유출 법칙을 찾습니다.",
+             en:"Build the tanks on the stand, level them, fill with the siphon pump, and time the falling water level with the stopwatch to find the outflow law."},
+       tags:["유체","시간측정","곡선맞춤"], tagsEn:["Fluids","Timing","Curve fit"],
+       /* pdf·sol : 문제지 정리되면 아래 두 줄을 되살린다
+              pdf:{ko:"pdf/APhO_2026_E1_KO.pdf", en:"pdf/APhO_2026_E1_EN.pdf"},
+              sol:"pdf/APhO_2026_S1.pdf"                                        */
        files:{sim:"sim/apho2026_E1_web.html",
               exe:{ko:REL+"v1.0/APhO2026_E1_sim_KO.exe", en:REL+"v1.0/APhO2026_E1_sim_EN.exe"},
-              src:{ko:"src/apho2026_E1_sim_KO.py", en:"src/apho2026_E1_sim_EN.py"},
-              pdf:{ko:"pdf/APhO_2026_E1_KO.pdf", en:"pdf/APhO_2026_E1_EN.pdf"},
-              sol:"pdf/APhO_2026_S1.pdf"}},
-      {id:"E2", en:"Estimation of Unknown Resistance", ko:"미지 저항의 추정", state:"wip", hold:true,
+              src:{ko:"src/apho2026_E1_sim_KO.py", en:"src/apho2026_E1_sim_EN.py"}}},
+      {id:"E2",
+       title:{ko:"미지 저항의 추정",en:"Estimation of Unknown Resistance"},
+       desc:{ko:"브레드보드에 분압 회로를 꾸미고, micro:bit의 5×5 LED에 흘러가는 ADC 정수 하나만 읽어 미지 저항값을 추정합니다.",
+             en:"Wire a divider on the breadboard and estimate the unknown resistors from the single ADC integer the micro:bit scrolls across its 5×5 LED matrix."},
+       tags:["전기회로","ADC","분압"], tagsEn:["Circuits","ADC","Voltage divider"],
+       /* pdf·sol : 문제지 정리되면 아래 두 줄을 되살린다
+              pdf:{ko:"pdf/APhO_2026_E2_KO.pdf", en:"pdf/APhO_2026_E2_EN.pdf"},
+              sol:"pdf/APhO_2026_S2.pdf"                                        */
        files:{sim:"sim/apho2026_E2_web.html",
               exe:{ko:REL+"v1.0/APhO2026_E2_sim_KO.exe", en:REL+"v1.0/APhO2026_E2_sim_EN.exe"},
-              src:{ko:"src/apho2026_E2_sim_KO.py", en:"src/apho2026_E2_sim_EN.py"},
-              pdf:{ko:"pdf/APhO_2026_E2_KO.pdf", en:"pdf/APhO_2026_E2_EN.pdf"},
-              sol:"pdf/APhO_2026_S2.pdf"}}
+              src:{ko:"src/apho2026_E2_sim_KO.py", en:"src/apho2026_E2_sim_EN.py"}}}
     ]},
    {y:2025,host:{ko:"사우디아라비아 · 다란",en:"Dhahran, Saudi Arabia"},cc:"sa",
     problems:[
@@ -898,11 +908,17 @@ const DATA={
 let lang = new URLSearchParams(location.search).get("lang");
 if(lang!=="ko" && lang!=="en") lang = "ko";
 
+/* the toggle is painted from `lang`, never from the click, so a page opened
+   straight at ?lang=en lights the right button too */
+function paintLang(){
+  document.getElementById("lang-ko").setAttribute("aria-pressed", lang==="ko");
+  document.getElementById("lang-en").setAttribute("aria-pressed", lang==="en");
+}
+
 function setLang(next){
   lang = next;
   document.documentElement.lang = lang;
-  document.getElementById("lang-ko").setAttribute("aria-pressed", lang==="ko");
-  document.getElementById("lang-en").setAttribute("aria-pressed", lang==="en");
+  paintLang();
   /* Keep the choice in the address bar so a refresh or a shared link holds it.
      Some embedded frames refuse history writes, so this must never be able to
      stop the re-render below. */
@@ -914,6 +930,7 @@ function setLang(next){
 }
 document.getElementById("lang-ko").onclick=()=>setLang("ko");
 document.getElementById("lang-en").onclick=()=>setLang("en");
+paintLang();
 
 /* a host country gets its flag; a year run by an institution gets its badge */
 const flagImg = (cc,cls="flag",org=null) =>
