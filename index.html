@@ -501,7 +501,7 @@ ko:{
       {y:"2025", n:"ESF",   sub:"동아시아 고교생 지구과학 페스티벌", medal:"bronze", label:"동메달"}
     ]},
   tComps:"대회", tYears:"수록 연도", tProbs:"실험 문제", tLive:"공개됨",
-  tallyNote:"실험 라운드 문제만 모읍니다. 이론 문제는 다루지 않습니다.",
+  tallyNote:"실험 라운드 문제만 모읍니다. 이론 문제는 시뮬레이터가 딸린 것만 싣습니다.",
   expN:"실험 {n}문제", noPapers:"실험 자료 없음",
   ebComps:"수록 대회", hComps:"대회를 고르세요",
   pComps:"연도를 고르고, 그 해의 실험 문제를 여세요.",
@@ -547,7 +547,7 @@ en:{
       {y:"2025", n:"ESF",   sub:"East Asia High School Earth Science Festival", medal:"bronze", label:"Bronze"}
     ]},
   tComps:"Competitions", tYears:"Years", tProbs:"Experimental problems", tLive:"Published",
-  tallyNote:"Experimental rounds only. Theory problems are out of scope.",
+  tallyNote:"Experimental rounds only. A theory problem is listed when it ships with a simulator.",
   expN:"{n} experimental", noPapers:"no experimental papers",
   ebComps:"Covered competitions", hComps:"Choose a competition",
   pComps:"Pick a year, then open that year's experimental problems.",
@@ -1515,7 +1515,138 @@ const SIG_S26E1={
     c.textAlign="left";
   }};
 
-const ALL_SIGS=[SIG_I17E1,SIG_I17E2,SIG_A23E1,SIG_A23E2,SIG_S25T1,SIG_S26E1];
+/* ── APhO 2026 E1 · tank A emptying itself through the 5 mm hole ─ */
+const SIG_A26E1={
+  sim:"sim/apho2026_E1_web.html", tag:"APhO 2026 E1", span:120, rate:8,
+  capL:{ko:"물시계 · 탱크 A 수위 (5 mm 구멍)",en:"Water clock · level in tank A (5 mm hole)"},
+  capR:{ko:"경과",en:"elapsed"},
+  read:t=>mmss(Math.min(t,120)),
+  paint(c,w,h,t){
+    /* the bench's own tank — 10 x 10 cm, a 5 mm hole, Cd = 0.8 — draining
+       by Torricelli until the meniscus holds the last few millimetres */
+    const G=981, A_T=10.0*10.0, D=0.5, A_H=Math.PI*(D/2)*(D/2), CD=0.8;
+    const H0=13.0, H_STOP=72.0/(G*(D/2)), TMAX=120, VMAX=14;
+    const K=CD*A_H*Math.sqrt(2*G)/(2*A_T);
+    const lev=x=>{const r=Math.sqrt(H0)-K*x; return Math.max(r>0?r*r:0,H_STOP);};
+    const pad=16, padL=36, padB=22;
+    const X=u=>padL+u/TMAX*(w-padL-pad);
+    const Y=v=>h-padB-v/VMAX*(h-padB-pad);
+    c.fillStyle="#fff"; c.fillRect(0,0,w,h);
+    PEN(c,"#DCE7F0",.5); c.beginPath();
+    for(let u=0;u<=TMAX;u+=10){c.moveTo(X(u),pad);c.lineTo(X(u),h-padB);}
+    for(let v=0;v<=VMAX+1e-9;v+=1){c.moveTo(padL,Y(v));c.lineTo(w-pad,Y(v));}
+    c.stroke();
+    PEN(c,"#B4CADC",1); c.beginPath();
+    c.moveTo(padL,Y(0)); c.lineTo(w-pad,Y(0));
+    c.moveTo(padL,pad);  c.lineTo(padL,h-padB); c.stroke();
+    /* the thirteen marks engraved on the front wall */
+    PEN(c,"#9FB6C8",1.3); c.beginPath();
+    for(let m=1;m<=13;m++){c.moveTo(padL,Y(m));c.lineTo(padL+(m%5===0?13:8),Y(m));}
+    c.stroke();
+    /* below this the hole stops giving: surface tension holds the rest */
+    PEN(c,"#98A6B4",1); c.setLineDash([3,4]); c.beginPath();
+    c.moveTo(padL,Y(H_STOP)); c.lineTo(w-pad,Y(H_STOP)); c.stroke(); c.setLineDash([]);
+    const tt=Math.min(t,TMAX), N=600;
+    PEN(c,"#2c6f9b",2.2); c.beginPath();
+    for(let i=0;i<=N;i++){const x=tt*i/N;
+      i?c.lineTo(X(x),Y(lev(x))):c.moveTo(X(x),Y(lev(x)));}
+    c.stroke();
+    c.fillStyle="#2c6f9b"; c.beginPath(); c.arc(X(tt),Y(lev(tt)),3.2,0,7); c.fill();
+    c.fillStyle="#8A99A8"; c.font="9.5px IBM Plex Mono,ui-monospace,monospace";
+    c.textAlign="center";
+    for(let u=30;u<=TMAX;u+=30) c.fillText(u+" s",X(u),h-7);
+    c.textAlign="right";
+    for(let v=0;v<=12;v+=4) c.fillText(v+" cm",padL-5,Y(v)+3);
+    c.textAlign="left";
+  }};
+
+/* ── APhO 2026 E2 · the one number the kit gives, scrolled on the LEDs ── */
+const MB_FONT={
+  "0":["111","101","101","101","111"], "1":["010","110","010","010","111"],
+  "2":["111","001","111","100","111"], "3":["111","001","111","001","111"],
+  "4":["101","101","111","001","001"], "5":["111","100","111","001","111"],
+  "6":["111","100","111","101","111"], "7":["111","001","001","010","010"],
+  "8":["111","101","111","101","111"], "9":["111","101","111","001","111"]};
+/* a 3.3 kΩ reference against three of the resistors in the kit */
+const MB_REF=3300, MB_R=[6800,560,4700];
+const MB_STREAM=(()=>{
+  const cols=[], own=[];
+  MB_R.forEach((R,vi)=>{
+    const code=Math.round(1023*R/(R+MB_REF));
+    for(let k=0;k<5;k++){ cols.push([0,0,0,0,0]); own.push(vi); }
+    for(const ch of String(code)){
+      const g=MB_FONT[ch];
+      for(let x=0;x<3;x++){
+        const col=[]; for(let y=0;y<5;y++) col.push(g[y][x]==="1"?1:0);
+        cols.push(col); own.push(vi);
+      }
+      cols.push([0,0,0,0,0]); own.push(vi);
+    }
+  });
+  return {cols, own, code:MB_R.map(R=>Math.round(1023*R/(R+MB_REF)))};
+})();
+const MB_COLT=0.17;                        /* micro:bit scrolls a column at a time */
+const SIG_A26E2={
+  sim:"sim/apho2026_E2_web.html", tag:"APhO 2026 E2", span:MB_STREAM.cols.length*MB_COLT, rate:1,
+  capL:{ko:"micro:bit · 5×5 LED에 흘러가는 ADC 값",en:"micro:bit · the ADC integer, scrolled on the 5×5 LEDs"},
+  capR:{ko:"ADC 값",en:"ADC value"},
+  read(t){ const n=MB_STREAM.cols.length, i=Math.floor(t/MB_COLT)%n;
+           return String(MB_STREAM.code[MB_STREAM.own[(i+2)%n]])+" / 1023"; },
+  paint(c,w,h,t){
+    const n=MB_STREAM.cols.length, idx=Math.floor(t/MB_COLT)%n;
+    c.fillStyle="#fff"; c.fillRect(0,0,w,h);
+    /* the board, drawn in the proportions the simulator itself uses */
+    const MW=188, MH=152, S=Math.min((w-44)/MW,(h-26)/MH);
+    const bx=(w-MW*S)/2, by=(h-MH*S)/2;
+    const X=u=>bx+u*S, Y=v=>by+v*S;
+    const box=(x,y,ww,hh,fill,stroke,lw)=>{
+      c.beginPath(); c.rect(X(x),Y(y),ww*S,hh*S);
+      if(fill){c.fillStyle=fill;c.fill();}
+      if(stroke){PEN(c,stroke,lw||1);c.stroke();}};
+    box(0,0,MW,MH,"#23262b","#111417",1.4);
+    /* the gold tabs and the reset ring along the top edge */
+    c.fillStyle="#f2b826";
+    for(let k=0;k<3;k++){ const x0=30+k*20;
+      c.beginPath(); c.moveTo(X(x0),Y(0)); c.lineTo(X(x0+16),Y(0));
+      c.lineTo(X(x0+8),Y(15)); c.closePath(); c.fill(); }
+    PEN(c,"#d8a72a",1.6); c.beginPath();
+    c.ellipse(X(MW/2),Y(29),17*S,9*S,0,0,7); c.stroke();
+    c.fillStyle="#d8a72a";
+    for(const dx of [-8,8]){ c.beginPath(); c.arc(X(MW/2+dx),Y(29),3*S,0,7); c.fill(); }
+    /* the 5 x 5 matrix — the only display the kit has */
+    for(let cx=0;cx<5;cx++) for(let ry=0;ry<5;ry++){
+      const on=MB_STREAM.cols[(idx+cx)%n][ry];
+      if(on){ c.fillStyle="#ff3320"; c.shadowColor="rgba(255,51,32,.75)"; c.shadowBlur=3*S; }
+      else  { c.fillStyle="#4a2018"; c.shadowBlur=0; }
+      c.fillRect(X(MW/2-44+cx*20),Y(46+ry*17),8*S,12*S);
+    }
+    c.shadowBlur=0;
+    /* buttons A and B */
+    c.textAlign="center"; c.textBaseline="middle";
+    c.font=(8*S|0)+"px IBM Plex Mono,ui-monospace,monospace";
+    for(const [dx,lab] of [[14,"A"],[MW-34,"B"]]){
+      box(dx,62,20,20,"#c9ced4","#7d848a",1.6);
+      box(dx+5,67,10,10,"#8d949b",null);
+      c.fillStyle="#f2b826"; c.beginPath();
+      c.moveTo(X(dx+2),Y(88)); c.lineTo(X(dx+18),Y(88)); c.lineTo(X(dx+10),Y(96));
+      c.closePath(); c.fill();
+      c.fillStyle="#23262b"; c.fillText(lab,X(dx+10),Y(91));
+    }
+    /* the gold edge connector */
+    box(0,MH-22,MW,22,"#c9a227","#8a6f18",1);
+    c.fillStyle="#e0bd45";
+    for(let k=0;k<28;k++) c.fillRect(X(6+k*6.4),Y(MH-20),3*S,20*S);
+    c.font=(7*S|0)+"px IBM Plex Mono,ui-monospace,monospace";
+    ["0","1","2","3V","G"].forEach((lab,k)=>{
+      const cxp=12+k*(MW-24)/4;
+      PEN(c,"#8a6f18",1.6); c.beginPath();
+      c.ellipse(X(cxp),Y(MH-10),9*S,9*S,0,0,7); c.stroke();
+      c.fillStyle="#5c4a10"; c.fillText(lab,X(cxp),Y(MH-10));
+    });
+    c.textBaseline="alphabetic"; c.textAlign="left";
+  }};
+
+const ALL_SIGS=[SIG_I17E1,SIG_I17E2,SIG_A23E1,SIG_A23E2,SIG_S25T1,SIG_S26E1,SIG_A26E1,SIG_A26E2];
 
 /* only the ones the site actually publishes a browser build for */
 function liveSigs(){
