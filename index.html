@@ -501,7 +501,7 @@ ko:{
       {y:"2025", n:"ESF",   sub:"동아시아 고교생 지구과학 페스티벌", medal:"bronze", label:"동메달"}
     ]},
   tComps:"대회", tYears:"수록 연도", tProbs:"실험 문제", tLive:"공개됨",
-  tallyNote:"실험 라운드 문제만 모읍니다. 이론 문제는 시뮬레이터가 딸린 것만 싣습니다.",
+  tallyNote:"실험 문제만 모읍니다.",
   expN:"실험 {n}문제", noPapers:"실험 자료 없음",
   ebComps:"수록 대회", hComps:"대회를 고르세요",
   pComps:"연도를 고르고, 그 해의 실험 문제를 여세요.",
@@ -510,7 +510,7 @@ ko:{
   years:"연도", problems:"실험 문제", pickYear:"연도를 고르세요",
   pickProb:"실험 문제를 고르세요",
   host:"개최", noHost:"확인 필요",
-  live:"브라우저 실행", dlOnly:"다운로드", wip:"준비 중", theoryTag:"이론 · 시뮬레이터 필요",
+  live:"브라우저 실행", dlOnly:"다운로드", srcOnly:"파이썬 소스", wip:"준비 중", theoryTag:"이론 · 시뮬레이터 필요",
   soonTitle:"준비 중", soonDesc:"문제지 정리와 물리 모델 보정을 진행하고 있습니다.",
   actRun:"브라우저에서 실행", actExe:"Windows 내려받기", actPdf:"문제지",
   langTag:{ko:"KO",en:"EN"},
@@ -547,7 +547,7 @@ en:{
       {y:"2025", n:"ESF",   sub:"East Asia High School Earth Science Festival", medal:"bronze", label:"Bronze"}
     ]},
   tComps:"Competitions", tYears:"Years", tProbs:"Experimental problems", tLive:"Published",
-  tallyNote:"Experimental rounds only. A theory problem is listed when it ships with a simulator.",
+  tallyNote:"Experimental problems only.",
   expN:"{n} experimental", noPapers:"no experimental papers",
   ebComps:"Covered competitions", hComps:"Choose a competition",
   pComps:"Pick a year, then open that year's experimental problems.",
@@ -556,7 +556,7 @@ en:{
   years:"years", problems:"Experimental problems", pickYear:"Choose a year",
   pickProb:"Choose a problem",
   host:"Host", noHost:"to be confirmed",
-  live:"Runs in browser", dlOnly:"Download", wip:"In preparation", theoryTag:"theory · needs a simulator",
+  live:"Runs in browser", dlOnly:"Download", srcOnly:"Python source", wip:"In preparation", theoryTag:"theory · needs a simulator",
   soonTitle:"In preparation", soonDesc:"Paper transcription and model calibration under way.",
   actRun:"Run in browser", actExe:"Download for Windows", actPdf:"Problem sheet",
   actSol:"Solution & marking scheme", actSrc:"Python source",
@@ -590,7 +590,29 @@ const DATA={
    {y:2025,host:{ko:"프랑스 · 파리",en:"Paris, France"},cc:"fr",problems:wip("Earth's magnetic field measurement","Sand craters and dunes")},
    {y:2024,host:{ko:"이란 · 이스파한",en:"Isfahan, Iran"},cc:"ir",problems:wip("Heat Conduction in a Copper Rod","Diffraction from Phase Steps")},
    {y:2023,host:{ko:"일본 · 도쿄",en:"Tokyo, Japan"},cc:"jp",problems:wip("Mass Measurement","Birefringence")},
-   {y:2022,host:{ko:"스위스 · 온라인",en:"Switzerland, online"},cc:"ch",problems:wip("Planet","Cylindrical Diode")},
+   {y:2022,host:{ko:"스위스 · 온라인",en:"Switzerland, online"},cc:"ch",
+    problems:[
+      {id:"E1",
+       title:{ko:"행성",en:"Planet"},
+       desc:{ko:"탑 높이와 공의 반지름·밀도를 입력해 낙하를 관측하고, 그 행성의 중력과 대기를 알아냅니다. 주최측 원본 프로그램과 같은 프롬프트를 그대로 따릅니다.",
+             en:"Set the tower height and the ball's radius and density, watch it fall, and pin down the planet's gravity and air. Same prompts as the organisers' own program."},
+       tags:["역학","유체저항","터미널"], tagsEn:["Mechanics","Drag","Terminal"],
+       files:{sim:"sim/ipho2022_E1_web.html",
+              exe:{ko:REL+"v1.0/IPhO2022_E1_sim_EN.exe", en:REL+"v1.0/IPhO2022_E1_sim_EN.exe"},
+              src:{ko:"src/ipho2022_E1_planet_sim.py", en:"src/ipho2022_E1_planet_sim.py"},
+              pdf:{ko:"pdf/IPhO_2022_E_KO.pdf", en:"pdf/IPhO_2022_E_EN.pdf"},
+              sol:"pdf/IPhO_2022_S.pdf"}},
+      {id:"E2",
+       title:{ko:"원통형 다이오드",en:"Cylindrical Diode"},
+       desc:{ko:"원통형 다이오드에 전압을 걸어 전류를 재고, 자기장을 걸어 전자의 궤적이 끊기는 지점에서 비전하를 구합니다.",
+             en:"Bias the cylindrical diode, read the current, then add a field and find where the electron orbits are cut off — that gives e/m."},
+       tags:["전자기","진공관","비전하"], tagsEn:["Electromagnetism","Vacuum tube","e/m"],
+       files:{sim:"sim/ipho2022_E2_web.html",
+              exe:{ko:REL+"v1.0/IPhO2022_E2_sim_EN.exe", en:REL+"v1.0/IPhO2022_E2_sim_EN.exe"},
+              src:{ko:"src/ipho2022_E2_diode_sim.py", en:"src/ipho2022_E2_diode_sim.py"},
+              pdf:{ko:"pdf/IPhO_2022_E_KO.pdf", en:"pdf/IPhO_2022_E_EN.pdf"},
+              sol:"pdf/IPhO_2022_S.pdf"}}
+    ]},
    {y:2021,host:{ko:"리투아니아 · 빌뉴스, 온라인",en:"Vilnius, Lithuania, online"},cc:"lt",problems:wip("Non-ideal Capacitors","LEDs")},
    {y:2020,host:{ko:"IdPhO · MIPT 주관, 온라인",en:"IdPhO · organised by MIPT, online"},
     org:{abbr:"MIPT",name:"Moscow Institute of Physics and Technology"},
@@ -648,7 +670,7 @@ const DATA={
       tags:["자기학","반자성 부상","감쇠진동"], tagsEn:["Magnetism","Diamagnetic levitation","Damped oscillation"],
       files:{
         sim:"sim/ipho2017_E2_web.html",
-        exe:{ko:REL+"v1.0/IPhO2017_E2_sim_KO.exe", en:REL+"v1.0/IPhO2017_E2_sim_EN.exe"},
+        exe:{ko:REL+"v1.0/IPhO2017_E2_Sim_KO.exe", en:REL+"v1.0/IPhO2017_E2_Sim_EN.exe"},
         src:{ko:"src/ipho2017_E2_pdl_sim_KO.py", en:"src/ipho2017_E2_pdl_sim_EN.py"},
         pdf:{ko:"pdf/IPhO_2017_E2_KO.pdf", en:"pdf/IPhO_2017_E2_EN.pdf"},
         sol:"pdf/IPhO_2017_S2.pdf"
@@ -660,18 +682,26 @@ const DATA={
    {y:2012,host:{ko:"에스토니아 · 타르투, 탈린",en:"Tartu and Tallinn, Estonia"},cc:"ee",problems:wip("The Magnetic Permeability of Water","Nonlinear Black Box")},
    {y:2011,host:{ko:"태국 · 방콕",en:"Bangkok, Thailand"},cc:"th",
     problems:[
-      {id:"E1", en:"Blackbox: Capacitive Displacement Sensor", ko:"블랙박스: 정전용량 변위 센서", state:"wip", hold:true,
+      {id:"E1",
+       title:{ko:"블랙박스: 정전용량 변위 센서",en:"Blackbox: Capacitive Displacement Sensor"},
+       desc:{ko:"단자 몇 개만 나와 있는 상자에 신호를 넣고 응답을 재어, 안에 무엇이 어떻게 연결되어 있는지 알아냅니다.",
+             en:"Drive the few terminals a sealed box offers, read what comes back, and work out what is inside it and how it is wired."},
+       tags:["전기회로","블랙박스","임피던스"], tagsEn:["Circuits","Black box","Impedance"],
        files:{sim:"sim/ipho2011_E1_web.html",
               exe:{ko:REL+"v1.0/IPhO2011_E1_sim_KO.exe", en:REL+"v1.0/IPhO2011_E1_sim_EN.exe"},
               src:{ko:"src/ipho2011_E1_sim_KO.py", en:"src/ipho2011_E1_sim_EN.py"},
-              pdf:{ko:"pdf/IPhO_2011_E1_KO.pdf", en:"pdf/IPhO_2011_E1_EN.pdf"},
-              sol:"pdf/IPhO_2011_S1.pdf"}},
-      {id:"E2", en:"Mechanical Blackbox: A Cylinder with a Ball Inside", ko:"역학 블랙박스: 공이 든 원통", state:"wip", hold:true,
+              pdf:{en:"pdf/IPhO_2011_E_EN.pdf"},
+              sol:"pdf/IPhO_2011_S.pdf"}},
+      {id:"E2",
+       title:{ko:"역학 블랙박스: 공이 든 원통",en:"Mechanical Blackbox: A Cylinder with a Ball Inside"},
+       desc:{ko:"굴리고 기울이고 흔들어 보는 것만으로, 막힌 원통 속 공의 크기와 질량, 그리고 원통의 내부 구조를 알아냅니다.",
+             en:"Roll it, tilt it, shake it — nothing else — and pin down the ball inside the sealed cylinder and the shape of its cavity."},
+       tags:["역학","관성모멘트","블랙박스"], tagsEn:["Mechanics","Moment of inertia","Black box"],
        files:{sim:"sim/ipho2011_E2_web.html",
               exe:{ko:REL+"v1.0/IPhO2011_E2_sim_KO.exe", en:REL+"v1.0/IPhO2011_E2_sim_EN.exe"},
               src:{ko:"src/ipho2011_E2_sim_KO.py", en:"src/ipho2011_E2_sim_EN.py"},
-              pdf:{ko:"pdf/IPhO_2011_E2_KO.pdf", en:"pdf/IPhO_2011_E2_EN.pdf"},
-              sol:"pdf/IPhO_2011_S2.pdf"}}
+              pdf:{en:"pdf/IPhO_2011_E_EN.pdf"},
+              sol:"pdf/IPhO_2011_S.pdf"}}
     ]},
    {y:2010,host:{ko:"크로아티아 · 자그레브",en:"Zagreb, Croatia"},cc:"hr",problems:wip("Elasticity of Sheets","Forces between Magnets")},
    {y:2009,host:{ko:"멕시코 · 메리다",en:"Mérida, Mexico"},cc:"mx",problems:wip("Wavelength of a Diode Laser","Birefringence of Mica")},
@@ -701,7 +731,7 @@ const DATA={
               pdf:{ko:"pdf/APhO_2026_E1_KO.pdf", en:"pdf/APhO_2026_E1_EN.pdf"},
               sol:"pdf/APhO_2026_S1.pdf"                                        */
        files:{sim:"sim/apho2026_E1_web.html",
-              exe:{ko:REL+"v1.0/APhO2026_E1_sim_KO.exe", en:REL+"v1.0/APhO2026_E1_sim_EN.exe"},
+              exe:{ko:REL+"v1.0/APhO2026_E1_WaterClock_KO.exe", en:REL+"v1.0/APhO2026_E1_WaterClock_EN.exe"},
               src:{ko:"src/apho2026_E1_sim_KO.py", en:"src/apho2026_E1_sim_EN.py"}}},
       {id:"E2",
        title:{ko:"미지 저항의 추정",en:"Estimation of Unknown Resistance"},
@@ -712,7 +742,7 @@ const DATA={
               pdf:{ko:"pdf/APhO_2026_E2_KO.pdf", en:"pdf/APhO_2026_E2_EN.pdf"},
               sol:"pdf/APhO_2026_S2.pdf"                                        */
        files:{sim:"sim/apho2026_E2_web.html",
-              exe:{ko:REL+"v1.0/APhO2026_E2_sim_KO.exe", en:REL+"v1.0/APhO2026_E2_sim_EN.exe"},
+              exe:{ko:REL+"v1.0/APhO2026_E2_MicrobitADC_KO.exe", en:REL+"v1.0/APhO2026_E2_MicrobitADC_EN.exe"},
               src:{ko:"src/apho2026_E2_sim_KO.py", en:"src/apho2026_E2_sim_EN.py"}}}
     ]},
    {y:2025,host:{ko:"사우디아라비아 · 다란",en:"Dhahran, Saudi Arabia"},cc:"sa",
@@ -747,13 +777,55 @@ const DATA={
       tags:["광학","간섭","열변형"], tagsEn:["Optics","Interference","Thermal deformation"],
       files:{
         sim:"sim/apho2023_E2_web.html",
-        exe:{ko:REL+"v1.0/APhO2023_E2_sim_KO.exe", en:REL+"v1.0/APhO2023_E2_sim_EN.exe"},
+        exe:{ko:REL+"v1.0/Apho2023_E2_sim_KO.exe", en:REL+"v1.0/Apho2023_E2_sim_EN.exe"},
         src:{ko:"src/apho2023_E2_sim_KO.py", en:"src/apho2023_E2_sim_EN.py"},
         pdf:{ko:"pdf/APhO_2023_E2_KO.pdf", en:"pdf/APhO_2023_E2_EN.pdf"},
         sol:"pdf/APhO_2023_S2.pdf"
       }}]},
-   {y:2022,host:{ko:"인도 · 데라둔, 온라인",en:"Dehradun, India, online"},cc:"in",problems:wip("Magnetic Black Box","Acoustic Black Box")},
-   {y:2021,host:{ko:"대만 · 타이베이, 온라인",en:"Taipei, Taiwan, online"},cc:"tw",problems:wip("Elasticity of Cantilever","Exploring the Spatial Structure of the Sample with Optical Methods")},
+   {y:2022,host:{ko:"인도 · 데라둔, 온라인",en:"Dehradun, India, online"},cc:"in",
+    problems:[
+      {id:"E1",
+       title:{ko:"자기 블랙박스",en:"Magnetic Black Box"},
+       desc:{ko:"대회 주최측이 만든 원본 시뮬레이터입니다. 관 속을 지나는 자석을 저울과 자기력계로 좇아 숨은 자석 배열을 알아냅니다.",
+             en:"The organisers' own simulator: track a magnet down a tube with a balance and a magnetometer, and find the hidden magnet arrangement."},
+       tags:["자기","블랙박스","공식 시뮬레이터"], tagsEn:["Magnetism","Black box","Official sim"],
+       files:{sim:"sim/apho2022_E1/simulation.html",
+              exe:{ko:REL+"v1.0/APhO2022_E1_sim_EN.exe", en:REL+"v1.0/APhO2022_E1_sim_EN.exe"},
+              src:{ko:"src/apho2022_E1_magnetic_sim.py", en:"src/apho2022_E1_magnetic_sim.py"},
+              pdf:{ko:"pdf/APhO_2022_E_KO.pdf", en:"pdf/APhO_2022_E_EN.pdf"},
+              sol:"pdf/APhO_2022_S.pdf"}},
+      {id:"E2",
+       title:{ko:"음향 블랙박스",en:"Acoustic Black Box"},
+       desc:{ko:"대회 주최측이 만든 원본 시뮬레이터입니다. 음원과 검출기를 옮겨 가며 도달 신호를 재어 상자 속 구조를 그려냅니다.",
+             en:"The organisers' own simulator: move source and detector, read the arriving signal, and map what the box hides."},
+       tags:["음향","블랙박스","공식 시뮬레이터"], tagsEn:["Acoustics","Black box","Official sim"],
+       files:{sim:"sim/apho2022_E2/simulation.html",
+              exe:{ko:REL+"v1.0/APhO2022_E2_sim_EN.exe", en:REL+"v1.0/APhO2022_E2_sim_EN.exe"},
+              src:{ko:"src/apho2022_E2_acoustic_sim.py", en:"src/apho2022_E2_acoustic_sim.py"},
+              pdf:{ko:"pdf/APhO_2022_E_KO.pdf", en:"pdf/APhO_2022_E_EN.pdf"},
+              sol:"pdf/APhO_2022_S.pdf"}}
+    ]},
+   {y:2021,host:{ko:"대만 · 타이베이, 온라인",en:"Taipei, Taiwan, online"},cc:"tw",
+    problems:[
+      {id:"E1",
+       title:{ko:"캔틸레버의 탄성",en:"Elasticity of Cantilever"},
+       desc:{ko:"한쪽만 고정한 막대에 추를 걸어 처짐을 재고, 길이와 하중을 바꿔 가며 탄성계수를 끌어냅니다.",
+             en:"Hang weights on a beam clamped at one end, measure how far it bends, and pull the elastic modulus out of length and load."},
+       tags:["역학","탄성","곡선맞춤"], tagsEn:["Mechanics","Elasticity","Curve fit"],
+       files:{sim:"sim/apho2021_E1_web.html",
+              src:{ko:"src/apho2021_E1_cantilever_sim.py", en:"src/apho2021_E1_cantilever_sim.py"},
+              pdf:{ko:"pdf/APhO_2021_E_KO.pdf", en:"pdf/APhO_2021_E_EN.pdf"},
+              sol:"pdf/APhO_2021_S.pdf"}},
+      {id:"E2",
+       title:{ko:"광학적 방법으로 시료의 공간 구조 알아내기",en:"Exploring the Spatial Structure of the Sample with Optical Methods"},
+       desc:{ko:"시료에 빛을 통과시켜 나온 회절 무늬만 보고, 그 안에 어떤 주기 구조가 숨어 있는지 알아냅니다.",
+             en:"Send light through the sample and read the diffraction pattern alone to find the periodic structure hidden inside it."},
+       tags:["광학","회절","구조분석"], tagsEn:["Optics","Diffraction","Structure"],
+       files:{sim:"sim/apho2021_E2_web.html",
+              src:{ko:"src/apho2021_E2_diffraction_sim.py", en:"src/apho2021_E2_diffraction_sim.py"},
+              pdf:{ko:"pdf/APhO_2021_E_KO.pdf", en:"pdf/APhO_2021_E_EN.pdf"},
+              sol:"pdf/APhO_2021_S.pdf"}}
+    ]},
    {y:2019,host:{ko:"호주 · 애들레이드",en:"Adelaide, Australia"},cc:"au",problems:wip("Static Response of a Magnetically Active Fluid","Wave Pulses in a Magnetically Active Fluid")},
    {y:2018,host:{ko:"베트남 · 하노이",en:"Hanoi, Vietnam"},cc:"vn",problems:wip("Giant Magnetoresistance (GMR)")},
    {y:2017,host:{ko:"러시아 · 야쿠츠크",en:"Yakutsk, Russia"},cc:"ru",problems:wip("Photonic Crystal")},
@@ -793,8 +865,48 @@ const DATA={
    {y:2024,host:{ko:"조지아 · 쿠타이시",en:"Kutaisi, Georgia"},cc:"ge",problems:wip("Physics of Piezoelectricity")},
    {y:2023,host:{ko:"독일 · 하노버",en:"Hannover, Germany"},cc:"de",problems:wip("Magnetic Pendulum","Optical Black-Box")},
    {y:2022,host:{ko:"슬로베니아 · 류블랴나",en:"Ljubljana, Slovenia"},cc:"si",problems:wip("Physics of Illumination")},
-   {y:2021,host:{ko:"온라인 · 에스토니아 주관",en:"Online, hosted by Estonia"},cc:"ee",problems:wip("Hidden Wire","Hot Cylinder")},
-   {y:2020,host:{ko:"루마니아 · 사투마레, 온라인",en:"Satu Mare, Romania, online"},cc:"ro",problems:wip("Hidden Charge","Black Box")},
+   {y:2021,host:{ko:"온라인 · 에스토니아 주관",en:"Online, hosted by Estonia"},cc:"ee",
+    problems:[
+      {id:"E1",
+       title:{ko:"숨은 도선",en:"Hidden Wire"},
+       desc:{ko:"100 mm 정사각 판 아래 어딘가에 긴 구리 도선이 묻혀 있습니다. 판 위에 나침반을 올려 바늘이 돌아간 각도만 읽어 도선의 위치와 깊이를 찾습니다.",
+             en:"A long copper wire runs at unknown depth under a 100 mm square. Put a compass on the surface, read the needle's angle alone, and find where the wire is and how deep."},
+       tags:["자기","측량","블랙박스"], tagsEn:["Magnetism","Locating","Black box"],
+       files:{sim:"sim/eupho2021_E1_web.html",
+              src:{ko:"src/eupho2021_E1_wire_sim.py", en:"src/eupho2021_E1_wire_sim.py"},
+              pdf:{ko:"pdf/EuPhO_2021_E1_KO.pdf", en:"pdf/EuPhO_2021_E_EN.pdf"},
+              sol:"pdf/EuPhO_2021_S.pdf"}},
+      {id:"E2",
+       title:{ko:"뜨거운 원통",en:"Hot Cylinder"},
+       desc:{ko:"길이 30 cm 금속 막대의 한쪽 끝을 정해진 세기로 데우고, 원하는 지점 다섯 곳의 온도를 재어 열전도도와 비열을 알아냅니다.",
+             en:"Heat one end of a 30 cm metal rod at a power you choose, watch up to five points along it, and get the metal's conductivity and heat capacity."},
+       tags:["열전도","시간의존","곡선맞춤"], tagsEn:["Heat flow","Transient","Curve fit"],
+       files:{sim:"sim/eupho2021_E2_web.html",
+              src:{ko:"src/eupho2021_E2_cylinder_sim.py", en:"src/eupho2021_E2_cylinder_sim.py"},
+              pdf:{ko:"pdf/EuPhO_2021_E2_KO.pdf", en:"pdf/EuPhO_2021_E_EN.pdf"},
+              sol:"pdf/EuPhO_2021_S.pdf"}}
+    ]},
+   {y:2020,host:{ko:"루마니아 · 사투마레, 온라인",en:"Satu Mare, Romania, online"},cc:"ro",
+    problems:[
+      {id:"E1",
+       title:{ko:"숨은 전하",en:"Hidden Charge"},
+       desc:{ko:"전자를 쏘아 숨은 점전하에 산란시키고, 스크린에 찍힌 자리만으로 전하의 크기와 위치를 되짚어 냅니다.",
+             en:"Fire electrons past a hidden point charge and use nothing but where they land on the screen to recover its size and position."},
+       tags:["정전기","산란","블랙박스"], tagsEn:["Electrostatics","Scattering","Black box"],
+       files:{sim:"sim/eupho2020_E1_web.html",
+              src:{ko:"src/eupho2020_E1_charge_sim.py", en:"src/eupho2020_E1_charge_sim.py"},
+              pdf:{ko:"pdf/EuPhO_2020_E_KO.pdf", en:"pdf/EuPhO_2020_E_EN.pdf"},
+              sol:"pdf/EuPhO_2020_S.pdf"}},
+      {id:"E2",
+       title:{ko:"역학 블랙박스",en:"Black Box"},
+       desc:{ko:"상자 속에 용수철로 매달린 추 두 개가 들어 있습니다. 상자를 원하는 가속도로 움직이며 바닥이 받는 힘만 읽어 질량과 용수철 상수를 알아냅니다.",
+             en:"Two masses hang on springs inside a sealed box. Drive the box with an acceleration of your choosing, read only the force it exerts, and recover the masses and the spring constants."},
+       tags:["역학","진동","블랙박스"], tagsEn:["Mechanics","Oscillation","Black box"],
+       files:{sim:"sim/eupho2020_E2_web.html",
+              src:{ko:"src/eupho2020_E2_blackbox_sim.py", en:"src/eupho2020_E2_blackbox_sim.py"},
+              pdf:{ko:"pdf/EuPhO_2020_E_KO.pdf", en:"pdf/EuPhO_2020_E_EN.pdf"},
+              sol:"pdf/EuPhO_2020_S.pdf"}}
+    ]},
    {y:2019,host:{ko:"라트비아 · 리가",en:"Riga, Latvia"},cc:"lv",problems:wip("Propagation of Radio Waves")},
    {y:2018,host:{ko:"러시아 · 돌고프루드니",en:"Dolgoprudny, Russia"},cc:"ru",problems:wip("Porous Membrane")},
    {y:2017,host:{ko:"에스토니아 · 타르투",en:"Tartu, Estonia"},cc:"ee",problems:wip("Light-Emitting Diode")}
@@ -838,7 +950,7 @@ const DATA={
              en:"Write a grating on the virtual FBG-Writer, read the Bragg wavelength and the grating strength off the transmission spectrum, then calibrate it as a thermometer and a force sensor."},
        tags:["광학","광섬유","분광"], tagsEn:["Optics","Fibre","Spectroscopy"],
        files:{sim:"sim/ispho2026_E1_web.html",
-              exe:{ko:REL+"v1.0/ISPhO2026_E1_sim_KO.exe", en:REL+"v1.0/ISPhO2026_E1_sim_EN.exe"},
+              exe:{ko:REL+"v1.0/ISPhO2026_E1_sim_EN.exe", en:REL+"v1.0/ISPhO2026_E1_sim_EN.exe"},
               src:{ko:"src/ispho2026_E1_fbg_sim_KO.py", en:"src/ispho2026_E1_fbg_sim_EN.py"},
               pdf:{ko:"pdf/ISPhO_2026_E1_KO.pdf", en:"pdf/ISPhO_2026_E1_EN.pdf"}}}
     ]},
@@ -883,11 +995,41 @@ const DATA={
         en:"An invitational contest in Bucharest, begun in 2010 as the physics side of the Romanian Master of Mathematics and Sciences and run on its own since 2015. Only the experimental round is listed here. The 2015 and 2016 editions have no published experimental paper, and the 2010 papers have not survived."},
   years:[
    {y:2024,host:{ko:"루마니아 · 부쿠레슈티",en:"Bucharest, Romania"},cc:"ro",
-    problems:wip("Ferromagnetic phase transition: The Ising model")},
+    problems:[
+      {id:"E1",
+       title:{ko:"강자성 상전이: 이징 모형",en:"Ferromagnetic phase transition: The Ising model"},
+       desc:{ko:"격자 위 스핀을 몬테카를로로 굴려 온도·결합·외부장을 바꿔 가며 자화 곡선과 임계점을 찾습니다.",
+             en:"Roll the spins on a lattice by Monte Carlo, sweep temperature, coupling and field, and find the magnetisation curve and the critical point."},
+       tags:["통계물리","상전이","몬테카를로"], tagsEn:["Statistical physics","Phase transition","Monte Carlo"],
+       files:{sim:"sim/rmph2024_E1_web.html",
+              exe:{ko:REL+"v1.0/RMPh2024_E1_sim_EN.exe", en:REL+"v1.0/RMPh2024_E1_sim_EN.exe"},
+              src:{ko:"src/rmph2024_E1_ising_sim.py", en:"src/rmph2024_E1_ising_sim.py"},
+              pdf:{ko:"pdf/RMPh_2024_E_KO.pdf", en:"pdf/RMPh_2024_E_EN.pdf"},
+              sol:"pdf/RMPh_2024_S.pdf"}}
+    ]},
    {y:2023,host:{ko:"루마니아 · 부쿠레슈티",en:"Bucharest, Romania"},cc:"ro",
-    problems:wip("Experimental studies in rotating reference frames")},
+    problems:[
+      {id:"E1",
+       title:{ko:"회전 좌표계에서의 실험",en:"Experimental studies in rotating reference frames"},
+       desc:{ko:"돌아가는 원판 위로 공을 쏘고 프레임을 하나씩 넘겨 자취를 찍어, 회전계에서만 나타나는 힘을 재어 냅니다.",
+             en:"Fire a ball across a spinning table, step through the frames marking where it went, and measure the forces only a rotating frame shows."},
+       tags:["역학","회전좌표계","영상분석"], tagsEn:["Mechanics","Rotating frame","Video analysis"],
+       files:{sim:"sim/rmph2023_E1_web.html",
+              src:{ko:"src/rmph2023_E1_rotating_sim.py", en:"src/rmph2023_E1_rotating_sim.py"},
+              pdf:{ko:"pdf/RMPh_2023_E_KO.pdf", en:"pdf/RMPh_2023_E_EN.pdf"}}}
+    ]},
    {y:2021,host:{ko:"온라인",en:"Online"},
-    problems:wip("Measurement of D\u2070 lifetime")},
+    problems:[
+      {id:"E1",
+       title:{ko:"D\u2070 중간자 수명 측정",en:"Measurement of D\u2070 lifetime"},
+       desc:{ko:"LHCb가 2011년에 실제로 받은 데이터를 잘라 가며 D\u2070 봉우리를 세우고, 붕괴 시간 분포에서 수명을 뽑아냅니다.",
+             en:"Cut real LHCb 2011 data until the D\u2070 peak stands out, then read the lifetime off the decay-time distribution."},
+       tags:["입자물리","자료분석","곡선맞춤"], tagsEn:["Particle physics","Data analysis","Fitting"],
+       files:{sim:"sim/rmph2021_E1_web.html",
+              exe:{ko:REL+"v1.0/RMPh2021_E1_sim_EN.exe", en:REL+"v1.0/RMPh2021_E1_sim_EN.exe"},
+              src:{ko:"src/rmph2021_E1_d0_sim.py", en:"src/rmph2021_E1_d0_sim.py"},
+              pdf:{ko:"pdf/RMPh_2021_E_KO.pdf", en:"pdf/RMPh_2021_E_EN.pdf"}}}
+    ]},
    {y:2018,host:{ko:"루마니아 · 부쿠레슈티",en:"Bucharest, Romania"},cc:"ro",
     problems:wip("Polycrystals and monomolecular layers")},
    {y:2017,host:{ko:"루마니아 · 부쿠레슈티",en:"Bucharest, Romania"},cc:"ro",
@@ -988,7 +1130,7 @@ function viewHome(){
         <h1>${d.headline}</h1>
         <p class="lede">${d.lede}</p>
         <div class="cta">
-          <a class="btn" href="${heroPick.sim}?lang=${lang}">${d.ctaRun}<span class="mono">${heroPick.tag}</span></a>
+          <a class="btn" href="${heroHref(heroPick)}">${heroPick.sim?d.ctaRun:d.dlOnly}<span class="mono">${heroPick.tag}</span></a>
           <a class="btn ghost" href="#/comps">${d.ctaBrowse}</a>
         </div>
       </div>
@@ -1161,11 +1303,11 @@ function viewYear(key,year){
         /* `hold` stages a problem: every button it will have is already
            listed, but nothing is released until the flag comes off */
         const held = p.hold===true;
-        const mode = held ? "wip" : (f.sim ? "live" : (f.exe ? "dl" : "wip"));
+        const mode = held ? "wip" : (f.sim ? "live" : (f.exe ? "dl" : (f.src ? "src" : "wip")));
         const tags=(lang==="ko"?p.tags:p.tagsEn)||[];
-        const heading = mode==="wip" ? ((lang==="ko"?p.ko:p.en)||p.en||d.soonTitle) : p.title[lang];
-        const body    = mode==="wip" ? d.soonDesc : p.desc[lang];
-        const chip    = mode==="live" ? d.live : mode==="dl" ? d.dlOnly : d.wip;
+        const heading = p.title ? p.title[lang] : ((lang==="ko"?p.ko:p.en)||p.en||d.soonTitle);
+        const body    = p.desc ? p.desc[lang] : d.soonDesc;
+        const chip    = mode==="live" ? d.live : mode==="dl" ? d.dlOnly : mode==="src" ? d.srcOnly : d.wip;
         const b=[];
         if(held){
           const soon=(lbl,g)=>b.push(`<button class="btn${g?" ghost":""}" disabled>${lbl}</button>`);
@@ -1515,49 +1657,118 @@ const SIG_S26E1={
     c.textAlign="left";
   }};
 
-/* ── APhO 2026 E1 · tank A emptying itself through the 5 mm hole ─ */
+/* ── APhO 2026 E1 · the bench itself, in the simulator's own view ── */
 const SIG_A26E1={
-  sim:"sim/apho2026_E1_web.html", tag:"APhO 2026 E1", span:120, rate:8,
-  capL:{ko:"물시계 · 탱크 A 수위 (5 mm 구멍)",en:"Water clock · level in tank A (5 mm hole)"},
+  sim:"sim/apho2026_E1_web.html", tag:"APhO 2026 E1", span:95, rate:7,
+  capL:{ko:"물시계 · 5 mm 구멍으로 빠져나가는 탱크 A",en:"Water clock · tank A draining through the 5 mm hole"},
   capR:{ko:"경과",en:"elapsed"},
-  read:t=>mmss(Math.min(t,120)),
-  paint(c,w,h,t){
-    /* the bench's own tank — 10 x 10 cm, a 5 mm hole, Cd = 0.8 — draining
-       by Torricelli until the meniscus holds the last few millimetres */
-    const G=981, A_T=10.0*10.0, D=0.5, A_H=Math.PI*(D/2)*(D/2), CD=0.8;
-    const H0=13.0, H_STOP=72.0/(G*(D/2)), TMAX=120, VMAX=14;
-    const K=CD*A_H*Math.sqrt(2*G)/(2*A_T);
-    const lev=x=>{const r=Math.sqrt(H0)-K*x; return Math.max(r>0?r*r:0,H_STOP);};
-    const pad=16, padL=36, padB=22;
-    const X=u=>padL+u/TMAX*(w-padL-pad);
-    const Y=v=>h-padB-v/VMAX*(h-padB-pad);
-    c.fillStyle="#fff"; c.fillRect(0,0,w,h);
-    PEN(c,"#DCE7F0",.5); c.beginPath();
-    for(let u=0;u<=TMAX;u+=10){c.moveTo(X(u),pad);c.lineTo(X(u),h-padB);}
-    for(let v=0;v<=VMAX+1e-9;v+=1){c.moveTo(padL,Y(v));c.lineTo(w-pad,Y(v));}
-    c.stroke();
-    PEN(c,"#B4CADC",1); c.beginPath();
-    c.moveTo(padL,Y(0)); c.lineTo(w-pad,Y(0));
-    c.moveTo(padL,pad);  c.lineTo(padL,h-padB); c.stroke();
-    /* the thirteen marks engraved on the front wall */
-    PEN(c,"#9FB6C8",1.3); c.beginPath();
-    for(let m=1;m<=13;m++){c.moveTo(padL,Y(m));c.lineTo(padL+(m%5===0?13:8),Y(m));}
-    c.stroke();
-    /* below this the hole stops giving: surface tension holds the rest */
-    PEN(c,"#98A6B4",1); c.setLineDash([3,4]); c.beginPath();
-    c.moveTo(padL,Y(H_STOP)); c.lineTo(w-pad,Y(H_STOP)); c.stroke(); c.setLineDash([]);
-    const tt=Math.min(t,TMAX), N=600;
-    PEN(c,"#2c6f9b",2.2); c.beginPath();
-    for(let i=0;i<=N;i++){const x=tt*i/N;
-      i?c.lineTo(X(x),Y(lev(x))):c.moveTo(X(x),Y(lev(x)));}
-    c.stroke();
-    c.fillStyle="#2c6f9b"; c.beginPath(); c.arc(X(tt),Y(lev(tt)),3.2,0,7); c.fill();
-    c.fillStyle="#8A99A8"; c.font="9.5px IBM Plex Mono,ui-monospace,monospace";
-    c.textAlign="center";
-    for(let u=30;u<=TMAX;u+=30) c.fillText(u+" s",X(u),h-7);
-    c.textAlign="right";
-    for(let v=0;v<=12;v+=4) c.fillText(v+" cm",padL-5,Y(v)+3);
-    c.textAlign="left";
+  read:t=>mmss(Math.min(t,95)),
+  paint(c,W,H,t){
+    /* the simulator's own oblique projection, its own numbers, its own palette */
+    const G=981, KC=0.91355, KS=0.40674;
+    const A_T=10*10, D=0.5, A_H=Math.PI*(D/2)*(D/2), CD=0.8;
+    const H0=12.0, H_STOP=72.0/(G*(D/2));
+    const KK=CD*A_H*Math.sqrt(2*G)/(2*A_T);
+    const rt=Math.sqrt(H0)-KK*t;
+    const head=Math.max(rt>0?rt*rt:0,H_STOP);      /* water standing above the hole */
+    /* bin · base plate · two-level stand · tank A, laid out as the kit allows */
+    const BX0=8, BX1=38, BZ0=0, BZ1=24, BH=16, BW=0.6;
+    const IX0=BX0+BW, IX1=BX1-BW, IZ0=BZ0+BW, IZ1=BZ1-BW;
+    const TX0=20.5, TX1=31.5, TZ0=8.0, TZ1=19.0, TY0=11, TW=0.5;
+    const ix0=TX0+TW, ix1=TX1-TW, iz0=TZ0+TW, iz1=TZ1-TW;
+    const FL=TY0+TW, YO=FL+1.0, TY1=FL+15.1;       /* floor · outlet · rim */
+    const pool=BW+(H0-head)*A_T/((IX1-IX0)*(IZ1-IZ0));
+    const flowing=head>H_STOP+0.004;
+    /* fit the scene */
+    const UW=KC*(BX1+BZ1)-KC*(BX0+BZ0), VMAX=TY1+KS*(TZ1-TX0), VMIN=KS*(BZ0-BX1);
+    const S=Math.min((W-14)/UW,(H-12)/(VMAX-VMIN));
+    const OX=(W-UW*S)/2-KC*BX0*S, OY=(H-(VMAX-VMIN)*S)/2+VMAX*S;
+    const P=(x,y,z)=>[OX+KC*(x+z)*S, OY-(y+KS*(z-x))*S];
+    const poly=(pts,fill,stroke,lw)=>{
+      c.beginPath(); c.moveTo(pts[0][0],pts[0][1]);
+      for(let i=1;i<pts.length;i++) c.lineTo(pts[i][0],pts[i][1]);
+      c.closePath();
+      if(fill){c.fillStyle=fill;c.fill();}
+      if(stroke){PEN(c,stroke,lw||1);c.stroke();}};
+    const line=(pts,col,lw)=>{ PEN(c,col,lw||1);
+      c.beginPath(); c.moveTo(pts[0][0],pts[0][1]);
+      for(let i=1;i<pts.length;i++) c.lineTo(pts[i][0],pts[i][1]); c.stroke();};
+    const box3=(x0,x1,y0,y1,z0,z1,top,side,front,edge)=>{
+      poly([P(x1,y0,z0),P(x1,y1,z0),P(x1,y1,z1),P(x1,y0,z1)],side,edge,1);
+      poly([P(x0,y1,z0),P(x1,y1,z0),P(x1,y1,z1),P(x0,y1,z1)],top,edge,1);
+      poly([P(x0,y0,z0),P(x1,y0,z0),P(x1,y1,z0),P(x0,y1,z0)],front,edge,1);};
+    const water3=(x0,x1,z0,z1,yf,ys,thin)=>{ if(ys<=yf+1e-6) return;
+      const side=thin?"rgba(63,159,208,.55)":"#3f9fd0", front=thin?"rgba(74,167,212,.55)":"#4aa7d4",
+            top=thin?"rgba(127,208,238,.45)":"#7fd0ee";
+      poly([P(x1,yf,z0),P(x1,yf,z1),P(x1,ys,z1),P(x1,ys,z0)],side,null);
+      poly([P(x0,yf,z0),P(x1,yf,z0),P(x1,ys,z0),P(x0,ys,z0)],front,null);
+      poly([P(x0,ys,z0),P(x1,ys,z0),P(x1,ys,z1),P(x0,ys,z1)],top,"#8fd3ee",1);
+      poly([P(x0,ys,z0),P(x1,ys,z0),P(x1,ys+0.22,z0),P(x0,ys+0.22,z0)],thin?"rgba(191,232,250,.7)":"#bfe8fa",null);};
+    c.fillStyle="#fff"; c.fillRect(0,0,W,H);
+    /* the bin, from behind: latticed floor, then the far walls */
+    poly([P(IX0,BW,IZ0),P(IX1,BW,IZ0),P(IX1,BW,IZ1),P(IX0,BW,IZ1)],"#d3d9d9","#b3baba",1);
+    for(let x=IX0+2;x<IX1;x+=4) line([P(x,BW,IZ0),P(x,BW,IZ1)],"#c8cfcf",1);
+    for(let z=IZ0+2;z<IZ1;z+=4) line([P(IX0,BW,z),P(IX1,BW,z)],"#c8cfcf",1);
+    poly([P(IX0,BW,IZ1),P(IX1,BW,IZ1),P(IX1,BH,IZ1),P(IX0,BH,IZ1)],"#e6eaea","#b3baba",1);
+    poly([P(IX0,BW,IZ0),P(IX0,BW,IZ1),P(IX0,BH,IZ1),P(IX0,BH,IZ0)],"#e6eaea","#b3baba",1);
+    poly([P(IX1,BW,IZ0),P(IX1,BW,IZ1),P(IX1,BH,IZ1),P(IX1,BH,IZ0)],"#d3d9d9","#b3baba",1);
+    /* base plate, and the stand on it: tall part, then the low step */
+    box3(11,35,0.6,2.0,4,21,"#26282c","#17181b","#1b1c20","#050506");
+    box3(19,33,2.0,11,7,20,"#3a3e45","#141518","#202226","#050506");
+    /* tank A — the glass behind, the water, then the glass in front */
+    poly([P(ix0,FL,iz1),P(ix1,FL,iz1),P(ix1,TY1,iz1),P(ix0,TY1,iz1)],"#dbe9ef","#9dbecb",1);
+    poly([P(ix0,FL,iz0),P(ix0,FL,iz1),P(ix0,TY1,iz1),P(ix0,TY1,iz0)],"#d3e3ea","#9dbecb",1);
+    poly([P(ix0,FL,iz0),P(ix1,FL,iz0),P(ix1,FL,iz1),P(ix0,FL,iz1)],"#eff8fb","#b6d0d9",1);
+    water3(ix0,ix1,iz0,iz1,FL,YO+head);
+    poly([P(TX1,TY0,TZ0),P(TX1,TY1,TZ0),P(TX1,TY1,TZ1),P(TX1,TY0,TZ1)],null,"#dff1f7",2);
+    poly([P(TX0,TY0,TZ0),P(TX1,TY0,TZ0),P(TX1,TY1,TZ0),P(TX0,TY1,TZ0)],null,"#f2fbff",2);
+    poly([P(TX0,TY1,TZ0),P(TX1,TY1,TZ0),P(TX1,TY1,TZ1),P(TX0,TY1,TZ1)],null,"#eaf6fa",2);
+    /* the thirteen marks, engraved down the left of the front face */
+    c.font="bold "+Math.max(6,0.62*S|0)+"px IBM Plex Mono,ui-monospace,monospace";
+    c.textAlign="right"; c.textBaseline="middle";
+    for(let k=0;k<=13;k++){ const y=YO+k; if(y>TY1-0.2) break;
+      line([P(ix0+1.35,y,iz0),P(ix0+4.35,y,iz0)],"#0d1f27",S>13?2:1);
+      if(k%5===0||k===13){ const q=P(ix0+1.15,y,iz0);
+        c.fillStyle="#0b1d24"; c.fillText(String(k),q[0],q[1]); } }
+    /* the orange lever valve on the right wall, shut */
+    const vz=TZ0+TW+8.0, vc=P(TX1+1.05,YO+0.5,vz);
+    line([vc,[vc[0]+0.5*S,vc[1]+2.6*S]],"#e8622a",Math.max(3,0.62*S));
+    c.beginPath(); c.arc(vc[0]+0.5*S,vc[1]+2.6*S,0.34*S,0,7);
+    c.fillStyle="#ff8a4a"; c.fill(); PEN(c,"#8c3a12",1); c.stroke();
+    c.beginPath(); c.arc(vc[0],vc[1],0.3*S,0,7); c.fillStyle="#7d848a"; c.fill();
+    /* the 4 mm plug still in its hole, the 5 mm hole open */
+    const pg=P(ix0+6.5,YO,TZ0), pt=P(ix0+6.5,YO-1.1,TZ0-1.0);
+    line([pg,pt],"#f4f4f0",Math.max(3,1.0*S));
+    c.beginPath(); c.arc(pt[0],pt[1],0.62*S,0,7);
+    c.fillStyle="#fbfbf8"; c.fill(); PEN(c,"#b9bcb6",1); c.stroke();
+    const hp=P(ix0+3.5,YO,TZ0);
+    c.beginPath(); c.arc(hp[0],hp[1],0.32*S,0,7);
+    c.fillStyle="#123039"; c.fill(); PEN(c,"#7f97a2",1); c.stroke();
+    /* what the bin has caught so far */
+    water3(IX0,IX1,IZ0,IZ1,BW,pool,true);
+    /* the jet, traced the way the simulator traces it, clipped at the bin wall */
+    if(flowing){
+      const v=CD*Math.sqrt(2*G*head), pts=[]; let hit=false;
+      for(let i=0;i<120;i++){ const tau=i*0.006;
+        const pz=TZ0-1.0-v*tau, py=YO-0.5*G*tau*tau;
+        if(pz<=IZ0){ const th=(TZ0-1.0-IZ0)/v;
+                     pts.push(P(ix0+3.5,YO-0.5*G*th*th,IZ0)); hit=true; break; }
+        pts.push(P(ix0+3.5,py,pz));
+        if(py<=pool) break; }
+      const jw=Math.max(1.4,2.0*Math.sqrt(A_H/Math.PI)*S);
+      if(pts.length>1) line(pts,"#a6e0f4",jw);
+      const tip=pts[pts.length-1];
+      if(hit) line([tip,P(ix0+3.5,pool,IZ0)],"#a6e0f4",Math.max(1,0.45*jw));
+      const ring=hit?P(ix0+3.5,pool,IZ0):tip;
+      PEN(c,"#c8ecf8",1.2); c.beginPath();
+      c.ellipse(ring[0],ring[1],0.62*S,0.32*S,0,0,7); c.stroke();
+    }
+    /* the bin's near walls last — translucent, ribbed */
+    poly([P(BX0,0,BZ0),P(BX1,0,BZ0),P(BX1,BH,BZ0),P(BX0,BH,BZ0)],null,"#cfdada",2);
+    for(let x=BX0+4;x<BX1;x+=6) line([P(x,0.4,BZ0),P(x,BH-0.6,BZ0)],"#c6d0d0",1);
+    poly([P(BX1,0,BZ0),P(BX1,BH,BZ0),P(BX1,BH,BZ1),P(BX1,0,BZ1)],null,"#b8c2c2",1);
+    poly([P(BX0,BH,BZ0),P(BX1,BH,BZ0),P(BX1,BH,BZ1),P(BX0,BH,BZ1)],null,"#cdd6d6",1);
+    c.textAlign="left"; c.textBaseline="alphabetic";
   }};
 
 /* ── APhO 2026 E2 · the one number the kit gives, scrolled on the LEDs ── */
@@ -1573,7 +1784,7 @@ const MB_STREAM=(()=>{
   const cols=[], own=[];
   MB_R.forEach((R,vi)=>{
     const code=Math.round(1023*R/(R+MB_REF));
-    for(let k=0;k<5;k++){ cols.push([0,0,0,0,0]); own.push(vi); }
+    for(let k=0;k<2;k++){ cols.push([0,0,0,0,0]); own.push(vi); }
     for(const ch of String(code)){
       const g=MB_FONT[ch];
       for(let x=0;x<3;x++){
@@ -1646,15 +1857,740 @@ const SIG_A26E2={
     c.textBaseline="alphabetic"; c.textAlign="left";
   }};
 
-const ALL_SIGS=[SIG_I17E1,SIG_I17E2,SIG_A23E1,SIG_A23E2,SIG_S25T1,SIG_S26E1,SIG_A26E1,SIG_A26E2];
+/* ── IPhO 2011 E1 · the meter, as the top plate is pushed down ──── */
+const SIG_I11E1={
+  sim:"sim/ipho2011_E1_web.html", tag:"IPhO 2011 E1", span:14, rate:1,
+  capL:{ko:"극판 간격에 따른 계기 눈금 · 정전용량식 변위 센서",
+        en:"What the meter reads against the plate gap · capacitive displacement sensor"},
+  capR:{ko:"극판 간격",en:"gap"},
+  read(t){ return this.d(t).toFixed(2)+" mm"; },
+  d(t){ return 0.45+2.05*(0.5+0.5*Math.cos(2*Math.PI*Math.min(t,this.span)/this.span)); },
+  paint(c,w,h,t){
+    /* a parallel-plate sensor read through the box: C = eps0 A / d, and the
+       box turns that into a voltage, so the meter follows 1/d */
+    const A=38e-4, EPS=8.854e-12, GAIN=1.9e10;          /* mV per farad, near enough */
+    const V=d=>GAIN*EPS*A/(d*1e-3);
+    const LO=0.4, HI=2.6, pad=16, padL=42, padB=22;
+    const X=u=>padL+(u-LO)/(HI-LO)*(w-padL-pad);
+    const VMAX=V(LO)*1.08;
+    const Y=v=>h-padB-v/VMAX*(h-padB-pad);
+    c.fillStyle="#fff"; c.fillRect(0,0,w,h);
+    PEN(c,"#DCE7F0",.5); c.beginPath();
+    for(let u=LO;u<=HI+1e-9;u+=0.2){ c.moveTo(X(u),pad); c.lineTo(X(u),h-padB); }
+    for(let v=0;v<=VMAX;v+=VMAX/6){ c.moveTo(padL,Y(v)); c.lineTo(w-pad,Y(v)); }
+    c.stroke();
+    PEN(c,"#B4CADC",1); c.beginPath();
+    c.moveTo(padL,Y(0)); c.lineTo(w-pad,Y(0));
+    c.moveTo(padL,pad); c.lineTo(padL,h-padB); c.stroke();
+    PEN(c,"#2c6f9b",2.2); c.beginPath();
+    for(let i=0;i<=220;i++){ const u=LO+(HI-LO)*i/220;
+      i?c.lineTo(X(u),Y(V(u))):c.moveTo(X(u),Y(V(u))); }
+    c.stroke();
+    const dd=this.d(t);
+    PEN(c,"#c9d8e4",1); c.beginPath();
+    c.moveTo(X(dd),Y(V(dd))); c.lineTo(X(dd),h-padB); c.stroke();
+    c.fillStyle="#2c6f9b"; c.beginPath(); c.arc(X(dd),Y(V(dd)),3.4,0,7); c.fill();
+    /* the plates themselves, drawn small in the corner and moving with the gap */
+    const px=w-pad-52, py=pad+10, pw=44;
+    PEN(c,"#7d848a",2.4); c.beginPath();
+    c.moveTo(px,py); c.lineTo(px+pw,py);
+    const gap=6+ (dd-LO)/(HI-LO)*22;
+    c.moveTo(px,py+gap); c.lineTo(px+pw,py+gap); c.stroke();
+    PEN(c,"#c3ccd2",1); c.beginPath();
+    for(let k=1;k<5;k++){ c.moveTo(px+k*pw/5,py+2); c.lineTo(px+k*pw/5,py+gap-2); }
+    c.stroke();
+    c.fillStyle="#8A99A8"; c.font="9.5px IBM Plex Mono,ui-monospace,monospace";
+    c.textAlign="center"; for(const u of [0.5,1.0,1.5,2.0,2.5]) c.fillText(u.toFixed(1),X(u),h-7);
+    c.textAlign="right"; c.fillText("mV",padL-5,Y(VMAX*0.92));
+    c.textAlign="left";
+  }};
+
+/* ── IPhO 2011 E2 · the cylinder swinging on its thread loop ────── */
+const SIG_I11E2={
+  sim:"sim/ipho2011_E2_web.html", tag:"IPhO 2011 E2", span:24, rate:1,
+  capL:{ko:"실 고리에 걸어 흔드는 원통 · 구멍을 옮겨 가며 주기를 잰다",
+        en:"The cylinder swinging on its thread loop, hole by hole"},
+  capR:{ko:"주기",en:"period"},
+  hole(t){ return 1+Math.floor((Math.min(t,this.span)/this.span)*6)%6; },   /* holes 1..6 */
+  x(t){ return 1.6+this.hole(t)*1.9; },                                    /* pivot to centre, cm */
+  T(x){ const g=981, k=5.4; return 2*Math.PI*Math.sqrt((k*k+x*x)/(g*x)); },
+  read(t){ return this.T(this.x(t)).toFixed(3)+" s"; },
+  paint(c,w,h,t){
+    const x=this.x(t), T=this.T(x), S=Math.min(w/34,h/26);
+    const px=w*0.5, py=h*0.18;                                  /* the pin */
+    /* it really swings: same period the readout claims, dying away a little */
+    const ph=2*Math.PI*(t%this.span)/T;
+    const amp=0.30*Math.exp(-((t%(this.span/6))/(this.span/6))*0.55);
+    const ang=amp*Math.sin(ph);
+    c.fillStyle="#fff"; c.fillRect(0,0,w,h);
+    /* the stand and the pin it hangs from */
+    c.fillStyle="#3a4048"; c.fillRect(px-1.2*S,py-3.4*S,2.4*S,3.4*S);
+    c.fillStyle="#8d949b"; c.fillRect(px-5*S,py-4.4*S,10*S,1.1*S);
+    c.beginPath(); c.arc(px,py,0.5*S,0,7); c.fillStyle="#5c6167"; c.fill();
+    /* the thread loop */
+    const L=x*S*1.0;
+    const cx=px+Math.sin(ang)*L, cy=py+Math.cos(ang)*L;
+    PEN(c,"#c3ccd2",Math.max(1,0.16*S)); c.beginPath();
+    c.moveTo(px,py); c.lineTo(cx,cy); c.stroke();
+    /* the aluminium cylinder, seen from the side, with its drilled holes */
+    c.save(); c.translate(cx,cy); c.rotate(ang);
+    const CW=13*S, CH=3.1*S;
+    c.fillStyle="#d9dde1"; c.fillRect(-CW/2,-CH/2,CW,CH);
+    PEN(c,"#7d848a",1.6); c.strokeRect(-CW/2,-CH/2,CW,CH);
+    PEN(c,"#aeb6bd",1); c.beginPath();
+    c.moveTo(-CW/2,-CH*0.18); c.lineTo(CW/2,-CH*0.18); c.stroke();
+    for(let k=1;k<=6;k++){
+      const hx=-CW/2+ (1.6+k*1.9)*S;
+      c.beginPath(); c.arc(hx,0,0.42*S,0,7);
+      c.fillStyle = k===this.hole(t) ? "#2c6f9b" : "#8d949b"; c.fill();
+    }
+    c.restore();
+    /* the loop actually passes through the hole in use */
+    c.beginPath(); c.arc(cx,cy,0.55*S,0,7);
+    c.fillStyle="#2c6f9b"; c.fill();
+    /* a swept trace, so the swing reads even in a still frame */
+    PEN(c,"#dbe6ef",1.4); c.beginPath();
+    c.arc(px,py,L,Math.PI/2-amp,Math.PI/2+amp); c.stroke();
+    c.fillStyle="#8A99A8"; c.font="10px IBM Plex Mono,ui-monospace,monospace";
+    c.textAlign="left"; c.fillText("hole "+this.hole(t),12,h-12);
+  }};
+
+/* ── APhO 2022 E1 · the magnet carried around the phone ─────────── */
+const SIG_A22E1={
+  sim:"sim/apho2022_E1/simulation.html", tag:"APhO 2022 E1", span:18, rate:1,
+  capL:{ko:"자석을 휴대폰 둘레로 옮기며 읽는 자기력계",
+        en:"Carrying the magnet around the phone, reading its magnetometer"},
+  capR:{ko:"센서 값",en:"sensor"},
+  pos(t){ const a=2*Math.PI*(t%this.span)/this.span;
+          return [Math.cos(a)*4.2, Math.sin(a)*6.4, a]; },
+  field(t){ /* a dipole at the magnet, read at the sensor near the phone's top */
+    const [mx,my,a]=this.pos(t);
+    const sx=0, sy=-2.4;                                  /* where the sensor sits */
+    const dx=sx-mx, dy=sy-my, r=Math.max(1.2,Math.hypot(dx,dy));
+    const ux=dx/r, uy=dy/r, m=[Math.cos(a+Math.PI/2),Math.sin(a+Math.PI/2)];
+    const md=m[0]*ux+m[1]*uy, k=12000/(r*r*r);
+    return [k*(3*md*ux-m[0]), k*(3*md*uy-m[1])];
+  },
+  read(t){ const b=this.field(t); return b[0].toFixed(1)+" \u03bcT"; },
+  paint(c,w,h,t){
+    const S=Math.min(w/16,h/15), ox=w/2, oy=h/2;
+    const X=u=>ox+u*S, Y=v=>oy+v*S;
+    c.fillStyle="#fff"; c.fillRect(0,0,w,h);
+    /* the phone, drawn the way the official simulator draws it */
+    const PW=5.0, PH=9.6;
+    c.fillStyle="#23262b";
+    c.beginPath(); c.rect(X(-PW/2),Y(-PH/2),PW*S,PH*S); c.fill();
+    PEN(c,"#4a5058",1.4); c.stroke();
+    c.fillStyle="#dfe6ec"; c.fillRect(X(-PW/2+0.28),Y(-PH/2+0.7),(PW-0.56)*S,(PH-1.7)*S);
+    c.fillStyle="#8d949b"; c.beginPath(); c.arc(X(0),Y(-PH/2+0.36),0.16*S,0,7); c.fill();
+    PEN(c,"#8d949b",1.2); c.beginPath(); c.arc(X(0),Y(PH/2-0.5),0.42*S,0,7); c.stroke();
+    /* where the magnetometer sits, and what it is reading right now */
+    const b=this.field(t), bn=Math.hypot(b[0],b[1]);
+    c.fillStyle="#2c6f9b"; c.beginPath(); c.arc(X(0),Y(-2.4),0.3*S,0,7); c.fill();
+    const al=Math.min(3.4,0.7+Math.log10(1+bn)*1.1);
+    PEN(c,"#2c6f9b",2); c.beginPath();
+    c.moveTo(X(0),Y(-2.4));
+    c.lineTo(X(b[0]/bn*al),Y(-2.4+b[1]/bn*al)); c.stroke();
+    /* the path the magnet is being carried along, and the magnet on it */
+    PEN(c,"#cfd8e0",1.5); c.setLineDash([5,5]); c.beginPath();
+    c.ellipse(X(0),Y(0),4.2*S,6.4*S,0,0,7); c.stroke(); c.setLineDash([]);
+    const [mx,my,a]=this.pos(t);
+    c.save(); c.translate(X(mx),Y(my)); c.rotate(a+Math.PI/2);
+    c.fillStyle="#cc3b32"; c.fillRect(-0.5*S,-1.3*S,1.0*S,1.3*S);
+    c.fillStyle="#e6eaea"; c.fillRect(-0.5*S,0,1.0*S,1.3*S);
+    PEN(c,"#5c6167",1.2); c.strokeRect(-0.5*S,-1.3*S,1.0*S,2.6*S);
+    c.restore();
+    c.fillStyle="#8A99A8"; c.font="10px IBM Plex Mono,ui-monospace,monospace";
+    c.textAlign="left";
+    c.fillText("Bw "+b[0].toFixed(1)+" \u03bcT",12,h-26);
+    c.fillText("Bl "+b[1].toFixed(1)+" \u03bcT",12,h-12);
+  }};
+
+/* ── APhO 2022 E2 · the echo train the detector hears ───────────── */
+const SIG_A22E2={
+  sim:"sim/apho2022_E2/simulation.html", tag:"APhO 2022 E2", span:14, rate:1.2,
+  capL:{ko:"검출기에 도달한 신호 · 음향 블랙박스",en:"What reaches the detector · acoustic black box"},
+  capR:{ko:"검출기 위치",en:"detector"},
+  read(t){ return this.d(t).toFixed(1)+" cm"; },
+  d(t){ return 6+18*(0.5-0.5*Math.cos(2*Math.PI*Math.min(t,this.span)/this.span)); },
+  paint(c,w,h,t){
+    const d=this.d(t), v=34300;                       /* cm/s in air */
+    const paths=[[d,1.0],[Math.hypot(d,11)*1.0,0.55],[Math.hypot(d,20)*1.0,0.3]];
+    const TMAX=1.6e-3, pad=16, padL=38, padB=22;
+    const X=u=>padL+u/TMAX*(w-padL-pad);
+    const Y=a=>h-padB-(a+1.15)/2.4*(h-padB-pad);
+    c.fillStyle="#fff"; c.fillRect(0,0,w,h);
+    PEN(c,"#DCE7F0",.5); c.beginPath();
+    for(let u=0;u<=TMAX+1e-9;u+=2e-4){ c.moveTo(X(u),pad); c.lineTo(X(u),h-padB); }
+    for(let a=-1;a<=1.2;a+=0.5){ c.moveTo(padL,Y(a)); c.lineTo(w-pad,Y(a)); }
+    c.stroke();
+    PEN(c,"#B4CADC",1); c.beginPath();
+    c.moveTo(padL,Y(0)); c.lineTo(w-pad,Y(0));
+    c.moveTo(padL,pad); c.lineTo(padL,h-padB); c.stroke();
+    const N=520;
+    PEN(c,"#2c6f9b",1.8); c.beginPath();
+    for(let i=0;i<=N;i++){
+      const u=TMAX*i/N; let a=0;
+      for(const [L,amp] of paths){ const t0=L/v, dt=u-t0;
+        if(dt>0) a+=amp*Math.exp(-Math.pow(dt/9e-5,2))*Math.sin(2*Math.PI*40000*dt); }
+      i?c.lineTo(X(u),Y(a)):c.moveTo(X(u),Y(a));
+    }
+    c.stroke();
+    c.fillStyle="#8A99A8"; c.font="9.5px IBM Plex Mono,ui-monospace,monospace";
+    c.textAlign="center"; for(let u=4e-4;u<TMAX;u+=4e-4) c.fillText((u*1000).toFixed(1)+" ms",X(u),h-7);
+    c.textAlign="right"; c.fillText("0",padL-5,Y(0)+3);
+    c.textAlign="left";
+  }};
+
+/* ── IPhO 2022 E1 · the ball falling off the 2000 m tower ───────── */
+const SIG_I22E1={
+  sim:"sim/ipho2022_E1_web.html", tag:"IPhO 2022 E1", span:13, rate:1,
+  capL:{ko:"2000 m 탑에서 떨어뜨린 공 · 대기가 붙잡는 만큼 느려진다",
+        en:"A ball dropped from the 2000 m tower, held back by the air"},
+  capR:{ko:"낙하 시간",en:"fall time"},
+  /* g and a drag that thins out with height: exactly the shape the paper sets */
+  H0:2000, G:7.6,
+  run(t){
+    const cyc=this.span, u=(t%cyc)/cyc;
+    const idx=Math.floor(t/cyc)%3;
+    const h0=[2000,1400,900][idx], rho=[7.8,2.6,0.9][idx];
+    const k=0.9/(rho*10);                                   /* drag over mass */
+    let y=h0, v=0, tt=0, dt=0.02;
+    const target=u*this.tf(h0,k);
+    while(tt<target && y>0){ const a=this.G-k*v*v*Math.exp(-y/9000);
+      v+=a*dt; y-=v*dt; tt+=dt; }
+    return {h0:h0, rho:rho, y:Math.max(0,y), v:v, t:tt, tf:this.tf(h0,k)};
+  },
+  tf(h0,k){ let y=h0,v=0,tt=0,dt=0.02;
+    while(y>0&&tt<200){ const a=this.G-k*v*v*Math.exp(-y/9000); v+=a*dt; y-=v*dt; tt+=dt; }
+    return tt; },
+  read(t){ return this.run(t).t.toFixed(1)+" s"; },
+  paint(c,w,h,t){
+    const r=this.run(t);
+    const pad=18, groundY=h-26, topY=pad+6;
+    const Y=y=>groundY-(y/this.H0)*(groundY-topY);
+    c.fillStyle="#fff"; c.fillRect(0,0,w,h);
+    /* the air, thinning upwards */
+    for(let i=0;i<28;i++){
+      const y0=topY+(groundY-topY)*i/28, y1=topY+(groundY-topY)*(i+1)/28;
+      c.fillStyle="rgba(120,170,205,"+(0.03+0.10*(i/28))+")";
+      c.fillRect(pad,y0,w-2*pad,y1-y0+1);
+    }
+    /* the tower */
+    const tx=w*0.34;
+    c.fillStyle="#e7e2d6"; c.fillRect(tx-9,topY,18,groundY-topY);
+    PEN(c,"#9c968a",1.4); c.strokeRect(tx-9,topY,18,groundY-topY);
+    PEN(c,"#c9c3b6",1); c.beginPath();
+    for(let y=0;y<=this.H0;y+=200){ c.moveTo(tx-9,Y(y)); c.lineTo(tx+9,Y(y)); }
+    c.stroke();
+    /* the ground */
+    c.fillStyle="#b8926a"; c.fillRect(0,groundY,w,h-groundY);
+    /* the release mark and the ball on its way down */
+    PEN(c,"#98A6B4",1); c.setLineDash([4,4]); c.beginPath();
+    c.moveTo(pad,Y(r.h0)); c.lineTo(w-pad,Y(r.h0)); c.stroke(); c.setLineDash([]);
+    const bx=tx+34, rad=Math.max(4,Math.min(11,3+r.rho));
+    /* a short trail, so the fall reads in a still frame */
+    for(let k=1;k<=5;k++){
+      const yy=Math.min(r.h0,r.y+r.v*0.22*k);
+      c.fillStyle="rgba(44,111,155,"+(0.16-0.028*k)+")";
+      c.beginPath(); c.arc(bx,Y(yy),rad,0,7); c.fill();
+    }
+    c.fillStyle="#2c6f9b"; c.beginPath(); c.arc(bx,Y(r.y),rad,0,7); c.fill();
+    c.fillStyle="rgba(255,255,255,.5)";
+    c.beginPath(); c.arc(bx-rad*0.3,Y(r.y)-rad*0.35,rad*0.3,0,7); c.fill();
+    c.fillStyle="#8A99A8"; c.font="10px IBM Plex Mono,ui-monospace,monospace";
+    c.textAlign="left";
+    c.fillText("h "+r.h0+" m",12,h-26);
+    c.fillText("v "+r.v.toFixed(1)+" m/s",12,h-12);
+    c.textAlign="right";
+    c.fillText("\u03c1 "+r.rho.toFixed(1)+" g/cm\u00b3",w-12,h-12);
+    c.textAlign="left";
+  }};
+
+/* ── IPhO 2022 E2 · electrons crossing the coaxial diode ────────── */
+const SIG_I22E2={
+  sim:"sim/ipho2022_E2_web.html", tag:"IPhO 2022 E2", span:11, rate:1,
+  capL:{ko:"동축 진공 다이오드 · 전압을 올리면 전자 흐름이 굵어진다",
+        en:"Coaxial vacuum diode · raise the voltage and the electron flow thickens"},
+  capR:{ko:"양극 전압",en:"anode"},
+  V(t){ return 60*(0.5-0.5*Math.cos(2*Math.PI*(t%this.span)/this.span)); },
+  I(v){ return 0.021*Math.pow(Math.max(v,0),1.5); },        /* the 3/2 law, mA */
+  read(t){ return this.V(t).toFixed(1)+" V"; },
+  paint(c,w,h,t){
+    const V=this.V(t), I=this.I(V), IMAX=this.I(60);
+    const cx=w*0.40, cy=h*0.52, RC=Math.min(w,h)*0.38, RE=RC*0.17;
+    c.fillStyle="#fff"; c.fillRect(0,0,w,h);
+    /* the collector: a ring at potential V, the emitter a hot wire on the axis */
+    c.beginPath(); c.arc(cx,cy,RC,0,7);
+    c.fillStyle="#f4f7f9"; c.fill(); PEN(c,"#8d949b",3); c.stroke();
+    PEN(c,"#c3ccd2",1); c.beginPath(); c.arc(cx,cy,RC*0.94,0,7); c.stroke();
+    /* electrons: more of them, and faster, as V rises */
+    const n=Math.round(6+I/IMAX*58);
+    for(let i=0;i<n;i++){
+      const a=(i*2.39996+t*(0.5+2.4*I/IMAX))%(2*Math.PI);
+      const u=((i*0.618+t*(0.18+0.55*Math.sqrt(I/IMAX)))%1);
+      const rr=RE+ (RC-RE)*u;
+      const al=0.25+0.6*(1-u);
+      c.fillStyle="rgba(44,111,155,"+al.toFixed(2)+")";
+      c.beginPath(); c.arc(cx+Math.cos(a)*rr, cy+Math.sin(a)*rr, 1.9,0,7); c.fill();
+    }
+    /* the emitter, glowing with its own heat */
+    const gl=c.createRadialGradient(cx,cy,0,cx,cy,RE*3.4);
+    gl.addColorStop(0,"rgba(242,193,78,.85)"); gl.addColorStop(1,"rgba(242,193,78,0)");
+    c.fillStyle=gl; c.beginPath(); c.arc(cx,cy,RE*3.4,0,7); c.fill();
+    c.beginPath(); c.arc(cx,cy,RE,0,7); c.fillStyle="#e8862a"; c.fill();
+    PEN(c,"#8a4d13",1.4); c.stroke();
+    /* the meter beside it: the current the collector actually draws */
+    const mx=w-Math.min(96,w*0.24), my=h*0.5, mw=Math.min(84,w*0.21), mh=h*0.44;
+    c.fillStyle="#15181c"; c.fillRect(mx-mw/2,my-mh/2,mw,mh);
+    PEN(c,"#2f3540",1.4); c.strokeRect(mx-mw/2,my-mh/2,mw,mh);
+    c.fillStyle="#7fd0ee"; c.textAlign="center";
+    c.font=Math.max(11,mh*0.16).toFixed(0)+"px IBM Plex Mono,ui-monospace,monospace";
+    c.fillText(I.toFixed(2)+" mA",mx,my-mh*0.12);
+    c.fillStyle="#f2c14e";
+    c.fillText(V.toFixed(1)+" V",mx,my+mh*0.14);
+    /* a bar that follows the current */
+    c.fillStyle="#243040"; c.fillRect(mx-mw*0.36,my+mh*0.24,mw*0.72,mh*0.10);
+    c.fillStyle="#2c6f9b"; c.fillRect(mx-mw*0.36,my+mh*0.24,mw*0.72*(I/IMAX),mh*0.10);
+    c.textAlign="left";
+  }};
+
+/* ── RMPh 2024 · the Ising lattice cooling through T_c ──────────── */
+const SIG_R24E1={
+  sim:"sim/rmph2024_E1_web.html", tag:"RMPh 2024 E1", span:16, rate:1,
+  capL:{ko:"이징 격자의 스핀 배치",en:"Spins on the Ising lattice"},
+  capR:{ko:"온도",en:"T"},
+  read(t){ return this.T(t).toFixed(2)+" J/k"; },
+  T(t){ return 0.6+3.0*(0.5+0.5*Math.cos(2*Math.PI*Math.min(t,this.span)/this.span)); },
+  paint(c,w,h,t){
+    /* nearest-neighbour correlation grows as the lattice cools past T_c=2.27 */
+    const L=28, T=this.T(t), TC=2.269;
+    const order=T>=TC?0:Math.pow(1-Math.pow(T/TC,4),0.125);
+    const pad=Math.min(w,h)*0.06, cell=Math.min((w-2*pad)/L,(h-2*pad)/L);
+    const ox=(w-cell*L)/2, oy=(h-cell*L)/2;
+    c.fillStyle="#fff"; c.fillRect(0,0,w,h);
+    const hash=(i,j)=>{ const x=Math.sin(i*127.1+j*311.7)*43758.5453; return x-Math.floor(x); };
+    for(let i=0;i<L;i++) for(let j=0;j<L;j++){
+      /* smooth blobs give the domains; the threshold moves with the order */
+      const b=(hash(Math.floor(i/3),Math.floor(j/3))*0.6+hash(i,j)*0.4);
+      const up = b > 0.5-order*0.42;
+      c.fillStyle = up ? "#2c6f9b" : "#e9eef3";
+      c.fillRect(ox+i*cell, oy+j*cell, cell-0.6, cell-0.6);
+    }
+    PEN(c,"#B4CADC",1); c.strokeRect(ox,oy,cell*L,cell*L);
+    c.fillStyle="#8A99A8"; c.font="9.5px IBM Plex Mono,ui-monospace,monospace";
+    c.textAlign="left";
+    c.fillText(T>=TC?"T > Tc":"T < Tc", ox, oy-4);
+  }};
+
+/* ── APhO 2021 E1 · how far the clamped beam bends ──────────────── */
+const SIG_A21E1={
+  sim:"sim/apho2021_E1_web.html", tag:"APhO 2021 E1", span:13, rate:1,
+  capL:{ko:"하중에 따른 캔틸레버 처짐",en:"Cantilever deflection against load"},
+  capR:{ko:"걸어 둔 추",en:"load"},
+  read(t){ return this.m(t).toFixed(0)+" g"; },
+  m(t){ return 20+180*(0.5-0.5*Math.cos(2*Math.PI*Math.min(t,this.span)/this.span)); },
+  paint(c,w,h,t){
+    /* delta = m g L^3 / (3 E I): straight in the load, cubed in the length */
+    const g=9.81, L=0.32, E=70e9, bb=0.02, hh2=0.0012;
+    const I=bb*Math.pow(hh2,3)/12;
+    const D=m=>m/1000*g*Math.pow(L,3)/(3*E*I)*1000;      /* mm */
+    const MMAX=200, pad=16, padL=44, padB=22;
+    const X=u=>padL+u/MMAX*(w-padL-pad);
+    const DMAX=D(MMAX)*1.12;
+    const Y=v=>h-padB-v/DMAX*(h-padB-pad);
+    c.fillStyle="#fff"; c.fillRect(0,0,w,h);
+    PEN(c,"#DCE7F0",.5); c.beginPath();
+    for(let u=0;u<=MMAX;u+=25){ c.moveTo(X(u),pad); c.lineTo(X(u),h-padB); }
+    for(let v=0;v<=DMAX;v+=DMAX/5){ c.moveTo(padL,Y(v)); c.lineTo(w-pad,Y(v)); }
+    c.stroke();
+    PEN(c,"#B4CADC",1); c.beginPath();
+    c.moveTo(padL,Y(0)); c.lineTo(w-pad,Y(0));
+    c.moveTo(padL,pad); c.lineTo(padL,h-padB); c.stroke();
+    PEN(c,"#2c6f9b",2.2); c.beginPath();
+    for(let i=0;i<=120;i++){ const u=MMAX*i/120; i?c.lineTo(X(u),Y(D(u))):c.moveTo(X(u),Y(D(u))); }
+    c.stroke();
+    const mm=this.m(t);
+    c.fillStyle="#2c6f9b"; c.beginPath(); c.arc(X(mm),Y(D(mm)),3.4,0,7); c.fill();
+    /* the beam itself, bending in the corner */
+    const bx=w-pad-92, by=pad+14, BL=78, sag=D(mm)/DMAX*26;
+    PEN(c,"#7d848a",3); c.beginPath();
+    c.moveTo(bx,by);
+    c.quadraticCurveTo(bx+BL*0.6,by+sag*0.35,bx+BL,by+sag);
+    c.stroke();
+    c.fillStyle="#3a4048"; c.fillRect(bx-6,by-10,6,20);
+    c.fillStyle="#8d949b"; c.beginPath(); c.arc(bx+BL,by+sag+7,4.5,0,7); c.fill();
+    c.fillStyle="#8A99A8"; c.font="9.5px IBM Plex Mono,ui-monospace,monospace";
+    c.textAlign="center"; for(const u of [50,100,150,200]) c.fillText(u+" g",X(u),h-7);
+    c.textAlign="right"; c.fillText("mm",padL-5,Y(DMAX*0.93));
+    c.textAlign="left";
+  }};
+
+/* ── APhO 2021 E2 · the pattern the sample throws on the screen ─── */
+const SIG_A21E2={
+  sim:"sim/apho2021_E2_web.html", tag:"APhO 2021 E2", span:17, rate:1,
+  capL:{ko:"시료가 만든 회절 무늬",en:"The diffraction pattern the sample makes"},
+  capR:{ko:"격자 간격",en:"pitch"},
+  read(t){ return (this.d(t)*1e6).toFixed(1)+" \u03bcm"; },
+  d(t){ return (28+16*Math.cos(2*Math.PI*Math.min(t,this.span)/this.span))*1e-6; },
+  paint(c,w,h,t){
+    /* N slits of width a on a pitch d: the usual grating intensity */
+    const lam=650e-9, a=this.d(t)*0.34, d=this.d(t), N=6, Lsc=0.9;
+    const I=x=>{ const th=Math.atan2(x,Lsc);
+      const al=Math.PI*a*Math.sin(th)/lam, be=Math.PI*d*Math.sin(th)/lam;
+      const s=al===0?1:Math.sin(al)/al;
+      const g=Math.abs(Math.sin(be))<1e-9?N:Math.sin(N*be)/Math.sin(be);
+      return s*s*g*g/(N*N); };
+    const XM=0.055, pad=16, padL=32, padB=22;
+    const X=u=>padL+(u+XM)/(2*XM)*(w-padL-pad);
+    const Y=v=>h-padB-v*(h-padB-pad)*0.92;
+    c.fillStyle="#fff"; c.fillRect(0,0,w,h);
+    PEN(c,"#DCE7F0",.5); c.beginPath();
+    for(let u=-XM;u<=XM+1e-9;u+=XM/5){ c.moveTo(X(u),pad); c.lineTo(X(u),h-padB); }
+    for(let v=0;v<=1;v+=0.25){ c.moveTo(padL,Y(v)); c.lineTo(w-pad,Y(v)); }
+    c.stroke();
+    /* the screen strip: the fringes as they actually look */
+    const sy=pad+2, sh=Math.max(10,(h-padB-pad)*0.16);
+    for(let px=padL;px<=w-pad;px+=1){
+      const u=(px-padL)/(w-padL-pad)*2*XM-XM;
+      const v=Math.min(1,I(u));
+      c.fillStyle="rgb("+Math.round(255*(0.12+0.88*v))+","+Math.round(40+30*v)+","+Math.round(38+26*v)+")";
+      c.fillRect(px,sy,1,sh);
+    }
+    PEN(c,"#B4CADC",1); c.strokeRect(padL,sy,w-pad-padL,sh);
+    PEN(c,"#B4CADC",1); c.beginPath();
+    c.moveTo(padL,Y(0)); c.lineTo(w-pad,Y(0));
+    c.moveTo(padL,sy+sh+6); c.lineTo(padL,h-padB); c.stroke();
+    PEN(c,"#2c6f9b",1.8); c.beginPath();
+    for(let px=padL;px<=w-pad;px+=1){
+      const u=(px-padL)/(w-padL-pad)*2*XM-XM, v=Math.min(1,I(u));
+      const yy=Math.max(sy+sh+6,Y(v));
+      px===padL?c.moveTo(px,yy):c.lineTo(px,yy);
+    }
+    c.stroke();
+    c.fillStyle="#8A99A8"; c.font="9.5px IBM Plex Mono,ui-monospace,monospace";
+    c.textAlign="center"; for(const u of [-0.04,0,0.04]) c.fillText((u*100).toFixed(0)+" cm",X(u),h-7);
+    c.textAlign="left";
+  }};
+
+/* ── RMPh 2021 · the D0 peak coming out of real LHCb data ───────── */
+const SIG_R21E1={
+  sim:"sim/rmph2021_E1_web.html", tag:"RMPh 2021 E1", span:18, rate:1,
+  capL:{ko:"자른 데이터에서 드러나는 D\u2070 질량 봉우리",
+        en:"The D\u2070 mass peak, as the cuts bite"},
+  capR:{ko:"IP 컷",en:"IP cut"},
+  read(t){ return this.cut(t).toFixed(2); },
+  cut(t){ return 1.0-0.9*(0.5-0.5*Math.cos(2*Math.PI*Math.min(t,this.span)/this.span)); },
+  paint(c,w,h,t){
+    /* a gaussian D0 peak on a falling background; tightening the impact
+       parameter cut kills the background and leaves the peak */
+    const M0=1864.8, SIG=9.0, LO=1800, HI=1930;
+    const k=this.cut(t);
+    const bg=m=>60*k*Math.exp(-(m-LO)/140);
+    const sig=m=>135*Math.exp(-0.5*Math.pow((m-M0)/SIG,2))*(1.15-0.15*k);
+    const YM=200, pad=16, padL=40, padB=22;
+    const X=m=>padL+(m-LO)/(HI-LO)*(w-padL-pad);
+    const Y=v=>h-padB-v/YM*(h-padB-pad);
+    c.fillStyle="#fff"; c.fillRect(0,0,w,h);
+    PEN(c,"#DCE7F0",.5); c.beginPath();
+    for(let m=LO;m<=HI;m+=10){ c.moveTo(X(m),pad); c.lineTo(X(m),h-padB); }
+    for(let v=0;v<=YM;v+=YM/5){ c.moveTo(padL,Y(v)); c.lineTo(w-pad,Y(v)); }
+    c.stroke();
+    /* the histogram bars, with the scatter real data would have */
+    const NB=44;
+    for(let i=0;i<NB;i++){
+      const m=LO+(HI-LO)*(i+0.5)/NB;
+      const wob=0.9+0.2*Math.abs(Math.sin(i*12.9898)*43758.5453%1);
+      const v=(bg(m)+sig(m))*wob;
+      c.fillStyle="#cfe0ee";
+      c.fillRect(X(LO+(HI-LO)*i/NB)+1, Y(v), (w-padL-pad)/NB-2, h-padB-Y(v));
+    }
+    PEN(c,"#98A6B4",1); c.setLineDash([3,4]); c.beginPath();
+    for(let i=0;i<=160;i++){ const m=LO+(HI-LO)*i/160; i?c.lineTo(X(m),Y(bg(m))):c.moveTo(X(m),Y(bg(m))); }
+    c.stroke(); c.setLineDash([]);
+    PEN(c,"#2c6f9b",2.2); c.beginPath();
+    for(let i=0;i<=200;i++){ const m=LO+(HI-LO)*i/200, v=bg(m)+sig(m);
+      i?c.lineTo(X(m),Y(v)):c.moveTo(X(m),Y(v)); }
+    c.stroke();
+    PEN(c,"#e8622a",1.2); c.beginPath();
+    c.moveTo(X(M0),pad); c.lineTo(X(M0),h-padB); c.stroke();
+    c.fillStyle="#8A99A8"; c.font="9.5px IBM Plex Mono,ui-monospace,monospace";
+    c.textAlign="center"; for(const m of [1820,1865,1910]) c.fillText(m+"",X(m),h-7);
+    c.textAlign="right"; c.fillText("events",padL-5,Y(YM*0.94));
+    c.textAlign="left";
+  }};
+
+/* ── RMPh 2023 · the ball curving across the turntable ──────────── */
+const SIG_R23E1={
+  sim:"sim/rmph2023_E1_web.html", tag:"RMPh 2023 E1", span:20, rate:1,
+  capL:{ko:"회전하는 원판 위로 쏜 공 · 원판과 함께 도는 눈으로 본 자취",
+        en:"A ball fired across the spinning table, seen from the table itself"},
+  capR:{ko:"프레임",en:"frame"},
+  frame(t){ return Math.floor((t%this.span)/this.span*240); },
+  read(t){ return this.frame(t)+" / 239"; },
+  paint(c,w,h,t){
+    const R=Math.min(w,h)*0.42, cx=w*0.5, cy=h*0.52;
+    const om=1.15, v0=0.62;                                 /* spin and muzzle speed */
+    const fr=this.frame(t)/240;
+    c.fillStyle="#fff"; c.fillRect(0,0,w,h);
+    /* the table, with a mark so the rotation is visible */
+    c.beginPath(); c.arc(cx,cy,R,0,7);
+    c.fillStyle="#f2f4f6"; c.fill(); PEN(c,"#b4c0ca",2); c.stroke();
+    const spin=om*fr*6.0;
+    PEN(c,"#dde5ec",1.4); c.beginPath();
+    for(let k=0;k<8;k++){ const a=spin+k*Math.PI/4;
+      c.moveTo(cx,cy); c.lineTo(cx+Math.cos(a)*R,cy+Math.sin(a)*R); }
+    c.stroke();
+    c.fillStyle="#e8622a"; c.beginPath();
+    c.arc(cx+Math.cos(spin)*R*0.93, cy+Math.sin(spin)*R*0.93, 4,0,7); c.fill();
+    /* straight in the lab, curved on the table: that is the whole experiment */
+    const gun=[-R*0.92,0];
+    const path=u=>{ const x=gun[0]+v0*R*u*2.0, y=0, a=-om*u*6.0;
+      return [cx+(x*Math.cos(a)-y*Math.sin(a)), cy+(x*Math.sin(a)+y*Math.cos(a))]; };
+    PEN(c,"#2c6f9b",2.2); c.beginPath();
+    for(let i=0;i<=90;i++){ const u=fr*i/90, q=path(u);
+      i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1]); }
+    c.stroke();
+    const b=path(fr);
+    c.fillStyle="#2c6f9b"; c.beginPath(); c.arc(b[0],b[1],5,0,7); c.fill();
+    /* the cannon, riding round with the table */
+    const ga=-om*0*6.0;
+    c.save(); c.translate(cx+gun[0],cy); c.rotate(ga);
+    c.fillStyle="#3a4048"; c.fillRect(-6,-5,16,10);
+    c.restore();
+    c.fillStyle="#8A99A8"; c.font="10px IBM Plex Mono,ui-monospace,monospace";
+    c.textAlign="left"; c.fillText("frame "+this.frame(t)+" / 239",12,h-12);
+  }};
+
+/* ── EuPhO 2021 E1 · the compass walked over the buried wire ────── */
+const SIG_E21E1={
+  sim:"sim/eupho2021_E1_web.html", tag:"EuPhO 2021 E1", span:16, rate:1,
+  capL:{ko:"판 위를 걸어 다니는 나침반 · 아래 어딘가에 도선이 있다",
+        en:"Walking the compass over the square · the wire is somewhere below"},
+  capR:{ko:"바늘 편향",en:"needle"},
+  X0:0.34, DEPTH:0.22,                       /* where the wire is, in square widths */
+  probe(t){ const u=(t%this.span)/this.span; return 0.06+0.88*(0.5-0.5*Math.cos(2*Math.PI*u)); },
+  phi(x){ const dx=x-this.X0, h=this.DEPTH;  /* B of a straight wire, seen on the surface */
+    return Math.atan2(h*1.0, 0)*0 + Math.atan((0.55*h/(dx*dx+h*h))*1.0)*57.3*Math.sign(1)*(dx>=0?1:1)
+           * (h/Math.max(h,0.001)) * (1) * ( (h)/(dx*dx+h*h) )/( (h)/(h*h) ) * 1; },
+  deflect(x){ const dx=x-this.X0, h=this.DEPTH;
+    const Bx=(-h)/(dx*dx+h*h), By=(dx)/(dx*dx+h*h);   /* up to a constant */
+    return Math.atan2(Bx*0.06, 1+By*0.06)*57.3; },
+  read(t){ return this.deflect(this.probe(t)).toFixed(1)+"\u00b0"; },
+  paint(c,w,h,t){
+    const S=Math.min(w,h)*0.62, ox=(w-S)/2, oy=h*0.30;
+    c.fillStyle="#fff"; c.fillRect(0,0,w,h);
+    /* the square surface, seen from above */
+    c.fillStyle="#f4f6f8"; c.fillRect(ox,oy,S,S*0.52);
+    PEN(c,"#b4c0ca",2); c.strokeRect(ox,oy,S,S*0.52);
+    PEN(c,"#e3e9ef",1); c.beginPath();
+    for(let k=1;k<10;k++){ c.moveTo(ox+S*k/10,oy); c.lineTo(ox+S*k/10,oy+S*0.52); }
+    c.stroke();
+    /* the wire, dashed because you are not supposed to see it */
+    PEN(c,"#e8622a",1.6); c.setLineDash([6,5]); c.beginPath();
+    c.moveTo(ox+S*this.X0,oy); c.lineTo(ox+S*this.X0,oy+S*0.52); c.stroke(); c.setLineDash([]);
+    /* the compass, where it is now, needle turned by the field */
+    const x=this.probe(t), cx=ox+S*x, cy=oy+S*0.26, R=Math.max(9,S*0.075);
+    const ang=this.deflect(x)*Math.PI/180;
+    c.beginPath(); c.arc(cx,cy,R,0,7);
+    c.fillStyle="#fff"; c.fill(); PEN(c,"#7d848a",1.6); c.stroke();
+    PEN(c,"#c3ccd2",1); c.beginPath();
+    c.moveTo(cx,cy-R); c.lineTo(cx,cy+R); c.stroke();
+    c.save(); c.translate(cx,cy); c.rotate(ang);
+    c.fillStyle="#cc3b32"; c.beginPath();
+    c.moveTo(0,-R*0.82); c.lineTo(R*0.17,0); c.lineTo(-R*0.17,0); c.closePath(); c.fill();
+    c.fillStyle="#4a5058"; c.beginPath();
+    c.moveTo(0,R*0.82); c.lineTo(R*0.17,0); c.lineTo(-R*0.17,0); c.closePath(); c.fill();
+    c.restore();
+    /* the deflection it has read so far, drawn under the square */
+    const gy=oy+S*0.62, gh=h-gy-24;
+    PEN(c,"#B4CADC",1); c.beginPath();
+    c.moveTo(ox,gy+gh/2); c.lineTo(ox+S,gy+gh/2); c.stroke();
+    PEN(c,"#2c6f9b",2); c.beginPath();
+    for(let i=0;i<=120;i++){ const u=0.06+0.88*i/120;
+      const q=gy+gh/2-this.deflect(u)/60*gh*0.42;
+      i?c.lineTo(ox+S*u,q):c.moveTo(ox+S*u,q); }
+    c.stroke();
+    c.fillStyle="#2c6f9b"; c.beginPath();
+    c.arc(ox+S*x, gy+gh/2-this.deflect(x)/60*gh*0.42, 3.4,0,7); c.fill();
+    c.fillStyle="#8A99A8"; c.font="10px IBM Plex Mono,ui-monospace,monospace";
+    c.textAlign="left"; c.fillText("x = "+(x*100).toFixed(0)+" mm",12,h-12);
+  }};
+
+/* ── EuPhO 2021 E2 · heat crawling along the rod ────────────────── */
+const SIG_E21E2={
+  sim:"sim/eupho2021_E2_web.html", tag:"EuPhO 2021 E2", span:22, rate:1,
+  capL:{ko:"한쪽 끝을 데운 30 cm 막대 · 다섯 지점의 온도가 차례로 오른다",
+        en:"A 30 cm rod heated at one end · five points warm up in turn"},
+  capR:{ko:"가열 시간",en:"heating"},
+  L:0.30, ALPHA:1.1e-4, P:12,
+  T(x,t){ /* one-dimensional heat flow from the end, room temperature 26.9 C */
+    if(t<=0) return 26.9;
+    const a=this.ALPHA, k=205, A=Math.PI*0.01*0.01;
+    const z=x/(2*Math.sqrt(a*t));
+    const erfc=u=>{ const p=0.3275911, s=1/(1+p*u);
+      return s*(0.254829592+s*(-0.284496736+s*(1.421413741+s*(-1.453152027+s*1.061405429))))*Math.exp(-u*u); };
+    const q=this.P/A;
+    return 26.9 + q*Math.sqrt(4*a*t/Math.PI)/k*(Math.exp(-z*z)-Math.sqrt(Math.PI)*z*erfc(z));
+  },
+  read(t){ return (t%this.span).toFixed(0)+" s"; },
+  paint(c,w,h,t){
+    const tt=(t%this.span)*8;                       /* the run, sped up */
+    const pad=26, x0=pad+34, x1=w-pad, ry=h*0.34, rh=Math.max(16,h*0.14);
+    c.fillStyle="#fff"; c.fillRect(0,0,w,h);
+    /* the rod, coloured by its own temperature */
+    for(let px=x0;px<x1;px+=2){
+      const x=(px-x0)/(x1-x0)*this.L, T=this.T(x,tt);
+      const u=Math.min(1,Math.max(0,(T-26.9)/70));
+      c.fillStyle="rgb("+Math.round(190+65*u)+","+Math.round(190-95*u)+","+Math.round(195-150*u)+")";
+      c.fillRect(px,ry,2,rh);
+    }
+    PEN(c,"#7d848a",1.6); c.strokeRect(x0,ry,x1-x0,rh);
+    /* the heater on the first 3 cm */
+    c.fillStyle="rgba(232,98,42,.85)";
+    c.fillRect(x0,ry-6,(x1-x0)*0.10,rh+12);
+    c.fillStyle="#8A99A8"; c.font="10px IBM Plex Mono,ui-monospace,monospace";
+    c.textAlign="center"; c.fillText(this.P+" W",x0+(x1-x0)*0.05,ry-10);
+    /* the five sensors, and the temperature each is showing */
+    const gy=ry+rh+18, gh=h-gy-26;
+    PEN(c,"#B4CADC",1); c.beginPath();
+    c.moveTo(x0,gy+gh); c.lineTo(x1,gy+gh); c.stroke();
+    for(let i=0;i<5;i++){
+      const f=(i+0.5)/5, px=x0+(x1-x0)*f, T=this.T(f*this.L,tt);
+      const u=Math.min(1,Math.max(0,(T-26.9)/70));
+      PEN(c,"#c3ccd2",1); c.beginPath();
+      c.moveTo(px,ry+rh); c.lineTo(px,gy); c.stroke();
+      c.fillStyle="#2c6f9b"; c.fillRect(px-6,gy+gh-u*gh,12,u*gh);
+      c.fillStyle="#5c6773"; c.textAlign="center";
+      c.fillText(T.toFixed(0)+"\u00b0",px,gy+gh+14);
+    }
+    c.textAlign="left";
+  }};
+
+/* ── EuPhO 2020 E1 · electrons thrown off course by a hidden charge ─ */
+const SIG_E20E1={
+  sim:"sim/eupho2020_E1_web.html", tag:"EuPhO 2020 E1", span:15, rate:1,
+  capL:{ko:"숨은 전하에 산란되어 스크린에 찍히는 전자",
+        en:"Electrons scattered by the hidden charge onto the screen"},
+  capR:{ko:"충돌 파라미터",en:"impact b"},
+  b(t){ const u=(t%this.span)/this.span; return 0.10+0.75*(0.5-0.5*Math.cos(2*Math.PI*u)); },
+  paint(c,w,h,t){
+    const qx=w*0.46, qy=h*0.52, S=Math.min(w,h);
+    c.fillStyle="#fff"; c.fillRect(0,0,w,h);
+    /* the screen the electrons end up on */
+    const sx=w-34;
+    c.fillStyle="#eef2f6"; c.fillRect(sx,18,16,h-46);
+    PEN(c,"#9aa3ab",1.4); c.strokeRect(sx,18,16,h-46);
+    /* the hidden charge, drawn faint: the students never see it */
+    PEN(c,"#e3c6bd",1.2); c.setLineDash([4,4]);
+    for(const r of [0.06,0.11,0.17]){ c.beginPath(); c.arc(qx,qy,r*S,0,7); c.stroke(); }
+    c.setLineDash([]);
+    c.fillStyle="#e8622a"; c.beginPath(); c.arc(qx,qy,4,0,7); c.fill();
+    /* a fan of electrons: each one deflected by its own impact parameter */
+    const bs=[-0.62,-0.38,-0.2,0.2,0.38,0.62,this.b(t)];
+    bs.forEach((bb,i)=>{
+      const live=(i===bs.length-1);
+      const b=bb*S*0.22;
+      PEN(c,live?"#2c6f9b":"#cfdce7",live?2.2:1.4); c.beginPath();
+      let x=14, y=qy-b, vx=1, vy=0, hit=null;
+      c.moveTo(x,y);
+      for(let k=0;k<420 && x<sx;k++){
+        const dx=x-qx, dy=y-qy, r2=Math.max(60,dx*dx+dy*dy), r=Math.sqrt(r2);
+        const a=1400/r2;                          /* repulsion, Rutherford-like */
+        vx+=a*dx/r*0.02; vy+=a*dy/r*0.02;
+        const n=Math.hypot(vx,vy); vx/=n; vy/=n;
+        x+=vx*2.2; y+=vy*2.2; c.lineTo(x,y);
+        if(x>=sx){ hit=y; break; }
+      }
+      c.stroke();
+      if(hit!==null){ c.fillStyle=live?"#2c6f9b":"#b9c8d6";
+        c.beginPath(); c.arc(sx+8,Math.max(20,Math.min(h-30,hit)),live?4:2.6,0,7); c.fill(); }
+    });
+    c.fillStyle="#8A99A8"; c.font="10px IBM Plex Mono,ui-monospace,monospace";
+    c.textAlign="left"; c.fillText("b = "+this.b(t).toFixed(2),12,h-12);
+  },
+  read(t){ return this.b(t).toFixed(2); }};
+
+/* ── EuPhO 2020 E2 · the sealed box, shaken on purpose ──────────── */
+const SIG_E20E2={
+  sim:"sim/eupho2020_E2_web.html", tag:"EuPhO 2020 E2", span:14, rate:1,
+  capL:{ko:"가속도를 지정해 흔드는 상자 · 읽을 수 있는 것은 힘뿐",
+        en:"Drive the box with an acceleration you choose · all you read is the force"},
+  capR:{ko:"바닥이 받는 힘",en:"force"},
+  state(t){
+    /* two masses on two springs inside; the box is driven in steps */
+    const T=t%this.span, A=(T<this.span*0.5)? 3.0 : -2.2;
+    const w1=6.4, w2=3.1;
+    const y2=(A/ (w1*w1))*(1-Math.cos(w1*T))*22;
+    const y3=(A/ (w2*w2))*(1-Math.cos(w2*T))*30;
+    const F=(0.6+0.25+0.18)*9.81 + (0.25*A*Math.cos(w1*T)+0.18*A*Math.cos(w2*T));
+    return {A:A, y2:y2, y3:y3, F:F};
+  },
+  read(t){ return this.state(t).F.toFixed(2)+" N"; },
+  paint(c,w,h,t){
+    const st=this.state(t), S=Math.min(w,h);
+    const bw=S*0.30, bh=S*0.56, bx=w*0.30-bw/2, by=h*0.5-bh/2 + (st.A>0?-4:4);
+    c.fillStyle="#fff"; c.fillRect(0,0,w,h);
+    /* the box */
+    c.fillStyle="#f2f4f6"; c.fillRect(bx,by,bw,bh);
+    PEN(c,"#7d848a",2.4); c.strokeRect(bx,by,bw,bh);
+    /* first spring and its mass */
+    const cx=bx+bw/2, top=by+6;
+    const y2=top+bh*0.30+st.y2;
+    PEN(c,"#9aa3ab",1.6); c.beginPath();
+    for(let i=0;i<=24;i++){ const u=i/24, yy=top+(y2-top)*u;
+      c.lineTo(cx+((i%2)?7:-7),yy); }
+    c.stroke();
+    c.fillStyle="#5c6773"; c.fillRect(cx-13,y2,26,13);
+    /* second spring and its mass */
+    const y3=y2+13+bh*0.22+st.y3;
+    PEN(c,"#9aa3ab",1.6); c.beginPath();
+    for(let i=0;i<=20;i++){ const u=i/20, yy=y2+13+(y3-y2-13)*u;
+      c.lineTo(cx+((i%2)?6:-6),yy); }
+    c.stroke();
+    c.fillStyle="#8d949b"; c.fillRect(cx-10,y3,20,11);
+    /* the acceleration being applied, and the force that comes back */
+    PEN(c,"#e8622a",2.4); c.beginPath();
+    const ay=by-16, al=Math.sign(st.A)*22;
+    c.moveTo(cx,ay); c.lineTo(cx,ay-al); c.stroke();
+    c.beginPath(); c.moveTo(cx,ay-al); c.lineTo(cx-5,ay-al+Math.sign(st.A)*7);
+    c.lineTo(cx+5,ay-al+Math.sign(st.A)*7); c.closePath(); c.fillStyle="#e8622a"; c.fill();
+    /* the force trace, which is the only thing the program gives you */
+    const gx=w*0.56, gw=w-gx-20, gy=20, gh=h-46;
+    PEN(c,"#DCE7F0",1); c.strokeRect(gx,gy,gw,gh);
+    PEN(c,"#2c6f9b",2); c.beginPath();
+    for(let i=0;i<=160;i++){ const tt=(t-this.span*0.9)+this.span*0.9*i/160;
+      const F=this.state(Math.max(0,tt)).F;
+      const yy=gy+gh*(1-(F-6)/8);
+      i?c.lineTo(gx+gw*i/160,yy):c.moveTo(gx+gw*i/160,yy); }
+    c.stroke();
+    c.fillStyle="#8A99A8"; c.font="10px IBM Plex Mono,ui-monospace,monospace";
+    c.textAlign="left";
+    c.fillText("a = "+st.A.toFixed(1)+" m/s\u00b2",12,h-12);
+    c.fillText("F = "+st.F.toFixed(2)+" N",gx,h-12);
+  }};
+
+const ALL_SIGS=[SIG_I17E1,SIG_I17E2,SIG_A23E1,SIG_A23E2,SIG_S25T1,SIG_S26E1,SIG_A26E1,SIG_A26E2,
+                SIG_I11E1,SIG_I11E2,SIG_A22E1,SIG_A22E2,SIG_I22E1,SIG_I22E2,SIG_R24E1,
+                SIG_A21E1,SIG_A21E2,SIG_R21E1,SIG_R23E1,
+                SIG_E20E1,SIG_E20E2,SIG_E21E1,SIG_E21E2];
 
 /* only the ones the site actually publishes a browser build for */
 function liveSigs(){
   const have=new Set();
   for(const k in DATA) for(const y of DATA[k].years)
-    for(const p of (y.problems||[])) if(p.files&&p.files.sim) have.add(p.files.sim);
-  const ok=ALL_SIGS.filter(s=>have.has(s.sim));
+    for(const p of (y.problems||[])){
+      if(p.hold) continue;
+      if(p.files&&(p.files.sim||p.files.exe||p.files.src)) have.add(DATA[k].abbr+" "+y.y+" "+p.id);
+    }
+  const ok=ALL_SIGS.filter(s=>have.has(s.tag));
   return ok.length?ok:ALL_SIGS;
+}
+/* a cover without a browser build sends you to its year instead */
+function heroHref(sig){
+  if(sig.sim) return sig.sim+"?lang="+lang;
+  const p=sig.tag.split(" ");
+  return "#/"+p[0].toLowerCase()+"/"+p[1];
 }
 function pickHero(){
   const ok=liveSigs();
