@@ -276,7 +276,19 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://haslalab.org/pdf/APhO_2023_E1_KO.pdf</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://haslalab.org/pdf/APhO_2023_E2_EN.pdf</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://haslalab.org/pdf/APhO_2023_E2_KO.pdf</loc>
     <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
