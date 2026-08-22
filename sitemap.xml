@@ -3,7 +3,7 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://haslalab.org/</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="ko" href="https://haslalab.org/?lang=ko"/>
@@ -12,7 +12,7 @@
   </url>
   <url>
     <loc>https://haslalab.org/problems.html</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="ko" href="https://haslalab.org/problems.html"/>
@@ -20,15 +20,51 @@
   </url>
   <url>
     <loc>https://haslalab.org/problems-en.html</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="ko" href="https://haslalab.org/problems.html"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://haslalab.org/problems-en.html"/>
   </url>
   <url>
+    <loc>https://haslalab.org/sim/apho2021_E1_web.html</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://haslalab.org/sim/apho2021_E1_web.html?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://haslalab.org/sim/apho2021_E1_web.html?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://haslalab.org/sim/apho2021_E1_web.html"/>
+  </url>
+  <url>
+    <loc>https://haslalab.org/sim/apho2021_E2_web.html</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://haslalab.org/sim/apho2021_E2_web.html?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://haslalab.org/sim/apho2021_E2_web.html?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://haslalab.org/sim/apho2021_E2_web.html"/>
+  </url>
+  <url>
+    <loc>https://haslalab.org/sim/apho2022_E1_web.html</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://haslalab.org/sim/apho2022_E1_web.html?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://haslalab.org/sim/apho2022_E1_web.html?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://haslalab.org/sim/apho2022_E1_web.html"/>
+  </url>
+  <url>
+    <loc>https://haslalab.org/sim/apho2022_E2_web.html</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://haslalab.org/sim/apho2022_E2_web.html?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://haslalab.org/sim/apho2022_E2_web.html?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://haslalab.org/sim/apho2022_E2_web.html"/>
+  </url>
+  <url>
     <loc>https://haslalab.org/sim/apho2023_E1_web.html</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="ko" href="https://haslalab.org/sim/apho2023_E1_web.html?lang=ko"/>
@@ -37,7 +73,7 @@
   </url>
   <url>
     <loc>https://haslalab.org/sim/apho2023_E2_web.html</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="ko" href="https://haslalab.org/sim/apho2023_E2_web.html?lang=ko"/>
@@ -45,8 +81,80 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://haslalab.org/sim/apho2023_E2_web.html"/>
   </url>
   <url>
+    <loc>https://haslalab.org/sim/apho2026_E1_web.html</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://haslalab.org/sim/apho2026_E1_web.html?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://haslalab.org/sim/apho2026_E1_web.html?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://haslalab.org/sim/apho2026_E1_web.html"/>
+  </url>
+  <url>
+    <loc>https://haslalab.org/sim/apho2026_E2_web.html</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://haslalab.org/sim/apho2026_E2_web.html?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://haslalab.org/sim/apho2026_E2_web.html?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://haslalab.org/sim/apho2026_E2_web.html"/>
+  </url>
+  <url>
+    <loc>https://haslalab.org/sim/eupho2020_E1_web.html</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://haslalab.org/sim/eupho2020_E1_web.html?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://haslalab.org/sim/eupho2020_E1_web.html?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://haslalab.org/sim/eupho2020_E1_web.html"/>
+  </url>
+  <url>
+    <loc>https://haslalab.org/sim/eupho2020_E2_web.html</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://haslalab.org/sim/eupho2020_E2_web.html?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://haslalab.org/sim/eupho2020_E2_web.html?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://haslalab.org/sim/eupho2020_E2_web.html"/>
+  </url>
+  <url>
+    <loc>https://haslalab.org/sim/eupho2021_E1_web.html</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://haslalab.org/sim/eupho2021_E1_web.html?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://haslalab.org/sim/eupho2021_E1_web.html?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://haslalab.org/sim/eupho2021_E1_web.html"/>
+  </url>
+  <url>
+    <loc>https://haslalab.org/sim/eupho2021_E2_web.html</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://haslalab.org/sim/eupho2021_E2_web.html?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://haslalab.org/sim/eupho2021_E2_web.html?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://haslalab.org/sim/eupho2021_E2_web.html"/>
+  </url>
+  <url>
+    <loc>https://haslalab.org/sim/ipho2011_E1_web.html</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://haslalab.org/sim/ipho2011_E1_web.html?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://haslalab.org/sim/ipho2011_E1_web.html?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://haslalab.org/sim/ipho2011_E1_web.html"/>
+  </url>
+  <url>
+    <loc>https://haslalab.org/sim/ipho2011_E2_web.html</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://haslalab.org/sim/ipho2011_E2_web.html?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://haslalab.org/sim/ipho2011_E2_web.html?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://haslalab.org/sim/ipho2011_E2_web.html"/>
+  </url>
+  <url>
     <loc>https://haslalab.org/sim/ipho2017_E1_web.html</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="ko" href="https://haslalab.org/sim/ipho2017_E1_web.html?lang=ko"/>
@@ -55,7 +163,7 @@
   </url>
   <url>
     <loc>https://haslalab.org/sim/ipho2017_E2_web.html</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="ko" href="https://haslalab.org/sim/ipho2017_E2_web.html?lang=ko"/>
@@ -63,8 +171,26 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://haslalab.org/sim/ipho2017_E2_web.html"/>
   </url>
   <url>
+    <loc>https://haslalab.org/sim/ipho2022_E1_web.html</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://haslalab.org/sim/ipho2022_E1_web.html?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://haslalab.org/sim/ipho2022_E1_web.html?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://haslalab.org/sim/ipho2022_E1_web.html"/>
+  </url>
+  <url>
+    <loc>https://haslalab.org/sim/ipho2022_E2_web.html</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://haslalab.org/sim/ipho2022_E2_web.html?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://haslalab.org/sim/ipho2022_E2_web.html?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://haslalab.org/sim/ipho2022_E2_web.html"/>
+  </url>
+  <url>
     <loc>https://haslalab.org/sim/ispho2025_T1_web.html</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="ko" href="https://haslalab.org/sim/ispho2025_T1_web.html?lang=ko"/>
@@ -73,7 +199,7 @@
   </url>
   <url>
     <loc>https://haslalab.org/sim/ispho2026_E1_web.html</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="ko" href="https://haslalab.org/sim/ispho2026_E1_web.html?lang=ko"/>
@@ -81,164 +207,341 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://haslalab.org/sim/ispho2026_E1_web.html"/>
   </url>
   <url>
+    <loc>https://haslalab.org/sim/rmph2021_E1_web.html</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://haslalab.org/sim/rmph2021_E1_web.html?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://haslalab.org/sim/rmph2021_E1_web.html?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://haslalab.org/sim/rmph2021_E1_web.html"/>
+  </url>
+  <url>
+    <loc>https://haslalab.org/sim/rmph2023_E1_web.html</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://haslalab.org/sim/rmph2023_E1_web.html?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://haslalab.org/sim/rmph2023_E1_web.html?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://haslalab.org/sim/rmph2023_E1_web.html"/>
+  </url>
+  <url>
+    <loc>https://haslalab.org/sim/rmph2024_E1_web.html</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://haslalab.org/sim/rmph2024_E1_web.html?lang=ko"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://haslalab.org/sim/rmph2024_E1_web.html?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://haslalab.org/sim/rmph2024_E1_web.html"/>
+  </url>
+  <url>
+    <loc>https://haslalab.org/pdf/APhO_2021_E_EN.pdf</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://haslalab.org/pdf/APhO_2021_E_KO.pdf</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://haslalab.org/pdf/APhO_2021_S.pdf</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://haslalab.org/pdf/APhO_2022_E_EN.pdf</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://haslalab.org/pdf/APhO_2022_E_KO.pdf</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://haslalab.org/pdf/APhO_2022_S.pdf</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://haslalab.org/pdf/APhO_2023_E1_EN.pdf</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://haslalab.org/pdf/APhO_2023_E2_EN.pdf</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://haslalab.org/pdf/APhO_2023_S1.pdf</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://haslalab.org/pdf/APhO_2023_S2.pdf</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://haslalab.org/pdf/EuPhO_2020_E_EN.pdf</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://haslalab.org/pdf/EuPhO_2020_E_KO.pdf</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://haslalab.org/pdf/EuPhO_2020_S.pdf</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://haslalab.org/pdf/EuPhO_2021_E1_KO.pdf</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://haslalab.org/pdf/EuPhO_2021_E2_KO.pdf</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://haslalab.org/pdf/EuPhO_2021_E_EN.pdf</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://haslalab.org/pdf/EuPhO_2021_S.pdf</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://haslalab.org/pdf/IPhO_2011_E_EN.pdf</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://haslalab.org/pdf/IPhO_2011_S.pdf</loc>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://haslalab.org/pdf/IPhO_2017_E1_EN.pdf</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://haslalab.org/pdf/IPhO_2017_E1_KO.pdf</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://haslalab.org/pdf/IPhO_2017_E2_EN.pdf</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://haslalab.org/pdf/IPhO_2017_E2_KO.pdf</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://haslalab.org/pdf/IPhO_2017_S1.pdf</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://haslalab.org/pdf/IPhO_2017_S2.pdf</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://haslalab.org/pdf/IPhO_2022_E_EN.pdf</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://haslalab.org/pdf/IPhO_2022_E_KO.pdf</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://haslalab.org/pdf/IPhO_2022_S.pdf</loc>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://haslalab.org/pdf/ISPhO_2023_S_T.pdf</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://haslalab.org/pdf/ISPhO_2023_T_EN.pdf</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://haslalab.org/pdf/ISPhO_2023_T_KO.pdf</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://haslalab.org/pdf/ISPhO_2024_E1_EN.pdf</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://haslalab.org/pdf/ISPhO_2024_E1_KO.pdf</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://haslalab.org/pdf/ISPhO_2024_S_E.pdf</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://haslalab.org/pdf/ISPhO_2024_S_T.pdf</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://haslalab.org/pdf/ISPhO_2024_T_EN.pdf</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://haslalab.org/pdf/ISPhO_2024_T_KO.pdf</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://haslalab.org/pdf/ISPhO_2025_E1_EN.pdf</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://haslalab.org/pdf/ISPhO_2025_E1_KO.pdf</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://haslalab.org/pdf/ISPhO_2025_S_E.pdf</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://haslalab.org/pdf/ISPhO_2025_S_T.pdf</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://haslalab.org/pdf/ISPhO_2025_T_EN.pdf</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://haslalab.org/pdf/ISPhO_2025_T_KO.pdf</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://haslalab.org/pdf/ISPhO_2026_E1_EN.pdf</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://haslalab.org/pdf/ISPhO_2026_E1_KO.pdf</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://haslalab.org/pdf/RMPh_2021_E_EN.pdf</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://haslalab.org/pdf/RMPh_2021_E_KO.pdf</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://haslalab.org/pdf/RMPh_2023_E_EN.pdf</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://haslalab.org/pdf/RMPh_2023_E_KO.pdf</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://haslalab.org/pdf/RMPh_2024_E_EN.pdf</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://haslalab.org/pdf/RMPh_2024_E_KO.pdf</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://haslalab.org/pdf/RMPh_2024_S.pdf</loc>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>

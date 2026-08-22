@@ -789,7 +789,7 @@ const DATA={
        desc:{ko:"대회 주최측이 만든 원본 시뮬레이터입니다. 관 속을 지나는 자석을 저울과 자기력계로 좇아 숨은 자석 배열을 알아냅니다.",
              en:"The organisers' own simulator: track a magnet down a tube with a balance and a magnetometer, and find the hidden magnet arrangement."},
        tags:["자기","블랙박스","공식 시뮬레이터"], tagsEn:["Magnetism","Black box","Official sim"],
-       files:{sim:"sim/apho2022_E1/simulation.html",
+       files:{sim:"sim/apho2022_E1_web.html",
               exe:{ko:REL+"v1.0/APhO2022_E1_sim_EN.exe", en:REL+"v1.0/APhO2022_E1_sim_EN.exe"},
               src:{ko:"src/apho2022_E1_magnetic_sim.py", en:"src/apho2022_E1_magnetic_sim.py"},
               pdf:{ko:"pdf/APhO_2022_E_KO.pdf", en:"pdf/APhO_2022_E_EN.pdf"},
@@ -799,7 +799,7 @@ const DATA={
        desc:{ko:"대회 주최측이 만든 원본 시뮬레이터입니다. 음원과 검출기를 옮겨 가며 도달 신호를 재어 상자 속 구조를 그려냅니다.",
              en:"The organisers' own simulator: move source and detector, read the arriving signal, and map what the box hides."},
        tags:["음향","블랙박스","공식 시뮬레이터"], tagsEn:["Acoustics","Black box","Official sim"],
-       files:{sim:"sim/apho2022_E2/simulation.html",
+       files:{sim:"sim/apho2022_E2_web.html",
               exe:{ko:REL+"v1.0/APhO2022_E2_sim_EN.exe", en:REL+"v1.0/APhO2022_E2_sim_EN.exe"},
               src:{ko:"src/apho2022_E2_acoustic_sim.py", en:"src/apho2022_E2_acoustic_sim.py"},
               pdf:{ko:"pdf/APhO_2022_E_KO.pdf", en:"pdf/APhO_2022_E_EN.pdf"},
@@ -1957,7 +1957,7 @@ const SIG_I11E2={
 
 /* ── APhO 2022 E1 · the magnet carried around the phone ─────────── */
 const SIG_A22E1={
-  sim:"sim/apho2022_E1/simulation.html", tag:"APhO 2022 E1", span:18, rate:1,
+  sim:"sim/apho2022_E1_web.html", tag:"APhO 2022 E1", span:18, rate:1,
   capL:{ko:"자석을 휴대폰 둘레로 옮기며 읽는 자기력계",
         en:"Carrying the magnet around the phone, reading its magnetometer"},
   capR:{ko:"센서 값",en:"sensor"},
@@ -2008,7 +2008,7 @@ const SIG_A22E1={
 
 /* ── APhO 2022 E2 · the echo train the detector hears ───────────── */
 const SIG_A22E2={
-  sim:"sim/apho2022_E2/simulation.html", tag:"APhO 2022 E2", span:14, rate:1.2,
+  sim:"sim/apho2022_E2_web.html", tag:"APhO 2022 E2", span:14, rate:1.2,
   capL:{ko:"검출기에 도달한 신호 · 음향 블랙박스",en:"What reaches the detector · acoustic black box"},
   capR:{ko:"검출기 위치",en:"detector"},
   read(t){ return this.d(t).toFixed(1)+" cm"; },

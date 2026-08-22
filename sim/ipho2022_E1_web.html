@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IPhO 2022 Q1 — Planet</title>
+<style>
+:root{--bg:#0c0c0c;--fg:#cccccc;--dim:#7d7d7d;--accent:#4ec9b0;--line:#2a2a2a;--panel:#141414}
+*{box-sizing:border-box}
+body{margin:0;background:#1e1e1e;color:var(--fg);
+     font:14px/1.5 ui-sans-serif,system-ui,"Segoe UI","Malgun Gothic",sans-serif;
+     height:100vh;display:flex;flex-direction:column;overflow:hidden}
+header{padding:12px 16px 10px;background:var(--panel);border-bottom:1px solid var(--line)}
+header h1{margin:0 0 3px;font-size:15px;color:#e8e8e8}
+header p{margin:0;color:var(--dim);font-size:12.5px}
+header details{margin-top:7px}
+header summary{cursor:pointer;color:var(--accent);font-size:12.5px}
+header ul{margin:6px 0 0;padding-left:18px;color:var(--dim);font-size:12.5px}
+header li{margin:2px 0}
+#screen{flex:1;overflow-y:auto;background:var(--bg);padding:12px 16px;
+        font:13px/1.45 ui-monospace,Consolas,"Courier New",monospace;white-space:pre-wrap;
+        word-break:break-word}
+#screen .in{color:#9cdcfe}
+#bar{display:flex;align-items:center;gap:0;background:var(--bg);border-top:1px solid var(--line);
+     padding:6px 16px 10px}
+#ps{color:var(--fg);font:13px/1.45 ui-monospace,Consolas,"Courier New",monospace;
+    white-space:pre;flex:none}
+#inp{flex:1;min-width:0;background:transparent;border:0;outline:0;color:#9cdcfe;
+     font:13px/1.45 ui-monospace,Consolas,"Courier New",monospace;padding:0}
+#tools{display:flex;gap:8px;padding:8px 16px;background:var(--panel);border-top:1px solid var(--line)}
+button{background:#2d2d2d;color:var(--fg);border:1px solid var(--line);border-radius:4px;
+       padding:5px 12px;font:12.5px inherit;cursor:pointer}
+button:hover{border-color:var(--accent);color:var(--accent)}
+
+</style>
+</head>
+<body>
+<script>
+/* IPhO 2022 Q1 "Planet" — browser build of the official console program
+   Exp1.exe / Exp1.Linux / Exp1.Linux64.  Same prompts, same ranges, same
+   rounding, same authorization key, same output line. */
+
+var AUTH_KEY = '12345678.888';
+
+var G_ACC = 15.8, T_DAY = 28000.0, OMEGA = 2 * Math.PI / T_DAY;
+var WIND = 1.31, RHO_A0 = 0.60, H_ATM = 7500.0, GAMMA = 1.4, T0_C = 20.0;
+var H_TOWER = 2000.0, R_MIN = 5.0, R_MAX = 50.0, RHO_MIN = 0.1, RHO_MAX = 10.0;
+var CD = 0.24, SIGMA_T = 0.01, SIGMA_S = 0.05;
+var BAR = new Array(49).join('=');
+
+function gauss(s) {
+  var u = 1 - Math.random(), v = Math.random();
+  return s * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+
+function airDensity(z) {
+  if (z >= H_ATM) return 0;
+  return RHO_A0 * Math.pow(1 - z / H_ATM, 1 / (GAMMA - 1));
+}
+
+function drop(h, rcm, rhoG) {
+  var r = rcm * 1e-2, rho = rhoG * 1e3;
+  var area = Math.PI * r * r, mass = 4 / 3 * Math.PI * r * r * r * rho;
+  var kd = CD * area / mass;
+
+  function d(s) {
+    var ra = airDensity(s[1]);
+    var rx = s[2] - WIND, rz = s[3];
+    var vr = Math.sqrt(rx * rx + rz * rz);
+    return [s[2], s[3],
+            -kd * ra * vr * rx - 2 * OMEGA * s[3],
+            -kd * ra * vr * rz - G_ACC + 2 * OMEGA * s[2]];
+  }
+
+  var st = [0, h, 0, 0], t = 0, dt = 2e-3, i;
+  while (st[1] > 0 && t < 1e5) {
+    var step = dt;
+    if (st[3] < 0 && st[1] / (-st[3]) < step) step = Math.max(st[1] / (-st[3]) * 0.5, 1e-6);
+    var k1 = d(st);
+    var s2 = []; for (i = 0; i < 4; i++) s2.push(st[i] + 0.5 * step * k1[i]);
+    var k2 = d(s2);
+    var s3 = []; for (i = 0; i < 4; i++) s3.push(st[i] + 0.5 * step * k2[i]);
+    var k3 = d(s3);
+    var s4 = []; for (i = 0; i < 4; i++) s4.push(st[i] + step * k3[i]);
+    var k4 = d(s4);
+    var nx = [];
+    for (i = 0; i < 4; i++) {
+      nx.push(st[i] + step / 6 * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]));
+    }
+    st = nx;
+    t += step;
+  }
+  return [t, Math.abs(st[0])];
+}
+
+function pad(s, n, right) {
+  s = String(s);
+  while (s.length < n) s = right ? s + ' ' : ' ' + s;
+  return s;
+}
+
+var PROGRAM = {
+  title: 'IPhO 2022 Q1 — Planet',
+  subtitle: '주최측이 배포한 것은 콘솔 실행 파일뿐입니다. 이 페이지는 그 프로그램을 브라우저에서 그대로 돌리는 판입니다.',
+  notes: [
+    '공식 프로그램은 <code>IPhO-2022/official/problem_2022_EXP_programs/</code>에 Windows·Linux·macOS 빌드로 들어 있습니다. 이 페이지는 그것과 같은 프롬프트·범위·반올림·출력 형식을 씁니다.',
+    '실행하면 인증 키를 묻습니다 — <b>12345678.888</b> (공식 문제지 Q1에 인쇄된 값).',
+    '입력 범위: 0 &lt; h &lt; 2000 m (1 m 단위), 5 &le; r &le; 50 cm (1 cm), 0.1 &le; &rho; &le; 10 g/cm&sup3; (0.01).',
+    '숨은 행성 값은 공식 해답이 제시하는 답과 맞습니다 — g = 15.8 m/s&sup2;, 바람 1.31 m/s, &rho;<sub>a0</sub> = 0.60 kg/m&sup3;, H&#8320; = 7500 m, 하루 28 000 s.',
+    'Ctrl+C 또는 "다시 시작"으로 처음부터 다시 실행합니다.'
+  ],
+  run: async function (term) {
+    var key = await term.ask('Enter Valid Authorization Key: ');
+    if (key.trim() !== AUTH_KEY) {
+      term.writeln('Invalid key -- the program is now in test mode; restart it and use '
+                   + 'the authorization key printed in the exam paper.');
+      return;
+    }
+    term.writeln('');
+
+    async function prompt(label, lo, hi, unitLo, unitHi, quant) {
+      var line = pad(unitLo, 3) + ' < ' + pad(label, 13, true) + ' < ' +
+                 pad(unitHi, 5, true) + ' | ' + pad(label, 13) + ': ';
+      for (;;) {
+        var raw = await term.ask(line);
+        var v = parseFloat(raw.trim());
+        if (raw.trim() === '' || isNaN(v)) { term.writeln('Value entered is not a number.'); continue; }
+        if (!(v >= lo && v <= hi)) { term.writeln('Value out of range.'); continue; }
+        return Math.round(v / quant) * quant;
+      }
+    }
+
+    for (;;) {
+      var h = await prompt('h (m)', 0, H_TOWER, '  0', '2000', 1);
+      var r = await prompt('r (cm)', R_MIN, R_MAX, '  5', '  50', 1);
+      var rho = await prompt('rho (g/cm^3)', RHO_MIN, RHO_MAX, '0.1', '10.0', 0.01);
+      term.writeln('...');
+      await term.yieldFrame();
+
+      var res = drop(h, r, rho);
+      var t = res[0] + gauss(SIGMA_T), s = res[1] + gauss(SIGMA_S);
+      term.writeln('t (s) = ' + t.toFixed(1) + ', s (m) = ' + s.toFixed(1));
+      term.writeln(BAR);
+    }
+  }
+};
+
+</script>
+<script>
+/* Console emulator for the olympiad programs whose originals are command-line
+   executables.  A program module defines a global PROGRAM:
+
+     PROGRAM = { title, subtitle, notes: [...], run: async function (term) {...} }
+
+   and drives the screen through term.write / term.writeln / term.ask, so the
+   prompts and the streamed output land on screen exactly as the original
+   executable prints them. */
+(function () {
+  var screen, ps, inp, pending = null, history = [], hpos = 0;
+
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  var term = {
+    write: function (s) {
+      screen.insertAdjacentHTML('beforeend', esc(s));
+      screen.scrollTop = screen.scrollHeight;
+    },
+    writeln: function (s) { term.write((s === undefined ? '' : s) + '\n'); },
+    echo: function (s) {
+      screen.insertAdjacentHTML('beforeend', '<span class="in">' + esc(s) + '</span>\n');
+      screen.scrollTop = screen.scrollHeight;
+    },
+    clear: function () { screen.innerHTML = ''; },
+    /* write the prompt, then wait for a line; the typed text is echoed after it,
+       which is what a terminal shows */
+    ask: function (prompt) {
+      term.write(prompt === undefined ? '' : prompt);
+      ps.textContent = prompt === undefined ? '' : prompt;
+      inp.focus();
+      return new Promise(function (resolve) { pending = resolve; });
+    },
+    /* let the browser paint between long computations */
+    yieldFrame: function () {
+      return new Promise(function (r) { setTimeout(r, 0); });
+    }
+  };
+
+  function submit() {
+    if (!pending) return;
+    var v = inp.value;
+    inp.value = '';
+    if (v !== '') { history.push(v); hpos = history.length; }
+    term.echo(v);
+    ps.textContent = '';
+    var done = pending;
+    pending = null;
+    done(v);
+  }
+
+  window.addEventListener('DOMContentLoaded', function () {
+    document.title = PROGRAM.title;
+
+    var head = document.createElement('header');
+    head.innerHTML =
+      '<h1>' + esc(PROGRAM.title) + '</h1>' +
+      (PROGRAM.subtitle ? '<p>' + esc(PROGRAM.subtitle) + '</p>' : '') +
+      (PROGRAM.notes && PROGRAM.notes.length
+        ? '<details><summary>이 프로그램에 대하여</summary><ul>' +
+          PROGRAM.notes.map(function (n) { return '<li>' + n + '</li>'; }).join('') +
+          '</ul></details>'
+        : '');
+    document.body.appendChild(head);
+
+    screen = document.createElement('div');
+    screen.id = 'screen';
+    document.body.appendChild(screen);
+
+    var bar = document.createElement('div');
+    bar.id = 'bar';
+    ps = document.createElement('span');
+    ps.id = 'ps';
+    inp = document.createElement('input');
+    inp.id = 'inp';
+    inp.autocomplete = 'off';
+    inp.spellcheck = false;
+    bar.appendChild(ps);
+    bar.appendChild(inp);
+    document.body.appendChild(bar);
+
+    var tools = document.createElement('div');
+    tools.id = 'tools';
+    var bRestart = document.createElement('button');
+    bRestart.textContent = '다시 시작 (Ctrl+C)';
+    var bCopy = document.createElement('button');
+    bCopy.textContent = '화면 복사';
+    var bSave = document.createElement('button');
+    bSave.textContent = '.txt로 저장';
+    tools.appendChild(bRestart);
+    tools.appendChild(bCopy);
+    tools.appendChild(bSave);
+    document.body.appendChild(tools);
+
+    inp.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { submit(); e.preventDefault(); }
+      else if (e.key === 'ArrowUp') {
+        if (hpos > 0) { hpos--; inp.value = history[hpos]; }
+        e.preventDefault();
+      } else if (e.key === 'ArrowDown') {
+        if (hpos < history.length - 1) { hpos++; inp.value = history[hpos]; }
+        else { hpos = history.length; inp.value = ''; }
+        e.preventDefault();
+      } else if (e.key === 'c' && e.ctrlKey) {
+        start();
+      }
+    });
+    screen.addEventListener('click', function () {
+      if (!window.getSelection().toString()) inp.focus();
+    });
+
+    bRestart.addEventListener('click', start);
+    bCopy.addEventListener('click', function () {
+      navigator.clipboard.writeText(screen.textContent).then(function () {
+        bCopy.textContent = '복사됨';
+        setTimeout(function () { bCopy.textContent = '화면 복사'; }, 1200);
+      }, function () {});
+    });
+    bSave.addEventListener('click', function () {
+      var blob = new Blob([screen.textContent], { type: 'text/plain;charset=utf-8' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = PROGRAM.title.replace(/[^\w.-]+/g, '_') + '.txt';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+
+    function start() {
+      pending = null;
+      ps.textContent = '';
+      inp.value = '';
+      term.clear();
+      inp.focus();
+      Promise.resolve(PROGRAM.run(term)).catch(function (err) {
+        term.writeln('\n[' + err.message + ']');
+      });
+    }
+    start();
+  });
+})();
+
+</script>
+</body>
+</html>

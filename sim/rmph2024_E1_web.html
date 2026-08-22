@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RMPh 2024 - Ising model</title>
+<style>
+:root{--bg:#f0f0f0;--panel:#fff;--fg:#111;--dim:#555;--line:#bbb;--btn:#e6e6e6}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+     font:13px/1.45 "Segoe UI",system-ui,sans-serif;height:100vh;overflow:hidden}
+#wrap{display:flex;height:100vh}
+#left{width:250px;flex:none;padding:10px;overflow-y:auto;background:var(--panel);
+      border-right:1px solid var(--line)}
+#right{flex:1;padding:10px;display:flex;flex-direction:column;min-width:0}
+label{display:block;margin:0 0 2px;font-size:12px}
+input[type=text]{width:100%;padding:4px 6px;margin-bottom:6px;border:1px solid var(--line);
+      border-radius:3px;font:12px ui-monospace,Consolas,monospace;background:#fff;color:var(--fg)}
+button{width:100%;padding:6px 8px;margin:3px 0;background:var(--btn);color:var(--fg);
+      border:1px solid var(--line);border-radius:3px;cursor:pointer;font:13px inherit}
+button:hover{background:#d8d8d8}
+button:disabled{opacity:.5;cursor:default}
+.chk{display:flex;align-items:center;gap:6px;margin:8px 0}
+#status{margin:8px 0 6px;color:var(--dim);font-size:12px;min-height:1.2em}
+#out{width:100%;height:230px;border:1px solid var(--line);background:#fff;color:var(--fg);
+     font:11.5px/1.4 ui-monospace,Consolas,monospace;padding:5px;resize:vertical;white-space:pre}
+#plot{flex:1;width:100%;background:#fff;border:1px solid var(--line)}
+h1{font-size:14px;margin:0 0 4px}
+p.note{margin:0 0 10px;color:var(--dim);font-size:11.5px}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="left">
+    <h1>RMPh 2024 &mdash; Ising model</h1>
+    <p class="note">N<sub>eq</sub> = N/10 is fixed, as in the original.</p>
+
+    <label>L</label><input type="text" id="L" value="20">
+    <label>J</label><input type="text" id="J" value="1.0">
+    <label>T</label><input type="text" id="T" value="2.2">
+    <label>H</label><input type="text" id="H" value="0.0">
+    <label>N (Monte Carlo steps)</label><input type="text" id="N" value="200000">
+    <label>T min</label><input type="text" id="Tmin" value="1.0">
+    <label>T max</label><input type="text" id="Tmax" value="4.0">
+    <label>T step</label><input type="text" id="Tstep" value="0.1">
+    <label>Repeats</label><input type="text" id="rep" value="1">
+
+    <div class="chk"><input type="checkbox" id="anim" checked><label for="anim" style="margin:0">Animation</label></div>
+
+    <button id="bSingle">Single simulation</button>
+    <button id="bT">M(T) scan</button>
+    <button id="bJ">J scan</button>
+    <button id="bH">H scan</button>
+    <button id="bL">L scan (finite size)</button>
+    <button id="bSave">Save graph</button>
+    <button id="bStop" disabled>Stop</button>
+
+    <div id="status">Ready</div>
+    <textarea id="out" readonly></textarea>
+  </div>
+  <div id="right"><canvas id="plot"></canvas></div>
+</div>
+
+<script>
+/* ---------------------------------------------------------------------------
+   Engine: a line-by-line port of the organisers' own Python, printed in full in
+   official/RMPh2024_Ising_Model_Solution.pdf section 1.  Single-spin Metropolis
+   steps, N_eq = N//10, the magnetisation sampled after every single step, the
+   signed average, and std/(L^2 sqrt(n-1)) for the error.
+--------------------------------------------------------------------------- */
+
+function newLattice(L) {
+  var s = new Int8Array(L * L);
+  for (var i = 0; i < L * L; i++) s[i] = 2 * ((Math.random() * 2) | 0) - 1;
+  return s;
+}
+
+/* One Metropolis step, exactly the original monte_carlo_step.  It returns the
+   change in sum(spins) so the caller can keep the magnetisation up to date
+   without rescanning the lattice; sampling sum(spins) after every single step
+   is what the original does, and this is the same number. */
+function monte_carlo_step(spins, L, J, T, H) {
+  var i = (Math.random() * (L * L)) | 0;
+  var i_row = (i / L) | 0, i_col = i % L;
+  var s = spins[i];
+  var deltaE = 2 * H * s + 2 * J * s * (
+      spins[((i_row + 1) % L) * L + i_col] +
+      spins[((i_row - 1 + L) % L) * L + i_col] +
+      spins[i_row * L + (i_col + 1) % L] +
+      spins[i_row * L + (i_col - 1 + L) % L]);
+  if (deltaE <= 0 || Math.random() < Math.exp(-deltaE / T)) {
+    spins[i] = -s;
+    return -2 * s;
+  }
+  return 0;
+}
+
+/* the whole simulation, run in slices so the page can animate and stay alive */
+function monte_carlo_simulation(L, J, T, H, N, animate, onFrame, done) {
+  var spins = newLattice(L);
+  var N_eq = Math.floor(N / 10);
+  var sum = 0, sum2 = 0, n = 0, phase = 0, k = 0;
+  var M = 0, i;
+  for (i = 0; i < L * L; i++) M += spins[i];
+  var slice = Math.max(2000, Math.floor(N / 120));
+
+  function chunk() {
+    if (stopped) { done(null); return; }
+    var end = Math.min(k + slice, phase === 0 ? N_eq : N);
+    for (; k < end; k++) {
+      M += monte_carlo_step(spins, L, J, T, H);
+      if (phase === 1) { sum += M; sum2 += M * M; n++; }
+    }
+    if (k >= (phase === 0 ? N_eq : N)) {
+      if (phase === 0) { phase = 1; k = 0; }
+      else {
+        var mag = (sum / n) / (L * L);
+        var mean = sum / n;
+        var variance = Math.max(0, sum2 / n - mean * mean);
+        var err = Math.sqrt(variance) / (L * L * Math.sqrt(n - 1));
+        done({ M: mag, err: err, spins: spins, L: L });
+        return;
+      }
+    }
+    if (animate) { onFrame(spins, L, phase === 0 ? 0 : k, N); setTimeout(chunk, 0); }
+    else if (k % (slice * 20) === 0) setTimeout(chunk, 0);
+    else chunk();
+  }
+  setTimeout(chunk, 0);
+}
+
+function staggered(spins, L) {
+  var a = 0;
+  for (var r = 0; r < L; r++) {
+    for (var c = 0; c < L; c++) a += ((r + c) % 2 ? -1 : 1) * spins[r * L + c];
+  }
+  return a / (L * L);
+}
+
+function get_energy(spins, L, J, H) {
+  var e = 0, m = 0;
+  for (var r = 0; r < L; r++) {
+    for (var c = 0; c < L; c++) {
+      var s = spins[r * L + c];
+      m += s;
+      e -= J * s * (spins[((r + 1) % L) * L + c] + spins[r * L + (c + 1) % L]);
+    }
+  }
+  return e - H * m;
+}
+
+/* ------------------------------------------------------------------ drawing */
+var cv = document.getElementById('plot'), cx = cv.getContext('2d');
+var stopped = false, busy = false;
+
+function fit() {
+  var r = cv.getBoundingClientRect(), d = window.devicePixelRatio || 1;
+  cv.width = Math.round(r.width * d); cv.height = Math.round(r.height * d);
+  cx.setTransform(d, 0, 0, d, 0, 0);
+  return { w: r.width, h: r.height };
+}
+
+/* the original used bw_cmap = ListedColormap(['black','white']) with
+   interpolation='nearest' and no ticks */
+function drawLattice(spins, L, title) {
+  var g = fit();
+  cx.fillStyle = '#fff'; cx.fillRect(0, 0, g.w, g.h);
+  var pad = 34;
+  var side = Math.min(g.w - 2 * pad, g.h - 2 * pad);
+  var x0 = (g.w - side) / 2, y0 = (g.h - side) / 2 + 6;
+  var cell = side / L;
+  for (var r = 0; r < L; r++) {
+    for (var c = 0; c < L; c++) {
+      cx.fillStyle = spins[r * L + c] > 0 ? '#ffffff' : '#000000';
+      cx.fillRect(x0 + c * cell, y0 + r * cell, Math.ceil(cell), Math.ceil(cell));
+    }
+  }
+  cx.strokeStyle = '#000'; cx.lineWidth = 1; cx.strokeRect(x0, y0, side, side);
+  if (title) {
+    cx.fillStyle = '#111'; cx.font = '13px "Segoe UI",sans-serif'; cx.textAlign = 'center';
+    cx.fillText(title, g.w / 2, y0 - 10);
+  }
+}
+
+function drawSeries(xs, ys, es, xlabel, ylabel, title) {
+  var g = fit();
+  cx.fillStyle = '#fff'; cx.fillRect(0, 0, g.w, g.h);
+  var L = 62, R = 18, T = 30, B = 46;
+  var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs);
+  var y0 = 0, y1 = 1;
+  for (var i = 0; i < ys.length; i++) {
+    y0 = Math.min(y0, ys[i] - es[i]); y1 = Math.max(y1, ys[i] + es[i]);
+  }
+  if (x1 === x0) x1 = x0 + 1;
+  if (y1 === y0) y1 = y0 + 1;
+  function X(v) { return L + (v - x0) / (x1 - x0) * (g.w - L - R); }
+  function Y(v) { return g.h - B - (v - y0) / (y1 - y0) * (g.h - T - B); }
+
+  cx.strokeStyle = '#ddd'; cx.lineWidth = 1;
+  cx.fillStyle = '#333'; cx.font = '11px "Segoe UI",sans-serif';
+  for (var k = 0; k <= 5; k++) {
+    var gx = x0 + (x1 - x0) * k / 5, gy = y0 + (y1 - y0) * k / 5;
+    cx.beginPath(); cx.moveTo(X(gx), Y(y0)); cx.lineTo(X(gx), Y(y1)); cx.stroke();
+    cx.beginPath(); cx.moveTo(X(x0), Y(gy)); cx.lineTo(X(x1), Y(gy)); cx.stroke();
+    cx.textAlign = 'center'; cx.fillText(gx.toFixed(2), X(gx), g.h - B + 15);
+    cx.textAlign = 'right'; cx.fillText(gy.toFixed(3), L - 6, Y(gy) + 4);
+  }
+  cx.strokeStyle = '#000';
+  cx.strokeRect(L, T, g.w - L - R, g.h - T - B);
+
+  cx.strokeStyle = '#1f77b4'; cx.fillStyle = '#1f77b4'; cx.lineWidth = 1.6;
+  cx.beginPath();
+  for (i = 0; i < xs.length; i++) { i ? cx.lineTo(X(xs[i]), Y(ys[i])) : cx.moveTo(X(xs[i]), Y(ys[i])); }
+  cx.stroke();
+  for (i = 0; i < xs.length; i++) {
+    cx.beginPath(); cx.arc(X(xs[i]), Y(ys[i]), 3, 0, 6.284); cx.fill();
+    if (es[i] > 0) {
+      cx.beginPath();
+      cx.moveTo(X(xs[i]), Y(ys[i] - es[i])); cx.lineTo(X(xs[i]), Y(ys[i] + es[i]));
+      cx.stroke();
+    }
+  }
+  cx.fillStyle = '#111'; cx.font = '12px "Segoe UI",sans-serif'; cx.textAlign = 'center';
+  cx.fillText(xlabel, (L + g.w - R) / 2, g.h - 10);
+  cx.save(); cx.translate(14, (T + g.h - B) / 2); cx.rotate(-Math.PI / 2);
+  cx.fillText(ylabel, 0, 0); cx.restore();
+  if (title) { cx.font = '13px "Segoe UI",sans-serif'; cx.fillText(title, g.w / 2, 18); }
+}
+
+/* --------------------------------------------------------------------- app */
+var $ = function (id) { return document.getElementById(id); };
+var out = $('out'), statusEl = $('status');
+function num(id) { return parseFloat($(id).value); }
+function log(s) { out.value += s; out.scrollTop = out.scrollHeight; }
+function setBusy(b) {
+  busy = b;
+  ['bSingle', 'bT', 'bJ', 'bH', 'bL'].forEach(function (i) { $(i).disabled = b; });
+  $('bStop').disabled = !b;
+}
+
+$('bStop').onclick = function () { stopped = true; statusEl.textContent = 'stopped'; };
+
+$('bSingle').onclick = function () {
+  if (busy) return;
+  var L = Math.round(num('L')), J = num('J'), T = num('T'), H = num('H');
+  var N = Math.round(num('N'));
+  if (!(L >= 2 && L <= 400)) { alert('L must be between 2 and 400'); return; }
+  if (!(N >= 10)) { alert('N must be at least 10'); return; }
+  stopped = false; setBusy(true); out.value = '';
+  statusEl.textContent = 'running ...';
+  monte_carlo_simulation(L, J, T, H, N, $('anim').checked,
+    function (s, l, k, n) { drawLattice(s, l, 'step ' + k + ' / ' + n); },
+    function (res) {
+      setBusy(false);
+      if (!res) return;
+      drawLattice(res.spins, res.L,
+        'L=' + L + ', J=' + J + ', T=' + T + ', H=' + H);
+      log('M      = ' + (res.M >= 0 ? '+' : '') + res.M.toFixed(6) + '\n' +
+          'error  = ' + res.err.toFixed(6) + '\n' +
+          '|M|    = ' + Math.abs(res.M).toFixed(6) + '\n' +
+          'A (staggered) = ' + staggered(res.spins, res.L).toFixed(6) + '\n' +
+          'E      = ' + get_energy(res.spins, res.L, J, H).toFixed(1) + '\n');
+      statusEl.textContent = 'done';
+    });
+};
+
+function series(xs, mode, xlabel, title) {
+  if (busy) return;
+  var L = Math.round(num('L')), J = num('J'), T = num('T'), H = num('H');
+  var N = Math.round(num('N')), rep = Math.max(1, Math.round(num('rep')));
+  stopped = false; setBusy(true); out.value = xlabel + '\tM\tM_err\n';
+  var ys = [], es = [], i = 0;
+
+  function next() {
+    if (stopped || i >= xs.length) {
+      setBusy(false);
+      statusEl.textContent = stopped ? 'stopped' : 'done';
+      return;
+    }
+    var x = xs[i], acc = [], r = 0;
+    function run1() {
+      var a = [L, J, T, H];
+      if (mode === 'T') a[2] = x; else if (mode === 'J') a[1] = x;
+      else if (mode === 'H') a[3] = x; else a[0] = Math.round(x);
+      monte_carlo_simulation(a[0], a[1], a[2], a[3], N, false, function () {},
+        function (res) {
+          if (!res) { setBusy(false); return; }
+          acc.push(res);
+          if (++r < rep) { run1(); return; }
+          var m = 0, e = 0;
+          acc.forEach(function (z) { m += z.M; e += z.err; });
+          m /= acc.length; e /= acc.length;
+          ys.push(Math.abs(m)); es.push(e);
+          log(x.toFixed(3) + '\t' + (m >= 0 ? '+' : '') + m.toFixed(6) + '\t' + e.toFixed(6) + '\n');
+          drawSeries(xs.slice(0, ys.length), ys, es, xlabel, '|M|', title);
+          statusEl.textContent = xlabel + ' = ' + x;
+          i++;
+          setTimeout(next, 0);
+        });
+    }
+    run1();
+  }
+  next();
+}
+
+$('bT').onclick = function () {
+  var a = num('Tmin'), b = num('Tmax'), d = num('Tstep'), xs = [];
+  for (var x = a; x <= b + d / 2; x += d) xs.push(Math.round(x * 1e6) / 1e6);
+  series(xs, 'T', 'T', 'Magnetization vs temperature');
+};
+$('bJ').onclick = function () {
+  var xs = []; for (var k = 0; k < 10; k++) xs.push(0.2 + 1.8 * k / 9);
+  series(xs, 'J', 'J', 'Magnetization vs J');
+};
+$('bH').onclick = function () {
+  var xs = []; for (var k = 0; k < 17; k++) xs.push(-2 + 4 * k / 16);
+  series(xs, 'H', 'H', 'Magnetization vs external field');
+};
+$('bL').onclick = function () { series([5, 10, 20, 30], 'L', 'L', 'Finite-size scan'); };
+
+$('bSave').onclick = function () {
+  var a = document.createElement('a');
+  a.download = 'rmph2024_ising.png';
+  a.href = cv.toDataURL('image/png');
+  a.click();
+};
+
+window.addEventListener('resize', function () {
+  if (!busy) fit();
+});
+drawLattice(newLattice(20), 20, 'press "Single simulation" to start');
+</script>
+</body>
+</html>

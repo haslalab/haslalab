@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APhO 2021 Experiment 1 — Elasticity of cantilever</title>
+<style>
+/* The organisers' program is a Unity build; these are its own colours, read
+   back out of the screenshots in the official question paper:
+   scene #2e2e2e, lower panel #383838, apparatus #dddddd, sample stage #c9c9c9,
+   its tab #646464, the PSD face #979797, a live button #c1c1c1 and a dead one
+   #696969.  The app writes everything in bold Liberation Sans, white.        */
+:root{
+  --scene:#2e2e2e; --panel:#383838; --metal:#dddddd; --stage:#c9c9c9;
+  --tab:#646464; --psd:#979797; --grid:#b4b4b4; --btn:#c1c1c1; --btnoff:#696969;
+  --btntext:#2b2b2b; --btnofftext:#9c9c9c; --trace:#e02020;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--scene);color:#fff;overflow:auto;
+     font:bold 15px/1.3 "Liberation Sans",Arial,Helvetica,sans-serif;
+     user-select:none}
+/* the app keeps the 4:3 proportions of the original window: about two
+   thirds bench, one third lower panel, and it never collapses below the
+   size at which the apparatus stops fitting */
+#app{display:flex;flex-direction:column;height:100vh;min-height:720px;
+     min-width:1000px;padding:6px}
+
+/* ------------------------------------------------------------------ scene */
+#scene{position:relative;flex:1 1 auto;min-height:0}
+#bench{position:absolute;inset:0;width:100%;height:100%}
+
+.chip{position:absolute;left:10px;top:6px;padding:1px 22px;font:11px "Liberation Sans",Arial,sans-serif;
+      background:var(--metal);color:#111;border:1px solid #9a9a9a;border-radius:3px;cursor:pointer}
+#onoff{position:absolute;left:22px;top:28px;padding:8px 14px;
+       font:13px "Liberation Sans",Arial,sans-serif;background:#7d7d7d;color:#e8e8e8;
+       border:1px solid #9a9a9a;border-radius:6px;cursor:pointer}
+#onoff.on{background:var(--btn);color:var(--btntext)}
+
+#modes{position:absolute;right:12px;top:8px;display:flex;gap:5px}
+#modes button{padding:2px 12px;font:11px "Liberation Sans",Arial,sans-serif;
+      background:var(--btnoff);color:var(--btnofftext);border:1px solid #8a8a8a;
+      border-radius:3px;cursor:pointer}
+#modes button.on{background:var(--btn);color:var(--btntext)}
+
+/* the two positioners, drawn as the app draws them: a plain light slab with a
+   white caption under it giving (x, y) and the angle */
+.slab{position:absolute;transform-origin:50% 50%;background:var(--metal)}
+.cap{position:absolute;white-space:nowrap;font-size:17px}
+.cap .nudge{display:inline-block;margin-left:6px}
+.cap .nudge button{width:17px;height:16px;margin:0 1px;padding:0;line-height:1;
+      font-size:10px;background:var(--btnoff);color:#dcdcdc;border:1px solid #8a8a8a;
+      border-radius:2px;cursor:pointer;vertical-align:middle}
+.cap .nudge button:hover{background:#7c7c7c}
+
+/* C — the laser head */
+#laser{position:absolute;width:76px;height:22px;background:var(--metal)}
+#laser::after{content:"";position:absolute;right:-13px;top:4px;width:13px;height:14px;
+      background:#8f8f8f}
+
+/* N — the sample stage.  In the app this light box is also the control face
+   for tasks 1B, 1C and 1D; the small dark tab sits on its top edge. */
+#stage{position:absolute;left:50%;bottom:0;transform:translateX(-50%);
+       width:418px;background:var(--stage);color:#222;padding:10px 12px;min-height:96px}
+#tab{position:absolute;left:50%;top:-28px;transform:translateX(-50%);
+     width:52px;height:28px;background:var(--tab)}
+.face{display:none}
+.face.on{display:block}
+
+/* 1B — the point load: a 0..10 track with a red pointer, arrows and a readout */
+#track{position:relative;height:34px;margin:2px 4px 6px}
+#track .line{position:absolute;left:34px;right:44px;top:14px;height:2px;background:#1a1a1a}
+#track .lo{position:absolute;left:6px;top:2px;font-size:24px;color:#3a3a3a}
+#track .hi{position:absolute;right:2px;top:2px;font-size:24px;color:#3a3a3a}
+#pointer{position:absolute;top:16px;width:0;height:0;margin-left:-7px;
+      border-left:7px solid transparent;border-right:7px solid transparent;
+      border-bottom:18px solid var(--trace)}
+.wide{background:var(--tab);color:#e2e2e2;border:1px solid #4d4d4d;border-radius:4px;
+      width:72px;height:30px;font-size:16px;cursor:pointer}
+.readout{display:inline-block;background:var(--tab);color:#f0f0f0;border:1px solid #4d4d4d;
+      border-radius:4px;height:30px;line-height:28px;width:148px;text-align:center;
+      font:bold 17px Consolas,"Courier New",monospace;letter-spacing:2px}
+
+/* 1C — the heater controller: a black LCD, red current, green temperature */
+#lcd{background:#000;padding:8px 12px;display:flex;align-items:baseline;gap:10px}
+#lcd .cur{color:#ff2020;font:bold 30px Consolas,"Courier New",monospace;letter-spacing:3px}
+#lcd .curu{color:#ff2020;font-size:17px}
+#lcd .tmp{color:#22ee22;font:bold 30px Consolas,"Courier New",monospace;letter-spacing:3px;
+      margin-left:auto}
+#lcd .tmpu{color:#22ee22;font-size:17px}
+.lcdbtns{display:flex;gap:3px;margin-top:4px}
+.lcdbtns button{flex:1;height:26px;background:var(--tab);color:#dcdcdc;border:1px solid #4d4d4d;
+      border-radius:3px;font-size:13px;cursor:pointer}
+
+/* 1D — the sample switch */
+#samples{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px}
+#samples button{height:36px;background:var(--btnoff);color:var(--btnofftext);
+      border:1px solid #8a8a8a;border-radius:4px;font-size:17px;cursor:pointer}
+#samples button.on{background:var(--btn);color:var(--btntext)}
+
+/* ------------------------------------------------------------------ panel */
+#panel{flex:0 0 36%;min-height:330px;background:var(--panel);margin-top:4px;
+       display:flex;align-items:center;padding:12px 26px;gap:22px}
+#psdwrap{display:flex;align-items:center;gap:8px;height:100%}
+#psdwrap span{font-size:16px}
+#psd{height:calc(100% - 26px);aspect-ratio:275/290;max-height:290px;
+     background:var(--psd);display:block}
+#recbtns{display:flex;flex-direction:column;gap:16px;padding:0 6px}
+#recbtns button{width:96px;height:31px;background:var(--btn);color:var(--btntext);
+      border:1px solid #9a9a9a;border-radius:4px;font-size:16px;cursor:pointer}
+#recbtns button:disabled{background:var(--btnoff);color:var(--btnofftext);cursor:default}
+#recbtns .gap{height:56px}
+#hist{flex:1;height:calc(100% - 20px);max-height:320px;min-width:0}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="scene">
+    <canvas id="bench"></canvas>
+
+    <button class="chip" id="back">Back</button>
+    <button id="onoff" class="on">On / Off</button>
+    <div id="modes">
+      <button id="t1A" class="on">1A</button><button id="t1B">1B</button>
+      <button id="t1C">1C</button><button id="t1D">1D</button>
+    </div>
+
+    <div id="laser"></div>
+    <div class="slab" id="mirrorD"></div>
+    <div class="slab" id="mirrorF"></div>
+    <div class="cap" id="capD"></div>
+    <div class="cap" id="capF"></div>
+
+    <div id="stage">
+      <div id="tab"></div>
+
+      <div class="face" id="f1A"></div>
+
+      <div class="face" id="f1B">
+        <div id="track">
+          <span class="lo">0</span><span class="hi">10</span>
+          <div class="line"></div><div id="pointer"></div>
+        </div>
+        <div>
+          <button class="wide" data-step="force-0.01">&#9664;</button>
+          <button class="wide" data-step="force+0.01">&#9654;</button>
+          <span class="readout" id="forceRead">0.00</span>
+          <span style="font-size:22px;color:#333">&nbsp;nN</span>
+        </div>
+      </div>
+
+      <div class="face" id="f1C">
+        <div id="lcd">
+          <span class="cur" id="lcdCur">0</span><span class="curu">A</span>
+          <span class="tmp" id="lcdTmp">27.0</span><span class="tmpu">&#8451;</span>
+        </div>
+        <div class="lcdbtns">
+          <button data-step="cur-2">&#9664;</button>
+          <button data-step="cur+2">&#9654;</button>
+          <button id="bSet">&#8617;</button>
+        </div>
+      </div>
+
+      <div class="face" id="f1D">
+        <div id="samples">
+          <button class="samp on" data-s="0">Sample 0</button>
+          <button class="samp" data-s="2">Sample 2</button>
+          <button class="samp" data-s="1">Sample 1</button>
+          <button class="samp" data-s="3">Sample 3</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="panel">
+    <div id="psdwrap">
+      <span>-1 mm</span><canvas id="psd"></canvas><span>1 mm</span>
+    </div>
+    <div id="recbtns">
+      <button id="bRec">Record</button>
+      <button id="bStop" disabled>Stop</button>
+      <div class="gap"></div>
+      <button id="bReset">Reset</button>
+    </div>
+    <canvas id="hist"></canvas>
+  </div>
+</div>
+
+<script>
+/* ---------------------------------------------------------------------------
+   APhO 2021 Experiment 1 — Elasticity of cantilever.
+
+   The organisers shipped a Unity program (APhO-2021/official/simulation/), so
+   this page exists only because that program is Windows-only.  The screen is
+   laid out the way the app lays it out -- the dark bench with the laser head,
+   the two positioners and their white coordinate captions, the sample stage
+   with the control face that changes from task to task, and the lower panel
+   with the PSD square, Record / Stop / Reset and the 180 s trace -- and it
+   keeps the original's controls and precisions: the positioners are dragged or
+   nudged with arrows, positions read to 1e-3 m and the angle to 0.1 deg, the
+   PSD reads to 0.0001e-3 m over +-1e-3 m and records at 1 Hz for at most 180 s,
+   the point load reads to 0.01e-9 N, the heater current steps by 2e-3 A and the
+   temperature reads to 0.1 C.
+
+   Given by the problem: L = 100 um, w = 35 um, t2 = 0.20 um, t1 = 0.04 um,
+   E_Si = 280 GPa, I1 = 1.867e-28 m^4, I2 = 2.333e-26 m^4, alpha1 = 14.2e-6/K,
+   alpha2 = 0.8e-6/K, EI* = 1.84e-13 N m^2, room temperature 300 K.
+
+   The hidden constants below are not invented: they were read out of the
+   official executable (see the note on deflection_param further down).
+--------------------------------------------------------------------------- */
+var L_C = 100e-6, W_C = 35e-6, T2 = 0.20e-6, T1 = 0.04e-6;
+var E_SI = 280e9, I1 = 1.867e-28, I2 = 2.333e-26;
+var ALPHA1 = 14.2e-6, ALPHA2 = 0.8e-6, EI_STAR = 1.84e-13;
+/* The PSD is quiet to about 2e-5 m: part A.3 of the official solution reads
+   d = 6.267e-5 +- 1.88e-5 m off a settled trace.  Switching the instrument on
+   also shakes the cantilever, which is what A.2 is about -- "the cantilever
+   beam will be disturbed when the device turned on, it may take some time to
+   reach a stable state" -- so the trace starts near the +-6e-4 m swings of the
+   solution's own table and settles over a minute or so. */
+var PSD_RANGE = 1.0e-3, PSD_NOISE = 1.9e-5, T_ROOM = 300.0;
+var SHAKE = 6.0e-4, SHAKE_TAU = 26.0;          /* m, s */
+
+/* Hidden values, recovered from the official program itself.  APHO.exe is a
+   Unity Mono build; its Assembly-CSharp.dll carries the parameter sets as
+   literal strings under the key "deflection_param":
+
+       1b  "280 0.3 0.8 35 0.2 100"
+       1c  "280 0.3 0.8 78 0.4 14.2"
+       1d  "280 0.3 0.8 78 0.4 14.2 0.0107 0.0077 0.00318 0.02 0.02 0.02 0.8"
+
+   Read as (E, nu, alpha) per layer plus the geometry, that is silicon
+   E = 280 GPa, nu = 0.3, alpha = 0.8e-6/K with w = 35 um, t = 0.2 um,
+   L = 100 um -- exactly the numbers the problem paper gives -- and metal X
+   E = 78 GPa, nu = 0.4, alpha = 14.2e-6/K, again matching the paper's alpha1.
+   The three ratios that follow are the coverage ratios of samples 1, 2 and 3,
+   and the official D.4 confirms them: its own readings give sample 3 as
+   0.2978 of sample 1, against 0.00318 / 0.0107 = 0.2972 here.
+
+   E_METAL below is not that raw 78 GPa but the effective modulus a student
+   actually gets back out of the bending, which official C.3 answers as
+   4.98e10 Pa -- close to E (1 - nu) = 46.8 GPa for the film in the app's own
+   parameter string.  The page bends by the relation just below, so inverting
+   that same relation returns 4.98e10 Pa exactly.
+
+   C2_HID is fixed the same way: the product C2 x CR is all the experiment can
+   see, and -7.24e-2 with the ratios above puts sample 1 at delta = -4.21e-7 m,
+   which is the deflection behind the official D.1 table.  A student who takes
+   the coverage ratio of sample 1 as 1 % reports C2 = -7.7e-2, against the
+   official -7.89e-2. */
+var E_METAL = 4.98e10, C2_HID = -7.24e-2;
+var CR = [0.0, 0.0107, 0.0077, 0.00318];
+
+function deflectionForce(F) { return F * Math.pow(L_C, 3) / (3 * E_SI * I2); }
+function deflectionThermal(Tk) {
+  var h = T1 + T2;
+  var num = (ALPHA1 - ALPHA2) * (Tk - T_ROOM);
+  var den = 2 / (h * W_C) * ((T1 * E_METAL + T2 * E_SI) / (T1 * E_METAL * T2 * E_SI)) *
+            (E_METAL * I1 + E_SI * I2) + 0.5 * h;
+  return num / den * L_C * L_C;
+}
+function deflectionProtein(s) { return C2_HID * CR[s] / EI_STAR * Math.pow(L_C, 4); }
+
+function gauss(s) {
+  var u = 1 - Math.random(), v = Math.random();
+  return s * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+
+/* ------------------------------------------------------------------- state */
+var S = {
+  mode: '1A', laser: true, sample: 0, force: 0, cur: 0, temp: 26.9, target: 26.9,
+  rx: 20, ry: 20, ra: 22.5, px: 57, py: 20, pa: 90,  /* 1e-3 m, deg */
+  rec: false, t0: 0, hist: [], cursor: -1, onAt: Date.now()
+};
+
+var $ = function (i) { return document.getElementById(i); };
+
+/* the cantilever sits at the left edge of the carrier top, taken as the origin */
+var CANT = { x: 0, y: 0 };
+
+function deflection() {
+  if (S.mode === '1C') return deflectionThermal(S.temp + 273.15);
+  if (S.mode === '1D') return deflectionProtein(S.sample);
+  return deflectionForce(S.force * 1e-9);
+}
+
+/* --------------------------------------------------------------- the optics
+   The light really is traced: C emits towards the cantilever, the cantilever's
+   top face reflects it, D reflects it again and F catches it.  That is what
+   makes task A.1 -- "design a light path so that the laser spot ... can stably
+   appear near the origin of the PSD display screen" -- an actual task: if the
+   ray misses D, or misses the PSD, there is no reading at all.
+
+   The optical lever falls out of the geometry rather than being assumed.  A
+   deflection delta tilts the tip by theta = 3 delta / (2 L), the reflected ray
+   turns by 2 theta, and a flat mirror preserves that turn, so a PSD set square
+   to the beam sees the spot move by 2 theta D = 3 delta D / L with D the whole
+   path from the cantilever to the PSD.  Tilt the PSD away from square and the
+   reading picks up the 1 / cos factor, exactly as it would on a bench.        */
+var LASER = { x: -30, y: 30 };      /* C, the emitter, aimed at the cantilever */
+var MIRROR_HALF = 8;                /* half length of D's face, 1e-3 m         */
+var PSD_HALF = 8;                   /* half length of F's housing, 1e-3 m      */
+
+function unit(d) {
+  var m = Math.hypot(d[0], d[1]);
+  return [d[0] / m, d[1] / m];
+}
+function reflect(d, n) {            /* n a unit normal of the face */
+  var k = 2 * (d[0] * n[0] + d[1] * n[1]);
+  return [d[0] - k * n[0], d[1] - k * n[1]];
+}
+function faceNormal(deg) {          /* the face runs along deg, so the normal */
+  var a = deg * Math.PI / 180;      /* is a quarter turn from it              */
+  return [-Math.sin(a), Math.cos(a)];
+}
+/* where the ray p + t d meets the face centred at c, running along deg, of
+   half length h; s is the distance from the centre of the face */
+function hitFace(p, d, c, deg, h) {
+  var a = deg * Math.PI / 180, u = [Math.cos(a), Math.sin(a)];
+  var den = u[0] * d[1] - d[0] * u[1];
+  if (Math.abs(den) < 1e-12) return null;
+  var w = [c[0] - p[0], c[1] - p[1]];
+  var t = (u[0] * w[1] - w[0] * u[1]) / den;
+  var s = (d[0] * w[1] - w[0] * d[1]) / den;
+  if (t <= 1e-9 || Math.abs(s) > h) return null;
+  return { t: t, s: s, p: [p[0] + t * d[0], p[1] + t * d[1]] };
+}
+
+/* the whole path, in 1e-3 m: the corner points to draw, the reading on the PSD
+   face and the optical path length from the cantilever to the PSD */
+function beam() {
+  if (!S.laser) return null;
+  var p0 = [LASER.x, LASER.y], cant = [CANT.x, CANT.y];
+  var d0 = unit([cant[0] - p0[0], cant[1] - p0[1]]);
+  var theta = 3 * deflection() / (2 * L_C);        /* tip slope, rad */
+  var d1 = reflect(d0, [-Math.sin(theta), Math.cos(theta)]);
+  var pts = [p0, cant];
+
+  var h1 = hitFace(cant, d1, [S.rx, S.ry], S.ra, MIRROR_HALF);
+  if (!h1) {
+    pts.push([cant[0] + d1[0] * 400, cant[1] + d1[1] * 400]);
+    return { pts: pts, s: null, path: 0 };
+  }
+  pts.push(h1.p);
+
+  var d2 = reflect(d1, faceNormal(S.ra));
+  var h2 = hitFace(h1.p, d2, [S.px, S.py], S.pa, PSD_HALF);
+  if (!h2) {
+    pts.push([h1.p[0] + d2[0] * 400, h1.p[1] + d2[1] * 400]);
+    return { pts: pts, s: null, path: 0 };
+  }
+  pts.push(h2.p);
+  /* the face is read so that pushing the cantilever down drives d positive,
+     which is the sign the official B and C tables carry (and the samples of
+     part D come out negative, because their C2 is) */
+  return { pts: pts, s: -h2.s, path: (h1.t + h2.t) * 1e-3 };
+}
+
+/* how hard the beam is still shaking, so many seconds after switch-on */
+function shake() {
+  var age = (Date.now() - S.onAt) / 1000;
+  return SHAKE * Math.exp(-age / SHAKE_TAU);
+}
+
+function spot() {
+  var b = beam();
+  if (!b || b.s === null) return null;
+  var v = b.s * 1e-3 + gauss(PSD_NOISE) + gauss(shake());
+  return Math.abs(v) > PSD_RANGE ? null : v;    /* item H: the face is +-1 mm */
+}
+
+/* --------------------------------------------------------------- the scene */
+/* the bench canvas carries nothing but the background; the apparatus itself is
+   made of plain slabs, the way the app draws it */
+var VIEW = { x0: -22, x1: 118, y0: -6, y1: 54 };   /* in 1e-3 m */
+
+function mapper() {
+  var r = $('scene').getBoundingClientRect();
+  var s = Math.min(r.width / (VIEW.x1 - VIEW.x0), r.height / (VIEW.y1 - VIEW.y0));
+  var ox = (r.width - (VIEW.x1 - VIEW.x0) * s) / 2;
+  var oy = 6;
+  return {
+    w: r.width, h: r.height, s: s,
+    X: function (x) { return ox + (x - VIEW.x0) * s; },
+    Y: function (y) { return oy + (VIEW.y1 - y) * s; },
+    inv: function (px, py) {
+      return [(px - ox) / s + VIEW.x0, VIEW.y1 - (py - oy) / s];
+    }
+  };
+}
+
+function placeScene() {
+  var m = mapper();
+
+  var lx = m.X(-14), ly = m.Y(34);
+  var laser = $('laser');
+  laser.style.left = (lx - 38) + 'px';
+  laser.style.top = (ly - 11) + 'px';
+
+  var pieces = [['mirrorD', 'capD', S.rx, S.ry, S.ra, 'r'],
+                ['mirrorF', 'capF', S.px, S.py, S.pa, 'p']];
+  for (var i = 0; i < pieces.length; i++) {
+    var p = pieces[i], el = $(p[0]), cap = $(p[1]);
+    var w = Math.max(96, 24 * m.s), h = Math.max(30, 8 * m.s);
+    el.style.width = w + 'px';
+    el.style.height = h + 'px';
+    el.style.left = (m.X(p[2]) - w / 2) + 'px';
+    el.style.top = (m.Y(p[3]) - h / 2) + 'px';
+    el.style.transform = 'rotate(' + (-p[4]) + 'deg)';
+    cap.style.left = (m.X(p[2]) - 90) + 'px';
+    cap.style.top = (m.Y(p[3]) + h / 2 + 14) + 'px';
+  }
+
+  $('capD').innerHTML =
+    '(' + S.rx.toFixed(1) + ' mm, ' + S.ry.toFixed(1) + ' mm), ' +
+    S.ra.toFixed(1) + '&nbsp;&deg;' + nudges([['rx', 1], ['ry', 1], ['ra', 0.1]]);
+  $('capF').innerHTML =
+    '(' + S.px.toFixed(1) + ' mm, ' + S.py.toFixed(1) + ' mm), ' +
+    S.pa.toFixed(1) + '&nbsp;&deg;' + nudges([['px', 1], ['py', 1], ['pa', 0.1]]);
+}
+
+/* the small grey arrow pairs the app puts next to a value it lets you step */
+function nudges(list) {
+  var out = '<span class="nudge">';
+  for (var i = 0; i < list.length; i++) {
+    var k = list[i][0], d = list[i][1];
+    out += '<button data-step="' + k + '-' + d + '">&#9664;</button>' +
+           '<button data-step="' + k + '+' + d + '">&#9654;</button>';
+  }
+  return out + '</span>';
+}
+
+function fitCanvas(id) {
+  var cv = $(id), r = cv.getBoundingClientRect(), dp = window.devicePixelRatio || 1;
+  cv.width = Math.round(r.width * dp); cv.height = Math.round(r.height * dp);
+  var g = cv.getContext('2d');
+  g.setTransform(dp, 0, 0, dp, 0, 0);
+  return { g: g, w: r.width, h: r.height };
+}
+
+function drawBench() {
+  var c = fitCanvas('bench'), g = c.g, m = mapper();
+  g.clearRect(0, 0, c.w, c.h);
+  var b = beam();
+  if (!b) return;
+  /* B / C: the beam only shows while the laser is switched on, and it stops
+     dead where it misses a piece, which is the cue for aligning it */
+  g.strokeStyle = b.s === null ? 'rgba(224,32,32,0.45)' : '#e02020';
+  g.lineWidth = 1.6;
+  g.beginPath();
+  for (var i = 0; i < b.pts.length; i++) {
+    var q = b.pts[i];
+    i ? g.lineTo(m.X(q[0]), m.Y(q[1])) : g.moveTo(m.X(q[0]), m.Y(q[1]));
+  }
+  g.stroke();
+  /* the bright point where it lands on the PSD */
+  if (b.s !== null) {
+    var e = b.pts[b.pts.length - 1];
+    g.fillStyle = '#ff6b6b';
+    g.beginPath(); g.arc(m.X(e[0]), m.Y(e[1]), 3, 0, 6.284); g.fill();
+  }
+}
+
+/* H — the PSD face: a plain grey square with a 4 x 4 grid and a black spot */
+function drawPSD() {
+  var c = fitCanvas('psd'), g = c.g;
+  g.fillStyle = '#979797'; g.fillRect(0, 0, c.w, c.h);
+  g.strokeStyle = '#b4b4b4'; g.lineWidth = 2;
+  for (var k = 0; k <= 4; k++) {
+    var x = k / 4 * c.w, y = k / 4 * c.h;
+    g.beginPath(); g.moveTo(x, 0); g.lineTo(x, c.h); g.stroke();
+    g.beginPath(); g.moveTo(0, y); g.lineTo(c.w, y); g.stroke();
+  }
+  var sp = spot();
+  if (sp !== null) {
+    var f = sp / PSD_RANGE;                        /* -1 .. 1 across the face */
+    g.fillStyle = '#000';
+    g.fillRect(c.w / 2 - 3, c.h / 2 - f * c.h / 2 - 3, 6, 6);
+  }
+}
+
+/* L / M — the trace: 180 s across, +-1 mm high, sampled at 1 Hz */
+function drawHist() {
+  var c = fitCanvas('hist'), g = c.g;
+  var L = 34, R = 46, T = 26, B = 30;
+  g.clearRect(0, 0, c.w, c.h);
+  g.strokeStyle = '#cfcfcf'; g.lineWidth = 1;
+  g.beginPath(); g.moveTo(L, T); g.lineTo(L, c.h - B); g.stroke();
+  g.beginPath(); g.moveTo(L, (T + c.h - B) / 2); g.lineTo(c.w - R, (T + c.h - B) / 2); g.stroke();
+  g.fillStyle = '#fff'; g.font = 'bold 15px "Liberation Sans",Arial,sans-serif';
+  g.textAlign = 'center';
+  g.fillText('1 mm', L, T - 8);
+  g.fillText('-1 mm', L, c.h - B + 20);
+  g.textAlign = 'right';
+  g.fillText('1 Hz', c.w - R + 34, T - 8);
+  g.textAlign = 'center';
+  for (var k = 1; k <= 3; k++) {
+    var x = L + k / 3 * (c.w - R - L);
+    g.strokeStyle = '#8f8f8f';
+    g.beginPath(); g.moveTo(x, T); g.lineTo(x, c.h - B); g.stroke();
+    g.fillText((60 * k) + ' s', x, c.h - B + 20);
+  }
+  HIST_MAP = { X: function (t) { return L + t / 180 * (c.w - R - L); },
+               Y: function (v) { return (T + c.h - B) / 2 - v / PSD_RANGE * (c.h - B - T) / 2; },
+               T: function (px) { return (px - L) / (c.w - R - L) * 180; } };
+  var X = HIST_MAP.X, Y = HIST_MAP.Y;
+  g.fillStyle = '#e02020';
+  g.fillRect(L - 1, Y(0) - 1, 3, 3);
+  if (S.hist.length) {
+    g.strokeStyle = '#e02020'; g.lineWidth = 1.6; g.beginPath();
+    for (var i = 0; i < S.hist.length; i++) {
+      var p = S.hist[i];
+      i ? g.lineTo(X(p[0]), Y(p[1])) : g.moveTo(X(p[0]), Y(p[1]));
+    }
+    g.stroke();
+  }
+  /* item L of the paper: the trace is queried with the mouse or the arrow
+     keys, and reads to 0.0001e-3 m */
+  if (S.cursor >= 0 && S.cursor < S.hist.length) {
+    var q = S.hist[S.cursor];
+    g.strokeStyle = '#ffffff'; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(X(q[0]), T); g.lineTo(X(q[0]), c.h - B); g.stroke();
+    g.fillStyle = '#ffffff';
+    g.beginPath(); g.arc(X(q[0]), Y(q[1]), 3.5, 0, 6.284); g.fill();
+    g.textAlign = 'left';
+    g.font = 'bold 14px "Liberation Sans",Arial,sans-serif';
+    g.fillText(q[0].toFixed(0) + ' s,  ' + (q[1] * 1e3).toFixed(4) +
+               ' ×10⁻³ m', L + 8, T + 16);
+  }
+}
+var HIST_MAP = null;
+
+function refresh() {
+  placeScene();
+  $('forceRead').textContent = S.force.toFixed(2);
+  $('pointer').style.left =
+    (34 + S.force / 10 * ($('track').clientWidth - 78)) + 'px';
+  $('lcdCur').textContent = S.cur.toFixed(0);
+  $('lcdTmp').textContent = S.temp.toFixed(1);
+  drawBench();
+  drawPSD();
+  drawHist();
+}
+
+/* ------------------------------------------------------------------ inputs */
+document.addEventListener('click', function (e) {
+  var b = e.target.closest ? e.target.closest('button[data-step]') : null;
+  if (!b) return;
+  var m = b.getAttribute('data-step').match(/^([a-z]+)([+-][\d.]+)$/);
+  var key = m[1], dv = parseFloat(m[2]);
+  if (key === 'force') S.force = Math.min(10, Math.max(0, Math.round((S.force + dv) * 100) / 100));
+  else if (key === 'cur') S.cur = Math.max(0, S.cur + dv);
+  else { S[key] = Math.round((S[key] + dv) * 1000) / 1000; clampPieces(); }
+  refresh();
+});
+
+/* the pieces slide on the bench and cannot leave it, and the angles wrap */
+var BENCH = { x0: -18, x1: 114, y0: -2, y1: 50 };     /* in 1e-3 m */
+function clampPieces() {
+  S.rx = Math.min(BENCH.x1, Math.max(BENCH.x0, S.rx));
+  S.ry = Math.min(BENCH.y1, Math.max(BENCH.y0, S.ry));
+  S.px = Math.min(BENCH.x1, Math.max(BENCH.x0, S.px));
+  S.py = Math.min(BENCH.y1, Math.max(BENCH.y0, S.py));
+  S.ra = Math.round((S.ra % 360 + 360) % 360 * 10) / 10;
+  S.pa = Math.round((S.pa % 360 + 360) % 360 * 10) / 10;
+}
+
+/* drag the two positioners on the bench, as in the original */
+(function () {
+  var grab = null;
+  /* how far a click is from a face, so that the whole slab can be grabbed and
+     not just the point it is centred on */
+  function nearFace(p, c, deg, half) {
+    var a = deg * Math.PI / 180;
+    var dx = p[0] - c[0], dy = p[1] - c[1];
+    var along = dx * Math.cos(a) + dy * Math.sin(a);
+    var across = -dx * Math.sin(a) + dy * Math.cos(a);
+    return Math.abs(along) <= half + 2 && Math.abs(across) <= 4;
+  }
+  $('scene').addEventListener('mousedown', function (e) {
+    if (e.target.closest('#stage,#modes,#onoff,.chip,.cap')) return;
+    var r = $('scene').getBoundingClientRect(), m = mapper();
+    var p = m.inv(e.clientX - r.left, e.clientY - r.top);
+    if (nearFace(p, [S.rx, S.ry], S.ra, MIRROR_HALF)) grab = 'r';
+    else if (nearFace(p, [S.px, S.py], S.pa, PSD_HALF)) grab = 'p';
+    if (grab) e.preventDefault();
+  });
+  window.addEventListener('mousemove', function (e) {
+    if (!grab) return;
+    var r = $('scene').getBoundingClientRect(), m = mapper();
+    var p = m.inv(e.clientX - r.left, e.clientY - r.top);
+    if (grab === 'r') { S.rx = Math.round(p[0] * 1000) / 1000; S.ry = Math.round(p[1] * 1000) / 1000; }
+    else { S.px = Math.round(p[0] * 1000) / 1000; S.py = Math.round(p[1] * 1000) / 1000; }
+    clampPieces();
+    refresh();
+  });
+  window.addEventListener('mouseup', function () { grab = null; });
+})();
+
+/* the stage face follows the task, exactly as the app swaps it */
+['1A', '1B', '1C', '1D'].forEach(function (mode) {
+  $('t' + mode).addEventListener('click', function () {
+    S.mode = mode;
+    ['1A', '1B', '1C', '1D'].forEach(function (m2) {
+      $('t' + m2).className = m2 === mode ? 'on' : '';
+      $('f' + m2).className = m2 === mode ? 'face on' : 'face';
+    });
+    refresh();
+  });
+});
+$('f1A').className = 'face on';
+
+$('onoff').addEventListener('click', function () {
+  S.laser = !S.laser;
+  if (S.laser) S.onAt = Date.now();      /* A.2: switching on shakes the beam */
+  $('onoff').className = S.laser ? 'on' : '';
+  refresh();
+});
+$('back').addEventListener('click', function () {
+  S.mode = '1A'; $('t1A').click();
+});
+document.querySelectorAll('.samp').forEach(function (b) {
+  b.addEventListener('click', function () {
+    S.sample = parseInt(b.getAttribute('data-s'), 10);
+    document.querySelectorAll('.samp').forEach(function (o) { o.className = 'samp'; });
+    b.className = 'samp on';
+    refresh();
+  });
+});
+
+/* 1C — the heater takes time to reach the new temperature, as the paper warns */
+$('bSet').addEventListener('click', function () {
+  S.target = 26.9 + 0.9 * S.cur;      /* deg C per mA of heater current */
+});
+setInterval(function () {
+  if (S.laser && shake() > 0.02 * PSD_NOISE) drawPSD();
+  if (Math.abs(S.temp - S.target) > 0.01) {
+    S.temp += (S.target - S.temp) * 0.06;
+    $('lcdTmp').textContent = S.temp.toFixed(1);
+    if (S.mode === '1C') { drawPSD(); }
+  }
+}, 200);
+
+/* I / J / K — the PSD recorder, 1 Hz for at most 180 s */
+var recTimer = null;
+$('bRec').addEventListener('click', function () {
+  if (S.rec) return;
+  S.rec = true; S.t0 = Date.now();
+  $('bRec').disabled = true; $('bStop').disabled = false;
+  recTimer = setInterval(function () {
+    var t = (Date.now() - S.t0) / 1000;
+    if (t > 180) { stopRec(); return; }
+    var sp = spot();
+    if (sp !== null) S.hist.push([t, sp]);
+    drawPSD();
+    drawHist();
+  }, 1000);
+});
+function stopRec() {
+  S.rec = false;
+  clearInterval(recTimer);
+  $('bRec').disabled = false; $('bStop').disabled = true;
+}
+$('bStop').addEventListener('click', stopRec);
+$('bReset').addEventListener('click', function () {
+  stopRec(); S.hist = []; S.cursor = -1; drawHist();
+});
+
+/* L — query the trace: click it, or step through it with the arrow keys */
+$('hist').addEventListener('click', function (e) {
+  if (!S.hist.length || !HIST_MAP) return;
+  var r = this.getBoundingClientRect();
+  var t = HIST_MAP.T(e.clientX - r.left);
+  var best = 0;
+  for (var i = 1; i < S.hist.length; i++) {
+    if (Math.abs(S.hist[i][0] - t) < Math.abs(S.hist[best][0] - t)) best = i;
+  }
+  S.cursor = best;
+  drawHist();
+});
+window.addEventListener('keydown', function (e) {
+  var d = { ArrowLeft: -1, ArrowRight: 1 }[e.key];
+  if (!d || !S.hist.length) return;
+  S.cursor = Math.max(0, Math.min(S.hist.length - 1,
+                                  (S.cursor < 0 ? 0 : S.cursor) + d));
+  drawHist();
+  e.preventDefault();
+});
+
+window.addEventListener('resize', refresh);
+refresh();
+</script>
+</body>
+</html>

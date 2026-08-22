@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EuPhO 2020 Experiment 2 — Black Box</title>
+<style>
+:root{--bg:#0c0c0c;--fg:#cccccc;--dim:#7d7d7d;--accent:#4ec9b0;--line:#2a2a2a;--panel:#141414}
+*{box-sizing:border-box}
+body{margin:0;background:#1e1e1e;color:var(--fg);
+     font:14px/1.5 ui-sans-serif,system-ui,"Segoe UI","Malgun Gothic",sans-serif;
+     height:100vh;display:flex;flex-direction:column;overflow:hidden}
+header{padding:12px 16px 10px;background:var(--panel);border-bottom:1px solid var(--line)}
+header h1{margin:0 0 3px;font-size:15px;color:#e8e8e8}
+header p{margin:0;color:var(--dim);font-size:12.5px}
+header details{margin-top:7px}
+header summary{cursor:pointer;color:var(--accent);font-size:12.5px}
+header ul{margin:6px 0 0;padding-left:18px;color:var(--dim);font-size:12.5px}
+header li{margin:2px 0}
+#screen{flex:1;overflow-y:auto;background:var(--bg);padding:12px 16px;
+        font:13px/1.45 ui-monospace,Consolas,"Courier New",monospace;white-space:pre-wrap;
+        word-break:break-word}
+#screen .in{color:#9cdcfe}
+#bar{display:flex;align-items:center;gap:0;background:var(--bg);border-top:1px solid var(--line);
+     padding:6px 16px 10px}
+#ps{color:var(--fg);font:13px/1.45 ui-monospace,Consolas,"Courier New",monospace;
+    white-space:pre;flex:none}
+#inp{flex:1;min-width:0;background:transparent;border:0;outline:0;color:#9cdcfe;
+     font:13px/1.45 ui-monospace,Consolas,"Courier New",monospace;padding:0}
+#tools{display:flex;gap:8px;padding:8px 16px;background:var(--panel);border-top:1px solid var(--line)}
+button{background:#2d2d2d;color:var(--fg);border:1px solid var(--line);border-radius:4px;
+       padding:5px 12px;font:12.5px inherit;cursor:pointer}
+button:hover{border-color:var(--accent);color:var(--accent)}
+
+</style>
+</head>
+<body>
+<script>
+/* EuPhO 2020 Experiment 2 "Black Box" — browser build of the official console
+   program (Exp2-WIN.exe / Exp2-Linux / Exp2-OSX).
+
+   Ported line by line from the published C++ source, sources.zip ->
+   Experiment_2/ (constants.h, simulation.cpp, input.cpp, output.cpp) by
+   Richard Luhtaru: the hidden masses and springs, the non-linear springs, both
+   damping laws, the modified-Euler integrator at dt = 0.1 ms, the 5 mN force
+   noise, the command grammar, the abort conditions and the output layout. */
+
+var G = 9.81, Y1_INIT = 1.8, Y_CEIL = 3.0, Y_FLOOR = 0.0, BOX = 0.6;
+var M1 = 0.857, M2 = 0.236, M3 = 0.413;
+var K1L = 32.06, K1S = 20.0, K2L = 16.37, K2S = 15.0;
+var B1 = 0.22, B2 = 0.08, B3 = 0.08;
+var DT = 0.0001, FORCE_ERR = 0.005;
+var MAX_REPEAT = 1000, MIN_SAMPLING = 10, MAX_SAMPLING = 1000000;
+var MIN_DURATION = 10, MAX_DURATION = 10000000, MAX_ACCEL = 30;
+var OUTPUT_RES = 50;
+var HEADER = '| Time (s) | Force (N) | Accel (m/s^2) |';
+
+var STATUS = ['Experiment ended successfully.',
+              'The box hit the ceiling. Experiment ended.',
+              'The box hit the floor. Experiment ended.',
+              'Masses and/or the box collided. Experiment ended.'];
+
+function gauss(s) {
+  var u = 1 - Math.random(), v = Math.random();
+  return s * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+function k1of(x) { return K1L + K1S * x; }
+function k2of(x) { return K2L + K2S * x; }
+
+function makeSim() {
+  var f1 = (M2 + M3) * G, f2 = M3 * G, y2 = Y1_INIT, y3, i;
+  for (i = 0; i < 20; i++) y2 = Y1_INIT - f1 / k1of(Y1_INIT - y2);
+  y3 = y2;
+  for (i = 0; i < 20; i++) y3 = y2 - f2 / k2of(y2 - y3);
+  return { y1: Y1_INIT, v1: 0, y2: y2, v2: 0, y3: y3, v3: 0, a1: 0 };
+}
+
+function force(s) {
+  return M1 * s.a1 + B1 * s.v1 * Math.abs(s.v1) +
+         k1of(s.y1 - s.y2) * (s.y1 - s.y2) + M1 * G + gauss(FORCE_ERR);
+}
+
+function step(s, dt) {
+  var v1 = s.v1, y1 = s.y1, v2 = s.v2, y2 = s.y2, v3 = s.v3, y3 = s.y3;
+  var v1n = v1 + s.a1 * dt, y1n = y1 + 0.5 * (v1 + v1n) * dt;
+  var k1 = k1of(y1 - y2), k2 = k2of(y2 - y3);
+  var v2d0 = -B2 / M2 * (v2 - v1) + k1 / M2 * (y1 - y2) - k2 / M2 * (y2 - y3) - G;
+  var v3d0 = -B3 / M3 * (v3 - v1) + k2 / M3 * (y2 - y3) - G;
+  var v2g = v2 + v2d0 * dt, y2g = y2 + v2 * dt;
+  var v3g = v3 + v3d0 * dt, y3g = y3 + v3 * dt;
+  k1 = k1of(y1n - y2g); k2 = k2of(y2g - y3g);
+  var v2d1 = -B2 / M2 * (v2g - v1n) + k1 / M2 * (y1n - y2g) - k2 / M2 * (y2g - y3g) - G;
+  var v3d1 = -B3 / M3 * (v3g - v1n) + k2 / M3 * (y2g - y3g) - G;
+  s.v1 = v1n; s.y1 = y1n;
+  s.v2 = v2 + 0.5 * (v2d0 + v2d1) * dt; s.y2 = y2 + 0.5 * (v2 + v2g) * dt;
+  s.v3 = v3 + 0.5 * (v3d0 + v3d1) * dt; s.y3 = y3 + 0.5 * (v3 + v3g) * dt;
+  if (s.y1 > Y_CEIL) return 1;
+  if (s.y1 - BOX < Y_FLOOR) return 2;
+  if (s.y2 > s.y1 || s.y3 > s.y2 || s.y3 < s.y1 - BOX) return 3;
+  return 0;
+}
+
+function fmt(t, f, a) {
+  function w(s, n) { s = String(s); while (s.length < n) s = ' ' + s; return s; }
+  var acc = (a >= 0 ? '+' : '') + a.toFixed(2);
+  return '| ' + w(t.toFixed(2), 8) + ' | ' + w(f.toFixed(2), 9) + ' | ' + w(acc, 13) + ' |';
+}
+
+var PROGRAM = {
+  title: 'EuPhO 2020 Experiment 2 — Black Box',
+  subtitle: '주최측이 배포한 것은 콘솔 실행 파일입니다. 이 페이지는 공개된 C++ 원본 소스를 그대로 옮긴 브라우저 판입니다.',
+  notes: [
+    '공식 바이너리는 <code>EuPhO-2020/official/official_binaries/</code>에 Windows·Linux·macOS 빌드로 있습니다.',
+    'EuPhO는 <b>C++ 전체 소스도 공개했습니다</b> (<code>official/official_sources/Experiment_2/</code>). 숨은 질량·용수철 상수, 비선형 용수철, 두 가지 감쇠, dt = 0.1 ms 적분기, 5 mN 힘 오차, 명령 문법, 중단 조건, 출력 형식이 모두 원본과 같습니다.',
+    '명령: <code>지속시간 가속도</code> 쌍(예 <code>1.5 -0.4</code>), <code>repeat N</code> … <code>endrepeat</code>, <code>sample t</code>, <code>begin</code>, <code>quit</code>. 한 줄에 여러 개를 써도 됩니다.',
+    '|a| &le; 30 m/s&sup2;, 지속시간과 샘플링은 0.01 s의 배수. 상자는 높이 0.6 m이고 3 m 방 한가운데서 시작하며, 상자나 내부 질량이 부딪히면 실험이 끝납니다.',
+    '과제: m&#8321;, m&#8322;, m&#8323;, k&#8321;, k&#8322;를 모두 구하세요.'
+  ],
+  run: async function (term) {
+    term.writeln('EuPhO 2020 - Experiment 2');
+    term.writeln('');
+
+    for (;;) {
+      var sim = makeSim();
+      var seq = [], inrep = false, filename = null;
+
+      /* ---- input phase, exactly the original get_input() ---- */
+      for (;;) {
+        if (seq.length) {
+          term.writeln(describe(seq, true));
+        }
+        term.writeln('Enter "(duration in s) (acceleration in m/s^2)" (e.g. "1.5 -0.4") to add to sequence. (Max acceleration: 30 m/s^2)');
+        term.writeln('Enter "repeat (number of times)" (e.g. "repeat 10") to repeat actions.');
+        term.writeln('Enter "endrepeat" to end repeating actions.');
+        term.writeln('Enter "sample (time in s)" (e.g. "sample 0.4") to change sampling time for the output file. (Default: 0.01 s)');
+        term.writeln('Enter "begin" to start the experiment.');
+        term.writeln('Enter "quit" to exit the program.');
+        term.writeln('You can write multiple instructions on the same line (e.g. "1.5 -0.4 repeat 10 1.5 0.4 endrepeat").');
+
+        var line = await term.ask('');
+        term.writeln('');
+        var st;
+        try {
+          st = parseLine(seq, line, function (v) { inrep = v; }, function () { return inrep; });
+        } catch (err) {
+          term.writeln('\n******* ' + err.message + ' *******\n');
+          continue;
+        }
+        if (st === 'ok') { term.writeln('\n********************************'); }
+        else if (st === 'quit') { return; }
+        else {
+          term.writeln('Enter name for output file (e.g. "results"). You should use Latin letters and numbers because some special characters are not allowed.');
+          filename = (await term.ask('')).trim() || 'results';
+          term.writeln('\n******* Begin experiment. *******\n');
+          break;
+        }
+      }
+
+      /* ---- run ---- */
+      var flat = unpack(seq);
+      var rows = [], timeMs = 0, lastSample = -1e9, sampling = 10, status = 0;
+      var substeps = Math.round(1 / (1000 * DT));
+      var headerWritten = false, first = true;
+
+      outer:
+      for (var q = 0; q < flat.length; q++) {
+        if (flat[q][0] === 'sam') { sampling = flat[q][1]; continue; }
+        var a = flat[q][1][0], dur = flat[q][1][1], t0 = timeMs;
+        sim.a1 = a;
+        while (timeMs - t0 < dur) {
+          if (timeMs - lastSample >= sampling) {
+            if (!headerWritten) {
+              headerWritten = true;
+              rows.push('EuPhO 2020 - Experiment 2', '', describe(seq, false), HEADER);
+            }
+            rows.push(fmt(timeMs / 1000, force(sim), sim.a1));
+            lastSample = timeMs;
+          }
+          if (timeMs % OUTPUT_RES === 0) {
+            if (first) { term.writeln(HEADER); first = false; }
+            term.writeln(fmt(timeMs / 1000, force(sim), sim.a1));
+            if (timeMs % 500 === 0) await term.yieldFrame();
+          }
+          for (var k = 0; k < substeps; k++) {
+            status = step(sim, 1 / 1000 / substeps);
+            if (status !== 0) break;
+          }
+          if (status !== 0) break outer;
+          timeMs++;
+        }
+      }
+      var text = STATUS[status];
+      rows.push('', text);
+      term.writeln('');
+      term.writeln('');
+      term.writeln(text);
+      term.writeln('');
+      term.writeln('readings for "' + filename + '.txt":');
+      term.writeln(rows.join('\n'));
+      term.writeln('');
+      term.writeln('********************************');
+      term.writeln('');
+    }
+  }
+};
+
+function parseLine(seq, text, setRep, getRep) {
+  var toks = text.split(/\s+/).filter(Boolean), i = 0;
+  while (i < toks.length) {
+    var t = toks[i];
+    if (t === 'repeat') {
+      if (getRep()) throw new Error('Cannot repeat actions inside another repeat. Please try again.');
+      var n = parseInt(toks[i + 1], 10);
+      if (!(n >= 1 && n <= MAX_REPEAT)) throw new Error('Number of repeat times is out of range. Please try again.');
+      seq.push(['rep', n]); setRep(true); i += 2;
+    } else if (t === 'sample') {
+      var s = parseFloat(toks[i + 1]);
+      if (isNaN(s) || s * 1000 > MAX_SAMPLING) throw new Error('Sampling time is out of range. Please try again.');
+      var ms = Math.round(s * 1000 / MIN_SAMPLING) * MIN_SAMPLING;
+      seq.push(['sam', ms <= 0 ? MIN_SAMPLING : ms]); i += 2;
+    } else if (t === 'endrepeat') {
+      if (!getRep()) throw new Error('Cannot end repeat outside repeat. Please try again.');
+      setRep(false); seq.push(['end', 0]); i++;
+    } else if (t === 'begin') { return 'begin'; }
+    else if (t === 'quit') { return 'quit'; }
+    else {
+      var d = parseFloat(t);
+      if (isNaN(d)) throw new Error('Invalid entry. Please try again.');
+      if (d * 1000 > MAX_DURATION || d < 0) throw new Error('Duration is out of range. Please try again.');
+      if (i + 1 >= toks.length) throw new Error('Invalid entry. Please try again.');
+      var a = parseFloat(toks[i + 1]);
+      if (isNaN(a)) throw new Error('Invalid entry. Please try again.');
+      if (a < -MAX_ACCEL || a > MAX_ACCEL) throw new Error('Acceleration is out of range. Please try again.');
+      seq.push(['acc', [a, Math.round(d * 1000 / MIN_DURATION) * MIN_DURATION]]); i += 2;
+    }
+  }
+  return 'ok';
+}
+
+function unpack(seq) {
+  var flat = [], i = 0;
+  while (i < seq.length) {
+    if (seq[i][0] === 'rep') {
+      var n = seq[i][1], block = []; i++;
+      while (i < seq.length && seq[i][0] !== 'end') { block.push(seq[i]); i++; }
+      i++;
+      for (var j = 0; j < n; j++) flat = flat.concat(block);
+    } else if (seq[i][0] === 'end') { i++; }
+    else { flat.push(seq[i]); i++; }
+  }
+  return flat;
+}
+
+function describe(seq, current) {
+  var out = [current ? 'Current experiment sequence:' : 'Experiment sequence:'];
+  var inrep = false;
+  seq.forEach(function (a) {
+    var pad = inrep ? '    ' : '  ';
+    if (a[0] === 'acc') {
+      out.push(pad + 'Accelerate the box with a = ' + (a[1][0] >= 0 ? '+' : '') +
+               a[1][0].toFixed(2) + ' m/s^2 for ' + (a[1][1] / 1000).toFixed(2) + ' seconds.');
+    } else if (a[0] === 'sam') {
+      out.push(pad + 'Change sampling time to every ' + (a[1] / 1000).toFixed(2) + ' seconds.');
+    } else if (a[0] === 'rep') { out.push('  Repeat ' + a[1] + ' times:'); inrep = true; }
+    else if (a[0] === 'end') { inrep = false; }
+  });
+  return out.join('\n');
+}
+
+</script>
+<script>
+/* Console emulator for the olympiad programs whose originals are command-line
+   executables.  A program module defines a global PROGRAM:
+
+     PROGRAM = { title, subtitle, notes: [...], run: async function (term) {...} }
+
+   and drives the screen through term.write / term.writeln / term.ask, so the
+   prompts and the streamed output land on screen exactly as the original
+   executable prints them. */
+(function () {
+  var screen, ps, inp, pending = null, history = [], hpos = 0;
+
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  var term = {
+    write: function (s) {
+      screen.insertAdjacentHTML('beforeend', esc(s));
+      screen.scrollTop = screen.scrollHeight;
+    },
+    writeln: function (s) { term.write((s === undefined ? '' : s) + '\n'); },
+    echo: function (s) {
+      screen.insertAdjacentHTML('beforeend', '<span class="in">' + esc(s) + '</span>\n');
+      screen.scrollTop = screen.scrollHeight;
+    },
+    clear: function () { screen.innerHTML = ''; },
+    /* write the prompt, then wait for a line; the typed text is echoed after it,
+       which is what a terminal shows */
+    ask: function (prompt) {
+      term.write(prompt === undefined ? '' : prompt);
+      ps.textContent = prompt === undefined ? '' : prompt;
+      inp.focus();
+      return new Promise(function (resolve) { pending = resolve; });
+    },
+    /* let the browser paint between long computations */
+    yieldFrame: function () {
+      return new Promise(function (r) { setTimeout(r, 0); });
+    }
+  };
+
+  function submit() {
+    if (!pending) return;
+    var v = inp.value;
+    inp.value = '';
+    if (v !== '') { history.push(v); hpos = history.length; }
+    term.echo(v);
+    ps.textContent = '';
+    var done = pending;
+    pending = null;
+    done(v);
+  }
+
+  window.addEventListener('DOMContentLoaded', function () {
+    document.title = PROGRAM.title;
+
+    var head = document.createElement('header');
+    head.innerHTML =
+      '<h1>' + esc(PROGRAM.title) + '</h1>' +
+      (PROGRAM.subtitle ? '<p>' + esc(PROGRAM.subtitle) + '</p>' : '') +
+      (PROGRAM.notes && PROGRAM.notes.length
+        ? '<details><summary>이 프로그램에 대하여</summary><ul>' +
+          PROGRAM.notes.map(function (n) { return '<li>' + n + '</li>'; }).join('') +
+          '</ul></details>'
+        : '');
+    document.body.appendChild(head);
+
+    screen = document.createElement('div');
+    screen.id = 'screen';
+    document.body.appendChild(screen);
+
+    var bar = document.createElement('div');
+    bar.id = 'bar';
+    ps = document.createElement('span');
+    ps.id = 'ps';
+    inp = document.createElement('input');
+    inp.id = 'inp';
+    inp.autocomplete = 'off';
+    inp.spellcheck = false;
+    bar.appendChild(ps);
+    bar.appendChild(inp);
+    document.body.appendChild(bar);
+
+    var tools = document.createElement('div');
+    tools.id = 'tools';
+    var bRestart = document.createElement('button');
+    bRestart.textContent = '다시 시작 (Ctrl+C)';
+    var bCopy = document.createElement('button');
+    bCopy.textContent = '화면 복사';
+    var bSave = document.createElement('button');
+    bSave.textContent = '.txt로 저장';
+    tools.appendChild(bRestart);
+    tools.appendChild(bCopy);
+    tools.appendChild(bSave);
+    document.body.appendChild(tools);
+
+    inp.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { submit(); e.preventDefault(); }
+      else if (e.key === 'ArrowUp') {
+        if (hpos > 0) { hpos--; inp.value = history[hpos]; }
+        e.preventDefault();
+      } else if (e.key === 'ArrowDown') {
+        if (hpos < history.length - 1) { hpos++; inp.value = history[hpos]; }
+        else { hpos = history.length; inp.value = ''; }
+        e.preventDefault();
+      } else if (e.key === 'c' && e.ctrlKey) {
+        start();
+      }
+    });
+    screen.addEventListener('click', function () {
+      if (!window.getSelection().toString()) inp.focus();
+    });
+
+    bRestart.addEventListener('click', start);
+    bCopy.addEventListener('click', function () {
+      navigator.clipboard.writeText(screen.textContent).then(function () {
+        bCopy.textContent = '복사됨';
+        setTimeout(function () { bCopy.textContent = '화면 복사'; }, 1200);
+      }, function () {});
+    });
+    bSave.addEventListener('click', function () {
+      var blob = new Blob([screen.textContent], { type: 'text/plain;charset=utf-8' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = PROGRAM.title.replace(/[^\w.-]+/g, '_') + '.txt';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+
+    function start() {
+      pending = null;
+      ps.textContent = '';
+      inp.value = '';
+      term.clear();
+      inp.focus();
+      Promise.resolve(PROGRAM.run(term)).catch(function (err) {
+        term.writeln('\n[' + err.message + ']');
+      });
+    }
+    start();
+  });
+})();
+
+</script>
+</body>
+</html>

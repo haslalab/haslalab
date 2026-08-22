@@ -150,24 +150,27 @@ const T = {
            B:"저항 세트 B : 6.8 kΩ, 560 Ω, 미지(초록)",
            C:"저항 세트 C : 12 kΩ, 미지(파랑), 미지(빨강)",
            D:"저항 세트 D : 510 kΩ, 미지(검정)"},
-    lead:{vc:"Vc", gnd:"GND", probe:"탐침"},
+    lead:{w1:"점퍼선 1", w2:"점퍼선 2", w3:"점퍼선 3"},
+    hdrName:(c,r)=> r==="V" ? "3V" : r==="G" ? "GND" : "P"+c,
     board:"1. 브레드보드",
     railName:"전원라인",
     kitCap:n=>"3. Micro:bit 키트 (#"+n+")",
-    btnCap:"버튼 A/B : 측정값 표시",
+    btnCap:"A:P0  B:P1",
     emptyBay:"빈 칸",
     looseCells:"여분 AAA 건전지 (총 6개, 키트마다 2개씩)",
+    wireTray:"점퍼선 3개 — 집어서 헤더와 브레드보드에 꽂으세요",
     plugHint:"전지 플러그를 확장 보드의 PWR 소켓으로 끌어다 꽂으세요.",
     carryCell:"AAA 건전지 — 홀더의 빈 칸을 클릭",
     carryRes:c=>"저항 "+c+" — 첫 구멍을 클릭",
-    carryLead:l=>l+" 점퍼선 — 꽂을 구멍을 클릭",
+    carryLead:l=>l+" — 헤더나 브레드보드 구멍을 클릭",
     /* status lines */
-    stMiss:s=>"연결되지 않은 점퍼선 : "+s,
+    stMiss:s=>"아직 꽂지 않은 헤더 : "+s,
     stCells:(a,b)=>"건전지 "+a+"/2 — 여분 "+b+"개",
     stPlug:"전지 플러그가 PWR 소켓에 꽂혀 있지 않습니다.",
     stSwitch:"전지 홀더 스위치 : OFF",
     stDead:"⚠ 현재 Micro:bit 고장",
-    stCheck:"계통 점검 : 탐침을 GND 마디에 대면 0에 가깝고, Vc 마디에 대면 1023에 가까워야 합니다.",
+    stCheck:"계통 점검 : P0 점퍼선을 GND 마디에 대면 0, 3V 마디에 대면 1023에 가까워야 합니다.",
+    stPins:"확장 보드 헤더 : S 줄은 P0–P16, V 줄은 3V, G 줄은 GND입니다. 프로그램이 읽는 것은 P0(버튼 A)과 P1(버튼 B) 뿐입니다.",
     /* transient messages */
     m:{
       plugged:"전지 플러그를 PWR 소켓에 꽂았습니다. 스위치를 켜세요.",
@@ -180,16 +183,24 @@ const T = {
       cellIn:n=>"건전지를 "+n+"/2 개 넣었습니다.",
       cellDown:"건전지를 실험대에 내려놓았습니다.",
       cellHand:"건전지를 집었습니다. 홀더의 빈 칸을 클릭해 넣으세요.",
-      leadHole:l=>T.ko.lead[l]+" 점퍼선을 꽂을 구멍을 클릭하세요.",
-      leadTo:(l,h)=>T.ko.lead[l]+" 점퍼선을 "+nodeName(h)+" 에 연결했습니다.",
+      wireTake:l=>T.ko.lead[l]+"을 집었습니다. 헤더와 브레드보드에 한쪽씩 꽂으세요.",
+      wireHdr:(l,n)=>T.ko.lead[l]+"의 한쪽을 "+n+" 헤더에 꽂았습니다.",
+      wireHole:(l,h)=>T.ko.lead[l]+"의 한쪽을 "+nodeName(h)+" 에 꽂았습니다.",
+      wireDone:(l,n,h)=>T.ko.lead[l]+" : "+n+" ↔ "+nodeName(h),
+      hdrTaken:"그 헤더에는 이미 다른 점퍼선이 꽂혀 있습니다.",
+      noFree:"점퍼선 3개를 모두 썼습니다. 옮기려면 선을 클릭하고, 빼려면 우클릭하세요.",
+      handDrop:"들고 있던 것을 먼저 내려놓았습니다.",
       secondLead:"두 번째 리드를 꽂을 구멍을 클릭하세요.",
       sameNode:"같은 마디에 두 리드를 꽂으면 저항이 단락됩니다. 다른 마디를 고르세요.",
       resOut:c=>"저항 "+c+" 을(를) 뽑았습니다.",
-      leadOut:l=>T.ko.lead[l]+" 점퍼선을 뽑았습니다.",
+      wireOut:l=>T.ko.lead[l]+"을 뽑았습니다.",
       needCells:n=>"이 키트의 전지 홀더에 AAA 건전지 2개를 넣어야 합니다 (현재 "+n+"개).",
       notPlugged:"전지 홀더가 연결되어 있지 않습니다. 플러그를 PWR 소켓에 꽂으세요.",
       off:"전지 홀더 스위치가 꺼져 있습니다.",
-      nowire:"Vc, GND, 탐침 점퍼선이 모두 연결되어야 측정할 수 있습니다.",
+      nowire:"회로가 끊겨 있습니다.",
+      novc:"3V 헤더에 점퍼선을 꽂아야 회로에 전원이 들어갑니다.",
+      nognd:"GND 헤더에 점퍼선을 꽂아야 기준 전위가 생깁니다.",
+      floatPin:n=>"P"+n+" 에는 아무것도 연결되어 있지 않습니다 — 입력이 떠 있어 값이 흔들립니다.",
       dead:"이 Micro:bit는 고장났습니다. 다른 장치를 연결하거나 교체를 요청하세요.",
       short:"단락! Vc와 GND가 부하 없이 연결되어 장치가 고장났습니다.",
       spareOnce:"교체 장치는 참가자당 한 번만 제공됩니다.",
@@ -212,23 +223,26 @@ const T = {
            B:"Set B : 6.8 kΩ, 560 Ω, unknown (green)",
            C:"Set C : 12 kΩ, unknown (blue), unknown (red)",
            D:"Set D : 510 kΩ, unknown (black)"},
-    lead:{vc:"Vc", gnd:"GND", probe:"probe"},
+    lead:{w1:"jumper 1", w2:"jumper 2", w3:"jumper 3"},
+    hdrName:(c,r)=> r==="V" ? "3V" : r==="G" ? "GND" : "P"+c,
     board:"1. breadboard",
     railName:"rail",
     kitCap:n=>"3. Micro:bit kit (#"+n+")",
-    btnCap:"buttons A/B : reading",
+    btnCap:"A:P0  B:P1",
     emptyBay:"empty",
     looseCells:"loose AAA cells (six in all, two per kit)",
+    wireTray:"three jumpers — take one, then a header and a hole",
     plugHint:"drag the battery plug into the PWR socket of the shield",
     carryCell:"AAA cell: click an empty bay",
     carryRes:c=>"resistor "+c+" : click the first hole",
-    carryLead:l=>l+" jumper : click a hole",
-    stMiss:s=>"jumpers not connected : "+s,
+    carryLead:l=>l+" : click a header or a breadboard hole",
+    stMiss:s=>"headers still empty : "+s,
     stCells:(a,b)=>"cells "+a+" of 2 fitted, "+b+" loose",
     stPlug:"the battery plug is not in the PWR socket",
     stSwitch:"battery holder switch : OFF",
     stDead:"⚠ the current micro:bit is damaged",
-    stCheck:"System check: the probe should read ~0 at GND and ~1023 at Vc.",
+    stCheck:"System check: with the P0 jumper on the GND node it should read ~0, on the 3V node ~1023.",
+    stPins:"Expansion header: row S is P0–P16, row V is 3V, row G is GND. The program only ever reads P0 (button A) and P1 (button B).",
     m:{
       plugged:"Battery plugged into PWR; now switch it on.",
       already:"Already on the breadboard; right-click it to pull it out.",
@@ -240,16 +254,24 @@ const T = {
       cellIn:n=>n+" of 2 cells fitted.",
       cellDown:"Cell put back on the bench.",
       cellHand:"Cell in hand: click an empty bay of the holder.",
-      leadHole:l=>"Click the hole for the "+T.en.lead[l]+" jumper.",
-      leadTo:(l,h)=>T.en.lead[l]+" jumper connected to "+nodeName(h)+".",
+      wireTake:l=>T.en.lead[l]+" in hand — plug one end into a header, the other into the board.",
+      wireHdr:(l,n)=>T.en.lead[l]+" plugged into the "+n+" header.",
+      wireHole:(l,h)=>T.en.lead[l]+" plugged into "+nodeName(h)+".",
+      wireDone:(l,n,h)=>T.en.lead[l]+" : "+n+" ↔ "+nodeName(h),
+      hdrTaken:"another jumper is already in that header.",
+      noFree:"all three jumpers are in use — click one to move it, right-click to pull it out.",
+      handDrop:"put down what was in hand first.",
       secondLead:"Click the hole for the second lead.",
       sameNode:"Both leads in the same node would short the resistor.",
       resOut:c=>"Resistor "+c+" removed.",
-      leadOut:l=>T.en.lead[l]+" jumper unplugged.",
+      wireOut:l=>T.en.lead[l]+" pulled out.",
       needCells:n=>"This kit needs two AAA cells in its holder (only "+n+" fitted).",
       notPlugged:"The battery holder is not plugged in: push its plug into PWR.",
       off:"The battery holder is switched off.",
-      nowire:"Vc, GND and the probe jumper must all be connected.",
+      nowire:"the circuit is open.",
+      novc:"nothing is on the 3V header, so the circuit has no supply.",
+      nognd:"nothing is on the GND header, so there is no reference.",
+      floatPin:n=>"nothing is connected to P"+n+" — the input floats and the value wanders.",
       dead:"This micro:bit is damaged: connect another one or ask for the spare.",
       short:"Short circuit!  Vc and GND were joined without a load; the kit is damaged.",
       spareOnce:"Only one replacement per candidate is provided.",
@@ -275,17 +297,34 @@ const PACKS = {
 const DEV_COL=["#23262b","#23262b","#23262b"], DEV_EDGE=["#111417","#111417","#111417"];
 const DEV_NAME=["#1","#2","#3"];
 const TOL=0.001, NCOL=30;
+/* the expansion board breaks P0..P16 out as three header rows: S (the pin),
+   V (3V) and G (0V).  analogReadPin works on P0..P4 and P10 and returns
+   0..1023 for 0..3 V; the kit program shows P0 on button A and P1 on B. */
+const HDR_COLS=17, HDR_ROWS=["S","V","G"];
+const ANALOG_PINS=[0,1,2,3,4,10];
+const BTN_PIN={A:0, B:1};
+const WIRES=["w1","w2","w3"];
+const WIRE_KEY={w1:"probe", w2:"vc", w3:"gnd"};
+/* control point and end of the stub a half-plugged jumper hangs by,
+   one per wire so three of them never lie on top of each other */
+const LOOSE_STUB=[[-16,2,-30,6],[-18,10,-34,18],[-20,18,-38,30]];
 const ROWS_L="ABCDE", ROWS_R="FGHIJ", RAILS=["T+","T-","B+","B-"];
 
 const C_BG="#1b1e24", C_TXT="#e8eef2", C_ACC="#f2c14e";
 const C_BOARD="#e9e6dd", C_BOARD2="#d6d2c6", C_HOLE="#2a2c2f";
 const C_RED="#cc3b32", C_BLUE="#3363b8";
-const WIRE_SETS=[{probe:"#8b4fd0",vc:"#3fa85a",gnd:"#2f6fd0"},
-                 {probe:"#f5d033",vc:"#8a5a2b",gnd:"#e8862a"},
-                 {probe:"#f5d033",vc:"#e33d2e",gnd:"#23272e"}];
-const CASE_SETS=[{probe:"#4d2a75",vc:"#215c31",gnd:"#1b4079"},
-                 {probe:"#8a6f14",vc:"#4d3116",gnd:"#8a4d13"},
-                 {probe:"#8a6f14",vc:"#8a231a",gnd:"#aeb6bd"}];
+const WIRE_SETS=[{probe:"#f5d033",vc:"#e33d2e",gnd:"#23272e"},
+                 {probe:"#8b4fd0",vc:"#3fa85a",gnd:"#2f6fd0"},
+                 {probe:"#e6ebf0",vc:"#24b7c9",gnd:"#d94f8a"}];
+const CASE_SETS=[{probe:"#8a6f14",vc:"#8a231a",gnd:"#0c0e12"},
+                 {probe:"#4d2a75",vc:"#215c31",gnd:"#1b4079"},
+                 {probe:"#8f979e",vc:"#12707c",gnd:"#8a2d55"}];
+/* each kit comes with its own battery lead, in colours no jumper of that
+   kit uses, so a cable is never mistaken for a jumper */
+const CABLE_SETS=[{a:"#e6eaea",b:"#8d949b"},
+                  {a:"#cc3b32",b:"#1b1e22"},
+                  {a:"#1f8f9c",b:"#3a4048"}];
+const cableCol = () => CABLE_SETS[w.active];
 const P=22.0, BX=52.0, BY=452.0;
 const ROW_Y={"T+":0.0,"T-":1.0,A:2.9,B:3.9,C:4.9,D:5.9,E:6.9,
              F:8.7,G:9.7,H:10.7,I:11.7,J:12.7,"B+":14.6,"B-":15.6};
@@ -453,6 +492,7 @@ class World{
     this.cells_free=6; this.cell_hand=0; this.cells=[0,0,0];
     this.batt_in=[false,false,false]; this.switch=[false,false,false];
     this.spare_used=false;
+    this.jump={}; for(const id of WIRES) this.jump[id]={hdr:null, hole:null};
     this.msg=null;
     this.value={};
     for(const pk in PACKS) for(const [cid,nom] of PACKS[pk])
@@ -470,14 +510,41 @@ class World{
   }
   place(cid,h1,h2){ this.placed[cid]=[h1,h2]; this.cir.res[cid]=[h1,h2,this.value[cid]]; }
   remove(cid){ delete this.placed[cid]; delete this.cir.res[cid]; }
-  set_lead(which,hole){ this.cir.lead[which]=hole; }
-  measure(){
+  set_lead(which,hole){ this.cir.lead[which]=hole; }      /* kept for tests */
+  freeWire(){ for(const id of WIRES){ const j=this.jump[id]; if(!j.hdr&&!j.hole) return id; } return null; }
+  wireAtHdr(col,row){
+    for(const id of WIRES){ const j=this.jump[id];
+      if(j.hdr&&j.hdr[0]===col&&j.hdr[1]===row) return id; }
+    return null;
+  }
+  /* what the wiring means to the board: V row is the supply, G row the
+     reference, S row of column k is pin Pk */
+  roles(){
+    const r={vc:null, gnd:null, pin:{}};
+    for(const id of WIRES){
+      const j=this.jump[id];
+      if(!j.hdr||!j.hole) continue;
+      if(j.hdr[1]==="V")      r.vc=j.hole;
+      else if(j.hdr[1]==="G") r.gnd=j.hole;
+      else                    r.pin[j.hdr[0]]=j.hole;
+    }
+    return r;
+  }
+  measure(which){
     if(this.dev.dead) return "dead";
     if(!this.power) return "off";
+    const R=this.roles();
+    if(!R.vc)  return "novc";
+    if(!R.gnd) return "nognd";
+    const pin=BTN_PIN[which||"A"];
+    const hp=(R.pin[pin]===undefined) ? null : R.pin[pin];
+    this.cir.lead={vc:R.vc, gnd:R.gnd, probe:hp};
     const r=this.cir.solve();
     if(r===null) return "nowire";
     if(r==="short"){ this.dev.dead=true; return "short"; }
-    if(r.vp===null||r.vp===undefined) return "nowire";
+    /* an input with nothing on it is not an error on real hardware — it
+       floats, and the converter returns whatever the leakage leaves */
+    if(hp===null) return this.dev.read(this.rng.uniform(0.0,0.06));
     return this.dev.read(r.vp);
   }
 }
@@ -490,7 +557,7 @@ const S = {
   zoom:1.0, pan:[0,0], carry:null, pending:null, mouse:[0,0],
   holes:allHoles(), scroll:null, lastReading:null,
   viewTouched:false, draggingPlug:false, lp0:null,
-  zoneSlot:[], zoneCell:[], zonePin:{}, pinXY:{},
+  zoneSlot:[], zoneCell:[], zonePin:{}, pinXY:{}, zoneHdr:[], zoneWire:[], hdrPos:{},
   zoneSocket:null, zoneSwitch:null, zoneBtnA:null, zoneBtnB:null,
   plugPx:null, matrixOrg:null
 };
@@ -521,7 +588,7 @@ const SC = (x,y)=>[x*S.zoom+S.pan[0], y*S.zoom+S.pan[1]];
 const INV = (px,py)=>[(px-S.pan[0])/S.zoom, (py-S.pan[1])/S.zoom];
 
 function nearestHole(px,py,rmax){
-  rmax = rmax===undefined ? P*0.62 : rmax;
+  rmax = rmax===undefined ? Math.max(P*0.62, 14/S.zoom) : rmax;
   const [x,y]=INV(px,py);
   let best=null, bd=1e9;
   for(const h of S.holes){
@@ -536,6 +603,10 @@ function nearestHole(px,py,rmax){
    6.  DRAWING
    ══════════════════════════════════════════════════════════════ */
 function fs(pt){ return Math.max(6, Math.round(pt*S.zoom))*1.33; }
+/* every caption has a floor of ~8 screen px, which is 19 world units at the
+   default zoom — far more than the gaps they were laid out in.  Below this
+   zoom they would print on top of the parts, so they move to the HUD. */
+function roomy(){ return S.zoom>=0.85; }
 function setFont(pt,bold,mono){
   ctx.font = (bold?"bold ":"")+fs(pt).toFixed(1)+"px "+
              (mono?'ui-monospace,Consolas,monospace':'"Malgun Gothic","Apple SD Gothic Neo",sans-serif');
@@ -561,9 +632,23 @@ function TX(x,y,txt,pt,fill,anchor,bold,mono){
   ctx.fillStyle=fill||C_TXT;
   ctx.fillText(txt,a[0],a[1]);
 }
+function plateTXT(px,py,txt,size,fg){
+  ctx.font=size.toFixed(1)+'px "Malgun Gothic","Apple SD Gothic Neo",sans-serif';
+  ctx.textAlign="center"; ctx.textBaseline="middle";
+  const wd=ctx.measureText(txt).width, pad=3.5, h=size+5;
+  ctx.fillStyle="rgba(18,21,26,.86)";
+  ctx.fillRect(px-wd/2-pad, py-h/2, wd+pad*2, h);
+  ctx.fillStyle=fg; ctx.fillText(txt,px,py);
+}
 function TXPX(px,py,txt,pxsize,fill,anchor,bold){
   ctx.font=(bold?"bold ":"")+pxsize+'px "Malgun Gothic","Apple SD Gothic Neo",sans-serif';
-  anchorSet(anchor); ctx.fillStyle=fill; ctx.fillText(txt,px,py);
+  anchorSet(anchor);
+  /* the label follows the cursor over the bench, so it carries its own plate */
+  const wd=ctx.measureText(txt).width, pad=4, h=pxsize+6;
+  const x0 = anchor==="center" ? px-wd/2 : px;
+  ctx.fillStyle="rgba(18,21,26,.86)";
+  ctx.fillRect(x0-pad, py-h/2, wd+pad*2, h);
+  ctx.fillStyle=fill; ctx.fillText(txt,px,py);
 }
 function LN(pts,stroke,width,round){
   ctx.beginPath(); ctx.moveTo(pts[0][0],pts[0][1]);
@@ -585,8 +670,8 @@ function OVAL(x0,y0,x1,y1,fill,outline,width){
   if(fill){ ctx.fillStyle=fill; ctx.fill(); }
   if(outline){ ctx.strokeStyle=outline; ctx.lineWidth=width||1; ctx.stroke(); }
 }
-const wireCol = k => WIRE_SETS[w.active][k];
-const caseCol = k => CASE_SETS[w.active][k];
+const wireCol = k => WIRE_SETS[w.active][WIRE_KEY[k]||k];
+const caseCol = k => CASE_SETS[w.active][WIRE_KEY[k]||k];
 const d = () => T[lang];
 
 function nodeName(h){
@@ -632,78 +717,98 @@ function drawBreadboard(){
     if(h){
       const [hx,hy]=holePos(h);
       R(hx-0.5*P,hy-0.5*P,hx+0.5*P,hy+0.5*P,null,C_ACC,2);
-      TX(hx,hy-0.85*P,nodeName(h),8,C_ACC,"center",true);
+      const q=SC(hx,hy-0.95*P);
+      plateTXT(q[0],q[1],nodeName(h),Math.max(9,10*S.zoom),C_ACC);
     }
   }
 }
 
 function drawMicrobit(){
-  const bx=292.0, by=30.0;
-  R(bx,by,bx+268,by+372,"#2b2f36","#454b54",2);
-  TX(bx+8,by+5,d().kitCap(w.active+1),9,"#aeb6bd");
-  const mx=bx+40, my=by+26, MW=188.0, MH=152.0;
+  const bx=292.0, by=30.0, PW=300.0;
+  R(bx,by,bx+PW,by+392,"#2b2f36","#454b54",2);
+  if(roomy()) TX(bx+8,by+5,d().kitCap(w.active+1),9,"#aeb6bd");
+  const mx=bx+(PW-240)/2, my=by+26, MW=240.0, MH=194.0;
+  /* the board: 52 x 42 mm of dark PCB, USB and battery sockets along the
+     top edge, the touch logo under them, the LED matrix in the middle,
+     buttons A and B either side, gold fingers along the bottom */
   R(mx,my,mx+MW,my+MH,DEV_COL[w.active],DEV_EDGE[w.active],2);
-  for(const [xa,xb] of [[0.0,26.0],[MW-26.0,MW]]){
-    const a=SC(mx+xa,my), b=SC(mx+xb,my+22);
-    POLY([[a[0],a[1]],[b[0],a[1]],[xa===0?a[0]:b[0],b[1]]],"#f2b826",null);
-  }
-  for(let k=0;k<3;k++){
-    const a=SC(mx+30+k*20,my), b=SC(mx+46+k*20,my+15);
+  for(let k=0;k<4;k++){                                          /* edge triangles */
+    const a=SC(mx+8+k*26,my), b=SC(mx+30+k*26,my+17);
     POLY([[a[0],a[1]],[b[0],a[1]],[(a[0]+b[0])/2,b[1]]],"#f2b826",null);
   }
-  let a=SC(mx+MW/2-17,my+20), b=SC(mx+MW/2+17,my+38);
-  OVAL(a[0],a[1],b[0],b[1],null,"#d8a72a",2);
+  R(mx,my,mx+10,my+18,"#f2b826",null);
+  /* the gold touch logo */
+  let a=SC(mx+MW/2-17,my+22), b=SC(mx+MW/2+17,my+42);
+  OVAL(a[0],a[1],b[0],b[1],null,"#d8a72a",Math.max(1.5,2*S.zoom));
   for(const dx of [-8,8]){
-    const c=SC(mx+MW/2+dx,my+29), r=3*S.zoom;
+    const c=SC(mx+MW/2+dx,my+32), r=3.4*S.zoom;
     OVAL(c[0]-r,c[1]-r,c[0]+r,c[1]+r,"#d8a72a",null);
   }
-  S.matrixOrg=[mx+MW/2-40,my+46];
+  S.matrixOrg=[mx+MW/2-44,my+56];
   for(let r_=0;r_<5;r_++) for(let c_=0;c_<5;c_++)
     R(S.matrixOrg[0]+c_*20, S.matrixOrg[1]+r_*17,
       S.matrixOrg[0]+c_*20+8, S.matrixOrg[1]+r_*17+12,"#4a2018",null);
-  for(const [lab,dx] of [["A",14],["B",MW-34]]){
-    R(mx+dx,my+62,mx+dx+20,my+82,"#c9ced4","#7d848a",2);
-    R(mx+dx+5,my+67,mx+dx+15,my+77,"#8d949b",null);
-    const p1=SC(mx+dx+2,my+88), p2=SC(mx+dx+18,my+88), p3=SC(mx+dx+10,my+96);
-    POLY([p1,p2,p3],"#f2b826",null);
-    TX(mx+dx+10,my+92,lab,8,DEV_COL[w.active],"center",true);
+  /* the two tactile buttons, black with a metal plunger, silkscreened A and B */
+  for(const [lab,dx] of [["A",14],["B",MW-38]]){
+    R(mx+dx,my+86,mx+dx+24,my+110,"#15181c","#3a4048",1.5);
+    const c=SC(mx+dx+12,my+98), r=6.5*S.zoom;
+    OVAL(c[0]-r,c[1]-r,c[0]+r,c[1]+r,"#c9ced4","#7d848a",1);
+    const t1=SC(mx+dx+4,my+116), t2=SC(mx+dx+16,my+116), t3=SC(mx+dx+10,my+124);
+    POLY([t1,t2,t3],"#f2b826",null);
+    if(roomy()) TX(mx+dx+12,my+132,lab,9,"#e8eef2","center",true);
   }
-  S.zoneBtnA=[mx+14,my+62,mx+34,my+82];
-  S.zoneBtnB=[mx+MW-34,my+62,mx+MW-14,my+82];
-  R(mx,my+MH-22,mx+MW,my+MH,"#c9a227","#8a6f18",1);
-  for(let k=0;k<28;k++) R(mx+6+k*6.4,my+MH-20,mx+9+k*6.4,my+MH,"#e0bd45",null);
+  S.zoneBtnA=[mx+14,my+86,mx+38,my+110];
+  S.zoneBtnB=[mx+MW-38,my+86,mx+MW-14,my+110];
+  R(mx,my+MH-26,mx+MW,my+MH,"#c9a227","#8a6f18",1);
+  for(let k=0;k<28;k++) R(mx+5+k*(MW-10)/28,my+MH-24,mx+9+k*(MW-10)/28,my+MH,"#e0bd45",null);
+  /* the five big pads are rings: gold annulus, hole right through the board */
   ["0","1","2","3V","G"].forEach((lab,k)=>{
-    const cxp=mx+12+k*(MW-24)/4.0;
-    const q1=SC(cxp-9,my+MH-19), q2=SC(cxp+9,my+MH-1);
-    OVAL(q1[0],q1[1],q2[0],q2[1],null,"#8a6f18",2);
-    TX(cxp,my+MH-10,lab,7,"#5c4a10","center");
+    const cxp=mx+16+k*(MW-32)/4.0, cy=my+MH-13;
+    const c=SC(cxp,cy), r1=11*S.zoom, r2=5.4*S.zoom;
+    ctx.beginPath(); ctx.arc(c[0],c[1],r1,0,7);
+    ctx.fillStyle="#e0bd45"; ctx.fill();
+    ctx.strokeStyle="#8a6f18"; ctx.lineWidth=Math.max(1,1.2*S.zoom); ctx.stroke();
+    ctx.beginPath(); ctx.arc(c[0],c[1],r2,0,7);
+    ctx.fillStyle="#15181c"; ctx.fill();
+    ctx.strokeStyle="#8a6f18"; ctx.lineWidth=Math.max(1,0.9*S.zoom); ctx.stroke();
+    if(roomy()) TX(cxp,my+MH-34,lab,7,"#d8c894","center",true);
   });
-  const sx=bx+16, sy=my+MH, SW=236.0, SH=96.0;
-  R(sx,sy+4,sx+SW,sy+SH,"#efe9dc","#b8b09c",2);
-  R(sx+20,sy,sx+20+MW+8,sy+20,"#15181c","#000",1);
-  TX(sx+4,sy+26,"3a",8,"#6c6553");
-  TX(sx+30,sy+62,"analog",7,"#6c6553","e");
-  for(let k=0;k<17;k++){
-    const px=sx+30+k*11.5;
-    if(k%2===0) TX(px+3,sy+31,String(k),6,"#6c6553","center");
-    ["#e8c02a","#cc3b32","#1b1e22"].forEach((col,r_)=>{
-      R(px,sy+40+r_*12,px+7,sy+49+r_*12,col,"#8d8674",1);
-    });
-  }
-  ["S","V","G"].forEach((lab,r_)=>{ TX(sx+28,sy+45+r_*12,lab,6,"#6c6553","e"); });
-  ["probe","vc","gnd"].forEach((key,i2)=>{
-    const py=sy+45+i2*12;
-    R(sx+8,py-4,sx+22,py+5,wireCol(key),"#0c1218",1);
-    TX(sx+6,py,["3b","3c","3d"][i2],7,"#6c6553","e");
-    S.pinXY[key]=[sx+22,py];
-    S.zonePin[key]=[sx+4,py-7,sx+26,py+8];
+  const sx=bx+16, sy=my+MH-10, SW=PW-32, SH=104.0;
+  R(sx,sy+16,sx+SW,sy+SH,"#efe9dc","#b8b09c",2);
+  /* the edge-connector socket: the board is pushed down into it, so the
+     bottom of the fingers disappears inside */
+  const kx0=mx-16, kx1=mx+MW+16;
+  R(kx0,sy,kx1,sy+22,"#15181c","#000",1.5);
+  R(kx0+5,sy+3,kx1-5,sy+9,"#0a0c0f",null);
+  R(kx0,sy+18,kx1,sy+22,"#2a2f36",null);
+  for(const ex of [kx0+4,kx1-10]) R(ex,sy-6,ex+6,sy+4,"#8d949b","#5c6167",1);
+  if(roomy()) TX(sx+6,sy+SH-12,"3a",8,"#6c6553");
+  /* every pin is broken out three times: S is the pin itself, V is 3V,
+     G is 0V — that is where a jumper actually goes */
+  const HX=sx+30, HP=14.0;
+  S.zoneHdr=[]; S.hdrPos={};
+  HDR_ROWS.forEach((row,r_)=>{
+    const py=sy+38+r_*18;
+    if(roomy()) TX(HX-11,py, row==="V"?"V":row==="G"?"G":"S",7,"#6c6553","e");
+    for(let k=0;k<HDR_COLS;k++){
+      const px=HX+k*HP;
+      /* the pins are in the colours of the jumpers this kit came with */
+      const col = row==="V" ? wireCol("w2") : row==="G" ? wireCol("w3") : wireCol("w1");
+      R(px-4.5,py-7,px+4.5,py+7,col,"#8d8674",1);
+      R(px-2,py-2.6,px+2,py+2.6,"#15181c",null);
+      S.hdrPos[k+"|"+row]=[px,py];
+      S.zoneHdr.push({col:k,row:row,z:[px-7,py-10,px+7,py+10]});
+    }
+    /* no label past the last pin: it ran off the edge of the shield */
   });
-  const px0=sx+SW-42, py0=sy+SH-26;
+  if(roomy()) for(let k=0;k<HDR_COLS;k+=2)
+    TX(HX+k*HP,sy+26,String(k),6,"#6c6553","center");
+  const px0=sx+SW-40, py0=sy+SH-18;
   R(px0,py0,px0+34,py0+18,"#1b1e22","#000",1);
   TX(px0+17,py0+9,"PWR",6,"#9aa3ab","center");
   S.zoneSocket=[px0,py0,px0+34,py0+18];
 
-  const hx=bx+30, hy=by+300, k=w.active;
+  const hx=bx+16, hy=by+322, k=w.active;
   R(hx,hy,hx+150,hy+54,"#dfe4e6","#9aa0a6",2);
   S.zoneSlot=[];
   for(let c=0;c<2;c++){
@@ -711,16 +816,27 @@ function drawMicrobit(){
     R(hx+12,cy,hx+108,cy+16, loaded?"#c9c2ad":"#9aa0a6", loaded?"#8d8674":"#6f767c",1);
     if(loaded){
       R(hx+108,cy+4,hx+114,cy+12,"#b9b2a0","#8d8674",1);
-      TX(hx+60,cy+8,"AAA  1.5V",6,"#5d574a","center");
+      if(roomy()) TX(hx+60,cy+8,"AAA  1.5V",6,"#5d574a","center");
     }else{
-      TX(hx+60,cy+8,d().emptyBay,6,"#e6ecef","center");
+      if(roomy()) TX(hx+60,cy+8,d().emptyBay,6,"#e6ecef","center");
     }
     S.zoneSlot.push([hx+12,cy,hx+114,cy+16]);
   }
-  TX(hx+4,hy+58,"3e ("+DEV_NAME[k]+")",8,"#7b838b");
+  if(roomy()) TX(hx+4,hy+58,"3e ("+DEV_NAME[k]+")",8,"#7b838b");
 
-  const tx0=bx+16, ty0=by+352;
-  TX(tx0,ty0-12,d().looseCells,7,"#9aa3ab");
+  const wx0=40.0, wy0=164.0;
+  if(roomy()) TX(wx0,wy0-14,d().wireTray,7,"#9aa3ab");
+  S.zoneWire=[];
+  WIRES.forEach((id,i)=>{
+    const j=w.jump[id];
+    if(j.hdr||j.hole||(S.carry&&S.carry[0]==="wire"&&S.carry[1]===id)) return;
+    const x=wx0+i*54;
+    R(x,wy0,x+44,wy0+8,wireCol(id),caseCol(id),1);
+    S.zoneWire.push({id:id,z:[x-2,wy0-6,x+46,wy0+14]});
+  });
+
+  const tx0=40.0, ty0=88.0;
+  if(roomy()) TX(tx0,ty0-14,d().looseCells,7,"#9aa3ab");
   S.zoneCell=[];
   for(let c=0;c<6;c++){
     const x=tx0+c*40, avail=c<w.cells_free;
@@ -736,20 +852,27 @@ function drawMicrobit(){
 
   const aa=SC(hx+150,hy+20);
   let bb, mid;
-  if(w.batt_in[k]){ bb=SC(px0+6,py0+9); mid=SC(hx+190,hy+4); }
+  if(w.batt_in[k]){ bb=SC(px0+17,py0+9); mid=SC(hx+190,hy+4); }
   else            { bb=SC(hx+196,hy+30); mid=SC(hx+180,hy+46); }
-  for(const [col,off] of [["#cc3b32",-3],["#1b1e22",3]]){
+  for(const [col,off] of [[cableCol().a,-3],[cableCol().b,3]]){
     ctx.beginPath(); ctx.moveTo(aa[0],aa[1]+off);
     ctx.quadraticCurveTo(mid[0],mid[1]+off,bb[0],bb[1]+off);
     ctx.strokeStyle=col; ctx.lineWidth=Math.max(2,Math.round(2.4*S.zoom));
     ctx.lineCap="round"; ctx.stroke(); ctx.lineCap="butt";
   }
-  const pw=20.0, ph=14.0;
-  const plug=[bb[0]-pw*S.zoom/2, bb[1]-ph*S.zoom/2, bb[0]+pw*S.zoom/2, bb[1]+ph*S.zoom/2];
+  let plug;
+  if(w.batt_in[k]){                     /* seated: it covers the socket whole */
+    const q1=SC(px0-2,py0-2), q2=SC(px0+36,py0+20);
+    plug=[q1[0],q1[1],q2[0],q2[1]];
+  }else{
+    const pw=22.0, ph=15.0;
+    plug=[bb[0]-pw*S.zoom/2, bb[1]-ph*S.zoom/2, bb[0]+pw*S.zoom/2, bb[1]+ph*S.zoom/2];
+  }
   RPX(plug[0],plug[1],plug[2],plug[3], w.batt_in[k]?"#cdd3d6":"#f2f2f0","#8d949b",2);
+  if(w.batt_in[k]) RPX(plug[0]+3,plug[1]+3,plug[2]-3,plug[1]+(plug[3]-plug[1])*0.42,"#b6bcc2",null);
   S.plugPx=plug;
-  if(!w.batt_in[k]) TX(hx+150,hy+66,d().plugHint,7,"#e8c02a");
-  TX(bx+260,by+5,d().btnCap,7,"#7b838b","e");
+  /* the plug hint would run off the panel; the status list already says it */
+  if(roomy()) TX(bx+PW-12,by+5,d().btnCap,7,"#7b838b","e");
 }
 
 function matrixCells(){
@@ -815,18 +938,17 @@ function drawResistors(){
         LN([q1,q2],"#3a3f46",Math.max(1,Math.round(0.09*P*S.zoom)));
       }
     }
-    const t=SC(mx,my-0.62*P);
-    ctx.font=Math.max(6,Math.round(7*S.zoom))*1.33+"px ui-monospace,Consolas,monospace";
-    ctx.textAlign="center"; ctx.textBaseline="middle";
-    ctx.fillStyle="#6b7278"; ctx.fillText(cid,t[0],t[1]);
+    const t=SC(mx,my-0.68*P);
+    plateTXT(t[0],t[1],cid,Math.max(8,9*S.zoom),"#c7ced5");
   }
 }
 
 function drawWires(){
-  for(const key of ["vc","gnd","probe"]){
-    const h=w.cir.lead[key];
-    if(!h||!S.pinXY[key]) continue;
-    const p0=S.pinXY[key], p1=holePos(h);
+  for(const key of WIRES){
+    const j=w.jump[key];
+    if(!j.hdr||!j.hole) { drawLooseWire(key); continue; }
+    const p0=S.hdrPos[j.hdr[0]+"|"+j.hdr[1]], p1=holePos(j.hole);
+    if(!p0) continue;
     const a=SC(p0[0],p0[1]), b=SC(p1[0],p1[1]);
     const mid=SC((p0[0]+p1[0])/2+40,(p0[1]+p1[1])/2+60);
     const wdt=Math.max(2,Math.round(0.16*P*S.zoom));
@@ -838,11 +960,28 @@ function drawWires(){
     }
     const r=0.24*P*S.zoom;
     OVAL(b[0]-r,b[1]-r,b[0]+r,b[1]+r,wireCol(key),"#0c1218",1);
-    ctx.font=Math.max(6,Math.round(7*S.zoom))*1.33+'px "Malgun Gothic",sans-serif';
-    ctx.textAlign="center"; ctx.textBaseline="middle";
-    ctx.fillStyle = key==="gnd"?caseCol(key):wireCol(key);
-    ctx.fillText(d().lead[key], b[0]+14, b[1]-12);
+    OVAL(a[0]-r*0.8,a[1]-r*0.8,a[0]+r*0.8,a[1]+r*0.8,wireCol(key),"#0c1218",1);
+    plateTXT(b[0]+18, b[1]-14, d().hdrName(j.hdr[0],j.hdr[1]),
+             Math.max(9,10*S.zoom), j.hdr[1]==="G"?"#8fb4f0":wireCol(key));
   }
+}
+/* a jumper with only one end in place dangles from it */
+function drawLooseWire(key){
+  const j=w.jump[key];
+  if(!j.hdr&&!j.hole) return;
+  const p0 = j.hdr ? S.hdrPos[j.hdr[0]+"|"+j.hdr[1]] : holePos(j.hole);
+  if(!p0) return;
+  const st=LOOSE_STUB[WIRES.indexOf(key)]||LOOSE_STUB[0];
+  const a=SC(p0[0],p0[1]), b=SC(p0[0]+st[2],p0[1]+st[3]);
+  const wdt=Math.max(2,Math.round(0.16*P*S.zoom));
+  for(const [col,ww] of [[caseCol(key),wdt+3],[wireCol(key),wdt]]){
+    ctx.beginPath(); ctx.moveTo(a[0],a[1]);
+    ctx.quadraticCurveTo(SC(p0[0]+st[0],p0[1]+st[1])[0],SC(p0[0]+st[0],p0[1]+st[1])[1],b[0],b[1]);
+    ctx.strokeStyle=col; ctx.lineWidth=ww; ctx.lineCap="round"; ctx.stroke();
+    ctx.lineCap="butt";
+  }
+  const r=0.24*P*S.zoom;
+  OVAL(a[0]-r,a[1]-r,a[0]+r,a[1]+r,wireCol(key),"#0c1218",1);
 }
 
 function drawCarry(){
@@ -854,7 +993,7 @@ function drawCarry(){
   }
   if(S.carry&&S.carry[0]==="res")
     TXPX(px+16,py-14,d().carryRes(S.carry[1]),13,C_ACC,"w",true);
-  else if(S.carry&&S.carry[0]==="lead")
+  else if(S.carry&&S.carry[0]==="wire")
     TXPX(px+16,py-14,d().carryLead(d().lead[S.carry[1]]),13,C_ACC,"w",true);
   if(S.pending){
     const hp=holePos(S.pending), p=SC(hp[0],hp[1]);
@@ -882,6 +1021,55 @@ function draw(){
 function say(k){ w.msg = k===null ? null : {k:k, a:Array.prototype.slice.call(arguments,1)}; }
 function inside(z,x,y){ return !!z && z[0]<=x && x<=z[2] && z[1]<=y && y<=z[3]; }
 function sz(z){ const a=SC(z[0],z[1]), b=SC(z[2],z[3]); return [a[0],a[1],b[0],b[1]]; }
+/* a control has to stay clickable however far out the view is zoomed, so
+   every zone is grown to a minimum size in screen pixels before the test */
+function hpx(r,minPx){
+  let [x0,y0,x1,y1]=r; const m=minPx||20;
+  if(x1-x0<m){ const c=(x0+x1)/2; x0=c-m/2; x1=c+m/2; }
+  if(y1-y0<m){ const c=(y0+y1)/2; y0=c-m/2; y1=c+m/2; }
+  return [x0,y0,x1,y1];
+}
+function hz(z,minPx){ return hpx(sz(z),minPx); }
+/* neighbouring controls (cells, slots, the three lead sockets) sit closer
+   together than the enlarged zones, so the nearest centre wins */
+function pickNearest(items,x,y,rmax){
+  let best=null, bd=rmax*rmax;
+  for(const it of items){
+    const r=sz(it.z), cx=(r[0]+r[2])/2, cy=(r[1]+r[3])/2;
+    const d=(cx-x)*(cx-x)+(cy-y)*(cy-y);
+    if(d<=bd){ bd=d; best=it; }
+  }
+  return best;
+}
+/* the drawn wire itself is a target: click it anywhere to take the lead back */
+function wireAt(px,py,rmax){
+  rmax=rmax||12;
+  let best=null, bd=rmax*rmax;
+  for(const key of WIRES){
+    const j=w.jump[key]; if(!j||(!j.hdr&&!j.hole)) continue;
+    let p0,p1,m;
+    if(j.hdr&&j.hole){
+      p0=S.hdrPos[j.hdr[0]+"|"+j.hdr[1]]; if(!p0) continue;
+      p1=holePos(j.hole);
+      m=[(p0[0]+p1[0])/2+40,(p0[1]+p1[1])/2+60];
+    }else{                                   /* one end still free: the stub */
+      p0 = j.hdr ? S.hdrPos[j.hdr[0]+"|"+j.hdr[1]] : holePos(j.hole); if(!p0) continue;
+      const st=LOOSE_STUB[WIRES.indexOf(key)]||LOOSE_STUB[0];
+      p1=[p0[0]+st[2],p0[1]+st[3]];
+      m=[p0[0]+st[0],p0[1]+st[1]];
+    }
+    const a=SC(p0[0],p0[1]), b=SC(p1[0],p1[1]);
+    m=SC(m[0],m[1]);
+    for(let i=0;i<=24;i++){
+      const u=i/24, v=1-u;
+      const qx=v*v*a[0]+2*v*u*m[0]+u*u*b[0];
+      const qy=v*v*a[1]+2*v*u*m[1]+u*u*b[1];
+      const d=(qx-px)*(qx-px)+(qy-py)*(qy-py);
+      if(d<=bd){ bd=d; best=key; }
+    }
+  }
+  return best;
+}
 
 function mousePos(e){
   const r=cv.getBoundingClientRect();
@@ -891,7 +1079,7 @@ function mousePos(e){
 cv.addEventListener("mousemove",e=>{
   S.mouse=mousePos(e);
   if(S.draggingPlug){
-    if(inside(sz(S.zoneSocket),S.mouse[0],S.mouse[1])){
+    if(inside(hz(S.zoneSocket,26),S.mouse[0],S.mouse[1])){
       w.batt_in[w.active]=true; S.draggingPlug=false; say("plugged");
     }
   }
@@ -909,37 +1097,87 @@ cv.addEventListener("mousedown",e=>{
   if(e.button!==0) return;
   const [x,y]=mousePos(e); S.mouse=[x,y];
   const k=w.active;
+  /* holding a cell and a jumper at the same time used to leave both in
+     hand and the next click did two things at once */
+  const freeHand=what=>{
+    if(what!=="cell" && w.cell_hand){ w.cells_free+=1; w.cell_hand=0; }
+    if(what==="cell" && S.carry){ S.carry=null; S.pending=null; }
+  };
 
-  if(inside(sz(S.zoneSwitch),x,y)){
+  if(inside(hz(S.zoneSwitch,26),x,y)){
     w.switch[k]=!w.switch[k];
     say(w.switch[k]?"swOn":"swOff");
     return;
   }
-  for(let c=0;c<S.zoneSlot.length;c++){
-    if(inside(sz(S.zoneSlot[c]),x,y)){
-      if(w.cells[k]>c){ w.unload_cell(k); w.cell_hand=0; say("cellOut"); }
-      else if(!w.cell_hand){ say("pickFirst"); }
-      else { w.cells[k]+=1; w.cell_hand=0; say("cellIn",w.cells[k]); }
-      return;
-    }
+  /* a spare jumper on the bench */
+  const spare=pickNearest(S.zoneWire.map(o=>({key:o.id,z:o.z})),x,y,16);
+  if(spare){ freeHand("wire"); S.carry=["wire",spare.key]; S.pending=null;
+             say("wireTake",spare.key); return; }
+  const slot=pickNearest(S.zoneSlot.map((z,i)=>({i:i,z:z})),x,y,20);
+  if(slot){
+    freeHand("cell");
+    const c=slot.i;
+    if(w.cells[k]>c){ w.unload_cell(k); w.cell_hand=0; say("cellOut"); }
+    else if(!w.cell_hand){ say("pickFirst"); }
+    else { w.cells[k]+=1; w.cell_hand=0; say("cellIn",w.cells[k]); }
+    return;
   }
-  for(let c=0;c<S.zoneCell.length;c++){
-    if(!inside(sz(S.zoneCell[c]),x,y)) continue;
+  const tray=pickNearest(S.zoneCell.map((z,i)=>({i:i,z:z})),x,y,18);
+  if(tray){
+    freeHand("cell");
     if(w.cell_hand){ w.cells_free+=1; w.cell_hand=0; say("cellDown"); }
     else if(w.cells_free>0){ w.cells_free-=1; w.cell_hand=1; say("cellHand"); }
     return;
   }
-  if(inside(S.plugPx,x,y)){ S.draggingPlug=true; return; }
-  if(inside(sz(S.zoneBtnA),x,y)||inside(sz(S.zoneBtnB),x,y)){ pressButton(); return; }
-  for(const key in S.zonePin){
-    if(inside(sz(S.zonePin[key]),x,y)){
-      S.carry=["lead",key]; S.pending=null;
-      say("leadHole",key); return;
+  if(S.plugPx&&inside(hpx(S.plugPx,26),x,y)){ S.draggingPlug=true; return; }
+  if(inside(hz(S.zoneBtnA,28),x,y)){ pressButton("A"); return; }
+  if(inside(hz(S.zoneBtnB,28),x,y)){ pressButton("B"); return; }
+  /* a header on the expansion board */
+  const hdr=pickNearest(S.zoneHdr.map(o=>({key:o,z:o.z})),x,y,11);
+  if(hdr){
+    freeHand("wire");
+    const col=hdr.key.col, row=hdr.key.row;
+    const there=w.wireAtHdr(col,row);
+    if(S.carry&&S.carry[0]==="wire"){
+      const id=S.carry[1];
+      if(there&&there!==id){ say("hdrTaken"); return; }
+      w.jump[id].hdr=[col,row];
+      if(w.jump[id].hole){ S.carry=null; say("wireDone",id,d().hdrName(col,row),w.jump[id].hole); }
+      else say("wireHdr",id,d().hdrName(col,row));
+      return;
+    }
+    if(there){ S.carry=["wire",there]; w.jump[there].hdr=null; say("wireTake",there); return; }
+    const free=w.freeWire();
+    if(!free){ say("noFree"); return; }
+    w.jump[free].hdr=[col,row]; S.carry=["wire",free];
+    say("wireHdr",free,d().hdrName(col,row));
+    return;
+  }
+  /* the wire itself: whichever end is nearer comes loose */
+  if(!S.carry){
+    const onWire=wireAt(x,y);
+    if(onWire){
+      freeHand("wire");
+      const j=w.jump[onWire];
+      if(j.hdr&&j.hole){          /* both ends in: let go of the nearer one */
+        const ph=SC.apply(null,S.hdrPos[j.hdr[0]+"|"+j.hdr[1]]);
+        const pb=SC.apply(null,holePos(j.hole));
+        const dh=(ph[0]-x)*(ph[0]-x)+(ph[1]-y)*(ph[1]-y);
+        const db=(pb[0]-x)*(pb[0]-x)+(pb[1]-y)*(pb[1]-y);
+        if(dh<=db) j.hdr=null; else j.hole=null;
+      }                            /* one end free: just take it in hand */
+      S.carry=["wire",onWire]; S.pending=null; say("wireTake",onWire); return;
     }
   }
   const h=nearestHole(x,y);
-  if(S.carry&&S.carry[0]==="lead"){
-    if(h){ w.set_lead(S.carry[1],h); say("leadTo",S.carry[1],h); S.carry=null; }
+  if(S.carry&&S.carry[0]==="wire"){
+    if(h){
+      const id=S.carry[1];
+      w.jump[id].hole=h;
+      if(w.jump[id].hdr){ S.carry=null;
+        say("wireDone",id,d().hdrName(w.jump[id].hdr[0],w.jump[id].hdr[1]),h); }
+      else say("wireHole",id,h);
+    }
     return;
   }
   if(S.carry&&S.carry[0]==="res"){
@@ -974,11 +1212,18 @@ cv.addEventListener("contextmenu",e=>{
   if(S.carry||S.pending){ S.carry=null; S.pending=null; return; }
   const cid=resistorAt(x,y);
   if(cid){ w.remove(cid); refreshChips(); return; }
+  const onWire=wireAt(x,y);
+  if(onWire){ w.jump[onWire]={hdr:null,hole:null}; say("wireOut",onWire); return; }
+  const hz2=pickNearest(S.zoneHdr.map(o=>({key:o,z:o.z})),x,y,11);
+  if(hz2){
+    const at=w.wireAtHdr(hz2.key.col,hz2.key.row);
+    if(at){ w.jump[at]={hdr:null,hole:null}; say("wireOut",at); return; }
+  }
   const h=nearestHole(x,y);
   if(h){
-    for(const key in w.cir.lead){
-      if(sameHole(w.cir.lead[key],h)){
-        w.cir.lead[key]=null; say("leadOut",key); return;
+    for(const key of WIRES){
+      if(w.jump[key].hole&&sameHole(w.jump[key].hole,h)){
+        w.jump[key]={hdr:null,hole:null}; say("wireOut",key); return;
       }
     }
   }
@@ -1023,13 +1268,16 @@ cv.addEventListener("touchend",e=>{
   touchStart=null;
 },{passive:true});
 
-function pressButton(){
+function pressButton(which){
   const k=w.active;
   if(w.cells[k]<2){ say("needCells",w.cells[k]); return; }
   if(!w.batt_in[k]){ say("notPlugged"); return; }
-  const r=w.measure();
+  const r=w.measure(which);
   if(r==="off"){ say("off"); return; }
+  if(r==="novc"){ say("novc"); return; }
+  if(r==="nognd"){ say("nognd"); return; }
   if(r==="nowire"){ say("nowire"); return; }
+  if(w.roles().pin[BTN_PIN[which||"A"]]===undefined) say("floatPin",BTN_PIN[which||"A"]);
   if(r==="dead"){ say("dead"); S.scroll=["Err",performance.now()/1000]; return; }
   if(r==="short"){
     S.scroll=["Err",performance.now()/1000];
@@ -1085,8 +1333,13 @@ function takeResistor(cid){
 
 function statusText(){
   const L=[];
-  const miss=["vc","gnd","probe"].filter(k=>!w.cir.lead[k]).map(k=>d().lead[k]);
+  const R=w.roles();
+  const miss=[];
+  if(!R.vc) miss.push("3V");
+  if(!R.gnd) miss.push("GND");
+  if(R.pin[0]===undefined) miss.push("P0");
   if(miss.length) L.push(d().stMiss(miss.join(", ")));
+  L.push(d().stPins);
   if(w.cells[w.active]<2) L.push(d().stCells(w.cells[w.active],w.cells_free));
   else if(!w.batt_in[w.active]) L.push(d().stPlug);
   else if(!w.switch[w.active]) L.push(d().stSwitch);

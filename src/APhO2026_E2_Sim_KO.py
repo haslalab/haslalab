@@ -172,6 +172,7 @@ class World(object):
         self.batt_in = [False] * 3
         self.switch = [False] * 3
         self.spare_used = False
+        self.jump = dict((i, {'hdr': None, 'hole': None}) for i in WIRES)
         self.msg = ''
         self.value = {}
         for pk, items in PACKS.items():
@@ -233,13 +234,51 @@ class World(object):
     def set_lead(self, which, hole):
         self.cir.lead[which] = hole
 
-    def measure(self):
+    def free_wire(self):
+        for i in WIRES:
+            j = self.jump[i]
+            if not j['hdr'] and (not j['hole']):
+                return i
+        return None
+
+    def wire_at_hdr(self, col, row):
+        for i in WIRES:
+            j = self.jump[i]
+            if j['hdr'] and j['hdr'][0] == col and (j['hdr'][1] == row):
+                return i
+        return None
+
+    def roles(self):
+        """the V row is the supply, the G row the reference, the S row of
+        column k is pin Pk."""
+        r = {'vc': None, 'gnd': None, 'pin': {}}
+        for i in WIRES:
+            j = self.jump[i]
+            if not j['hdr'] or not j['hole']:
+                continue
+            if j['hdr'][1] == 'V':
+                r['vc'] = j['hole']
+            elif j['hdr'][1] == 'G':
+                r['gnd'] = j['hole']
+            else:
+                r['pin'][j['hdr'][0]] = j['hole']
+        return r
+
+    def measure(self, which='A'):
         """press button A: returns the integer the micro:bit scrolls, or a
         status string ('off', 'nowire', 'short', 'dead')."""
         if self.dev.dead:
             return 'dead'
         if not self.power:
             return 'off'
+        R = self.roles()
+        if not R['vc']:
+            return 'novc'
+        if not R['gnd']:
+            return 'nognd'
+        pin = BTN_PIN.get(which or 'A', 0)
+        hp = R['pin'].get(pin)
+        self.cir.lead = {'vc': R['vc'], 'gnd': R['gnd'], 'probe': hp}
         r = self.cir.solve()
         if r is None:
             return 'nowire'
@@ -247,6 +286,10 @@ class World(object):
             self.dev.dead = True
             return 'short'
         vp, volt, isup = r
+        # an input with nothing on it is not an error on real hardware: it
+        # floats, and the converter returns whatever the leakage leaves
+        if hp is None:
+            return self.dev.read(self.rng.uniform(0.0, 0.06))
         if vp is None:
             return 'nowire'
         return self.dev.read(vp)
@@ -259,11 +302,38 @@ C_BOARD2 = '#d6d2c6'
 C_HOLE = '#2a2c2f'
 C_RED = '#cc3b32'
 C_BLUE = '#3363b8'
-WIRE_SETS = ({'probe': '#8b4fd0', 'vc': '#3fa85a', 'gnd': '#2f6fd0'}, {'probe': '#f5d033', 'vc': '#8a5a2b', 'gnd': '#e8862a'}, {'probe': '#f5d033', 'vc': '#e33d2e', 'gnd': '#23272e'})
-CASE_SETS = ({'probe': '#4d2a75', 'vc': '#215c31', 'gnd': '#1b4079'}, {'probe': '#8a6f14', 'vc': '#4d3116', 'gnd': '#8a4d13'}, {'probe': '#8a6f14', 'vc': '#8a231a', 'gnd': '#aeb6bd'})
+WIRE_SETS = ({'probe': '#f5d033', 'vc': '#e33d2e', 'gnd': '#23272e'}, {'probe': '#8b4fd0', 'vc': '#3fa85a', 'gnd': '#2f6fd0'}, {'probe': '#e6ebf0', 'vc': '#24b7c9', 'gnd': '#d94f8a'})
+CASE_SETS = ({'probe': '#8a6f14', 'vc': '#8a231a', 'gnd': '#0c0e12'}, {'probe': '#4d2a75', 'vc': '#215c31', 'gnd': '#1b4079'}, {'probe': '#8f979e', 'vc': '#12707c', 'gnd': '#8a2d55'})
+# each kit comes with its own battery lead, in colours no jumper of that
+# kit uses, so a cable is never mistaken for a jumper
+CABLE_SETS = ({'a': '#e6eaea', 'b': '#8d949b'}, {'a': '#cc3b32', 'b': '#1b1e22'}, {'a': '#1f8f9c', 'b': '#3a4048'})
 C_WIRE = WIRE_SETS[2]
 C_WIRE_CASE = CASE_SETS[2]
-LEAD_LABEL = {'vc': 'Vc', 'gnd': 'GND', 'probe': '탐침'}
+LEAD_LABEL = {'w1': '점퍼선 1', 'w2': '점퍼선 2', 'w3': '점퍼선 3'}
+# the expansion board breaks P0..P16 out as three header rows: S (the pin),
+# V (3V) and G (0V).  analogReadPin works on P0-P4 and P10 and returns
+# 0..1023 for 0..3 V; the kit program shows P0 on button A and P1 on B.
+HDR_COLS = 17
+HDR_ROWS = ('S', 'V', 'G')
+ANALOG_PINS = (0, 1, 2, 3, 4, 10)
+BTN_PIN = {'A': 0, 'B': 1}
+WIRES = ('w1', 'w2', 'w3')
+WIRE_KEY = {'w1': 'probe', 'w2': 'vc', 'w3': 'gnd'}
+# control point and end of the stub a half-plugged jumper hangs by, one per
+# wire so three of them never lie on top of each other
+LOOSE_STUB = ((-16, 2, -30, 6), (-18, 10, -34, 18), (-20, 18, -38, 30))
+TAKE_MSG = '을 집었습니다. 헤더와 브레드보드에 한쪽씩 꽂으세요.'
+INTO_HDR = '의 한쪽을 헤더에 꽂았습니다 : '
+INTO_BOARD = '의 한쪽을 꽂았습니다 : '
+HDR_TAKEN = '그 헤더에는 이미 다른 점퍼선이 꽂혀 있습니다.'
+NO_FREE = '점퍼선 3개를 모두 썼습니다. 옮기려면 선을 클릭하고, 빼려면 우클릭하세요.'
+CARRY_TAIL = ' — 헤더나 브레드보드 구멍을 클릭'
+PULLED_OUT = '을 뽑았습니다.'
+FLOAT_MSG = ' 에는 아무것도 연결되어 있지 않습니다 — 입력이 떠 있어 값이 흔들립니다.'
+ARROW = ' <-> '
+
+def hdr_name(col, row):
+    return '3V' if row == 'V' else 'GND' if row == 'G' else 'P' + str(col)
 P = 22.0
 BX, BY = (52.0, 452.0)
 ROW_Y = {'T+': 0.0, 'T-': 1.0, 'A': 2.9, 'B': 3.9, 'C': 4.9, 'D': 5.9, 'E': 6.9, 'F': 8.7, 'G': 9.7, 'H': 10.7, 'I': 11.7, 'J': 12.7, 'B+': 14.6, 'B-': 15.6}
@@ -374,7 +444,9 @@ class App(tk.Tk):
     def inv(self, px, py):
         return ((px - self.pan[0]) / self.zoom, (py - self.pan[1]) / self.zoom)
 
-    def nearest_hole(self, px, py, rmax=P * 0.62):
+    def nearest_hole(self, px, py, rmax=None):
+        if rmax is None:
+            rmax = max(P * 0.62, 14.0 / self.zoom)
         x, y = self.inv(px, py)
         best, bd = (None, 1000000000.0)
         for h in self.holes:
@@ -417,10 +489,10 @@ class App(tk.Tk):
         self.w.cell_hand = 1 if v else 0
 
     def wire(self, key):
-        return WIRE_SETS[self.w.active][key]
+        return WIRE_SETS[self.w.active][WIRE_KEY.get(key, key)]
 
     def case(self, key):
-        return CASE_SETS[self.w.active][key]
+        return CASE_SETS[self.w.active][WIRE_KEY.get(key, key)]
 
     def _tagged(self, kw):
         kw.setdefault('tags', getattr(self, '_tag', 'dyn'))
@@ -472,7 +544,8 @@ class App(tk.Tk):
                 b = self.S(hx + 0.5 * P, hy + 0.5 * P)
                 self.cv.create_rectangle(a[0], a[1], b[0], b[1], outline=C_ACC, width=2)
                 node = node_of(h)
-                self._t(hx, hy - 0.85 * P, self._node_name(h), 8, C_ACC, anchor='center', bold=True)
+                q = self.S(hx, hy - 0.95 * P)
+                self._plate_text(q[0], q[1], self._node_name(h), max(9, 10 * self.zoom), C_ACC)
 
     def _node_name(self, h):
         if h[0] == 'rail':
@@ -488,76 +561,104 @@ class App(tk.Tk):
         to be pushed into the shield."""
         w = self.w
         bx, by = (292.0, 30.0)
-        self._r(bx, by, bx + 268, by + 372, fill='#2b2f36', outline='#454b54', width=2)
-        self._t(bx + 8, by + 5, '3. Micro:bit 키트 (#%d)' % (w.active + 1), 9, '#aeb6bd')
-        mx, my = (bx + 40, by + 26)
-        MW, MH = (188.0, 152.0)
+        PW = 300.0
+        self._r(bx, by, bx + PW, by + 392, fill='#2b2f36', outline='#454b54', width=2)
+        if self._roomy():
+            self._t(bx + 8, by + 5, '3. Micro:bit 키트 (#%d)' % (w.active + 1), 9, '#aeb6bd')
+        mx, my = (bx + (PW - 240) / 2, by + 26)
+        MW, MH = (240.0, 194.0)
         self._r(mx, my, mx + MW, my + MH, fill=DEV_COL[w.active], outline=DEV_EDGE[w.active], width=2)
-        for xa, xb in ((0.0, 26.0), (MW - 26.0, MW)):
-            a = self.S(mx + xa, my)
-            b = self.S(mx + xb, my + 22)
-            self.cv.create_polygon(a[0], a[1], b[0], a[1], a[0] if xa == 0 else b[0], b[1], fill='#f2b826', outline='', tags=getattr(self, '_tag', 'dyn'))
-        for k in range(3):
-            a = self.S(mx + 30 + k * 20, my)
-            b = self.S(mx + 46 + k * 20, my + 15)
+        # micro-USB, the battery socket and the reset button sit along the
+        # top edge, exactly as on the real board
+        for k in range(4):                       # the yellow edge triangles
+            a = self.S(mx + 8 + k * 26, my)
+            b = self.S(mx + 30 + k * 26, my + 17)
             self.cv.create_polygon(a[0], a[1], b[0], a[1], (a[0] + b[0]) / 2, b[1], fill='#f2b826', outline='', tags=getattr(self, '_tag', 'dyn'))
-        a = self.S(mx + MW / 2 - 17, my + 20)
-        b = self.S(mx + MW / 2 + 17, my + 38)
+        self._r(mx, my, mx + 10, my + 18, fill='#f2b826', outline='')
+        a = self.S(mx + MW / 2 - 17, my + 22)
+        b = self.S(mx + MW / 2 + 17, my + 42)
         self.cv.create_oval(a[0], a[1], b[0], b[1], outline='#d8a72a', width=2, tags=getattr(self, '_tag', 'dyn'))
         for dx in (-8, 8):
-            c = self.S(mx + MW / 2 + dx, my + 29)
-            r = 3 * self.zoom
+            c = self.S(mx + MW / 2 + dx, my + 32)
+            r = 3.4 * self.zoom
             self.cv.create_oval(c[0] - r, c[1] - r, c[0] + r, c[1] + r, fill='#d8a72a', outline='', tags=getattr(self, '_tag', 'dyn'))
-        self._matrix_org = (mx + MW / 2 - 40, my + 46)
+        self._matrix_org = (mx + MW / 2 - 44, my + 56)
         for r_ in range(5):
             for c_ in range(5):
                 self._r(self._matrix_org[0] + c_ * 20, self._matrix_org[1] + r_ * 17, self._matrix_org[0] + c_ * 20 + 8, self._matrix_org[1] + r_ * 17 + 12, fill='#4a2018', outline='')
-        for lab, dx in (('A', 14), ('B', MW - 34)):
-            self._r(mx + dx, my + 62, mx + dx + 20, my + 82, fill='#c9ced4', outline='#7d848a', width=2)
-            self._r(mx + dx + 5, my + 67, mx + dx + 15, my + 77, fill='#8d949b', outline='')
-            a = self.S(mx + dx + 2, my + 88)
-            b = self.S(mx + dx + 18, my + 88)
-            c = self.S(mx + dx + 10, my + 96)
-            self.cv.create_polygon(a[0], a[1], b[0], b[1], c[0], c[1], fill='#f2b826', outline='', tags=getattr(self, '_tag', 'dyn'))
-            self._t(mx + dx + 10, my + 92, lab, 8, DEV_COL[w.active], anchor='center', bold=True)
-        self.zone_btnA = (mx + 14, my + 62, mx + 34, my + 82)
-        self.zone_btnB = (mx + MW - 34, my + 62, mx + MW - 14, my + 82)
-        self._r(mx, my + MH - 22, mx + MW, my + MH, fill='#c9a227', outline='#8a6f18')
+        # black tactile switches with a metal plunger, silkscreened A and B
+        for lab, dx in (('A', 14), ('B', MW - 38)):
+            self._r(mx + dx, my + 86, mx + dx + 24, my + 110, fill='#15181c', outline='#3a4048')
+            c = self.S(mx + dx + 12, my + 98)
+            r = 6.5 * self.zoom
+            self.cv.create_oval(c[0] - r, c[1] - r, c[0] + r, c[1] + r, fill='#c9ced4', outline='#7d848a', tags=getattr(self, '_tag', 'dyn'))
+            t1 = self.S(mx + dx + 4, my + 116)
+            t2 = self.S(mx + dx + 16, my + 116)
+            t3 = self.S(mx + dx + 10, my + 124)
+            self.cv.create_polygon(t1[0], t1[1], t2[0], t2[1], t3[0], t3[1], fill='#f2b826', outline='', tags=getattr(self, '_tag', 'dyn'))
+            if self._roomy():
+                self._t(mx + dx + 12, my + 132, lab, 9, '#e8eef2', anchor='center', bold=True)
+        self.zone_btnA = (mx + 14, my + 86, mx + 38, my + 110)
+        self.zone_btnB = (mx + MW - 38, my + 86, mx + MW - 14, my + 110)
+        self._r(mx, my + MH - 26, mx + MW, my + MH, fill='#c9a227', outline='#8a6f18')
         for k in range(28):
-            self._r(mx + 6 + k * 6.4, my + MH - 20, mx + 9 + k * 6.4, my + MH, fill='#e0bd45', outline='')
+            self._r(mx + 5 + k * (MW - 10) / 28, my + MH - 24, mx + 9 + k * (MW - 10) / 28, my + MH, fill='#e0bd45', outline='')
+        # the five big pads are rings: gold annulus, hole right through
         for k, lab in enumerate(('0', '1', '2', '3V', 'G')):
-            cxp = mx + 12 + k * (MW - 24) / 4.0
-            a = self.S(cxp - 9, my + MH - 19)
-            b = self.S(cxp + 9, my + MH - 1)
-            self.cv.create_oval(a[0], a[1], b[0], b[1], outline='#8a6f18', width=2, tags=getattr(self, '_tag', 'dyn'))
-            self._t(cxp, my + MH - 10, lab, 7, '#5c4a10', anchor='center')
-        sx, sy = (bx + 16, my + MH)
-        SW, SH = (236.0, 96.0)
-        self._r(sx, sy + 4, sx + SW, sy + SH, fill='#efe9dc', outline='#b8b09c', width=2)
-        self._r(sx + 20, sy, sx + 20 + MW + 8, sy + 20, fill='#15181c', outline='#000')
-        self._t(sx + 4, sy + 26, '3a', 8, '#6c6553')
-        self._t(sx + 30, sy + 62, 'analog', 7, '#6c6553', anchor='e')
-        for k in range(17):
-            px = sx + 30 + k * 11.5
-            if k % 2 == 0:
-                self._t(px + 3, sy + 31, str(k), 6, '#6c6553', anchor='center')
-            for r_, col in enumerate(('#e8c02a', '#cc3b32', '#1b1e22')):
-                self._r(px, sy + 40 + r_ * 12, px + 7, sy + 49 + r_ * 12, fill=col, outline='#8d8674')
-        for r_, lab in enumerate(('S', 'V', 'G')):
-            self._t(sx + 28, sy + 45 + r_ * 12, lab, 6, '#6c6553', anchor='e')
-        for i2, key in enumerate(('probe', 'vc', 'gnd')):
-            py = sy + 45 + i2 * 12
-            self._r(sx + 8, py - 4, sx + 22, py + 5, fill=self.wire(key), outline='#0c1218')
-            self._t(sx + 6, py, ('3b', '3c', '3d')[i2], 7, '#6c6553', anchor='e')
-            self.pin_xy = getattr(self, 'pin_xy', {})
-            self.pin_xy[key] = (sx + 22, py)
-            self.zone_pin = getattr(self, 'zone_pin', {})
-            self.zone_pin[key] = (sx + 4, py - 7, sx + 26, py + 8)
-        px0, py0 = (sx + SW - 42, sy + SH - 26)
+            cxp = mx + 16 + k * (MW - 32) / 4.0
+            c = self.S(cxp, my + MH - 13)
+            r1 = 11 * self.zoom
+            r2 = 5.4 * self.zoom
+            self.cv.create_oval(c[0] - r1, c[1] - r1, c[0] + r1, c[1] + r1,
+                                fill='#e0bd45', outline='#8a6f18', tags=getattr(self, '_tag', 'dyn'))
+            self.cv.create_oval(c[0] - r2, c[1] - r2, c[0] + r2, c[1] + r2,
+                                fill='#15181c', outline='#8a6f18', tags=getattr(self, '_tag', 'dyn'))
+            if self._roomy():
+                self._t(cxp, my + MH - 34, lab, 7, '#d8c894', anchor='center', bold=True)
+        sx, sy = (bx + 16, my + MH - 10)
+        SW, SH = (PW - 32, 104.0)
+        self._r(sx, sy + 16, sx + SW, sy + SH, fill='#efe9dc', outline='#b8b09c', width=2)
+        # the edge-connector socket: the board is pushed down into it, so the
+        # bottom of the fingers disappears inside
+        kx0, kx1 = (mx - 16, mx + MW + 16)
+        self._r(kx0, sy, kx1, sy + 22, fill='#15181c', outline='#000')
+        self._r(kx0 + 5, sy + 3, kx1 - 5, sy + 9, fill='#0a0c0f', outline='')
+        self._r(kx0, sy + 18, kx1, sy + 22, fill='#2a2f36', outline='')
+        for ex in (kx0 + 4, kx1 - 10):
+            self._r(ex, sy - 6, ex + 6, sy + 4, fill='#8d949b', outline='#5c6167')
+        if self._roomy():
+            self._t(sx + 6, sy + SH - 12, '3a', 8, '#6c6553')
+        # every pin is broken out three times: S is the pin itself, V is 3V,
+        # G is 0V - that is where a jumper actually goes
+        HX, HP = (sx + 30, 14.0)
+        self.zone_hdr = []
+        self.hdr_pos = {}
+        for r_, row in enumerate(HDR_ROWS):
+            py = sy + 38 + r_ * 18
+            if self._roomy():
+                self._t(HX - 11, py, row, 7, '#6c6553', anchor='e')
+            for k in range(HDR_COLS):
+                px = HX + k * HP
+                # the pins are in the colours of the jumpers this kit came with
+                if row == 'V':
+                    col = self.wire('w2')
+                elif row == 'G':
+                    col = self.wire('w3')
+                else:
+                    col = self.wire('w1')
+                self._r(px - 4.5, py - 7, px + 4.5, py + 7, fill=col, outline='#8d8674')
+                self._r(px - 2, py - 2.6, px + 2, py + 2.6, fill='#15181c', outline='')
+                self.hdr_pos[(k, row)] = (px, py)
+                self.zone_hdr.append((k, row, (px - 7, py - 10, px + 7, py + 10)))
+            # no label past the last pin: it ran off the edge of the shield
+        if self._roomy():
+            for k in range(0, HDR_COLS, 2):
+                self._t(HX + k * HP, sy + 26, str(k), 6, '#6c6553', anchor='center')
+        px0, py0 = (sx + SW - 40, sy + SH - 18)
         self._r(px0, py0, px0 + 34, py0 + 18, fill='#1b1e22', outline='#000')
         self._t(px0 + 17, py0 + 9, 'PWR', 6, '#9aa3ab', anchor='center')
         self.zone_socket = (px0, py0, px0 + 34, py0 + 18)
-        hx, hy = (bx + 30, by + 300)
+        hx, hy = (bx + 16, by + 322)
         k = w.active
         self._r(hx, hy, hx + 150, hy + 54, fill='#dfe4e6', outline='#9aa0a6', width=2)
         self.zone_slot = []
@@ -567,13 +668,28 @@ class App(tk.Tk):
             self._r(hx + 12, cy, hx + 108, cy + 16, fill='#c9c2ad' if loaded else '#9aa0a6', outline='#8d8674' if loaded else '#6f767c')
             if loaded:
                 self._r(hx + 108, cy + 4, hx + 114, cy + 12, fill='#b9b2a0', outline='#8d8674')
-                self._t(hx + 60, cy + 8, 'AAA  1.5V', 6, '#5d574a', anchor='center')
+                if self._roomy():
+                    self._t(hx + 60, cy + 8, 'AAA  1.5V', 6, '#5d574a', anchor='center')
             else:
-                self._t(hx + 60, cy + 8, '빈 칸', 6, '#e6ecef', anchor='center')
+                if self._roomy():
+                    self._t(hx + 60, cy + 8, '빈 칸', 6, '#e6ecef', anchor='center')
             self.zone_slot.append((hx + 12, cy, hx + 114, cy + 16))
-        self._t(hx + 4, hy + 58, '3e (%s)' % DEV_NAME[k], 8, '#7b838b')
-        tx0, ty0 = (bx + 16, by + 352)
-        self._t(tx0, ty0 - 12, '여분 AAA 건전지 (총 6개, 키트마다 2개씩)', 7, '#9aa3ab')
+        if self._roomy():
+            self._t(hx + 4, hy + 58, '3e (%s)' % DEV_NAME[k], 8, '#7b838b')
+        wx0, wy0 = (40.0, 164.0)
+        if self._roomy():
+            self._t(wx0, wy0 - 14, '점퍼선 3개 — 집어서 헤더와 브레드보드에 꽂으세요', 7, '#9aa3ab')
+        self.zone_wire = []
+        for i2, wid in enumerate(WIRES):
+            j = w.jump[wid]
+            if j['hdr'] or j['hole'] or (self.carry and self.carry[0] == 'wire' and self.carry[1] == wid):
+                continue
+            x = wx0 + i2 * 54
+            self._r(x, wy0, x + 44, wy0 + 8, fill=self.wire(wid), outline=self.case(wid))
+            self.zone_wire.append((wid, (x - 2, wy0 - 6, x + 46, wy0 + 14)))
+        tx0, ty0 = (40.0, 88.0)
+        if self._roomy():
+            self._t(tx0, ty0 - 12, '여분 AAA 건전지 (총 6개, 키트마다 2개씩)', 7, '#9aa3ab')
         self.zone_cell = []
         for c in range(6):
             x = tx0 + c * 40
@@ -589,20 +705,31 @@ class App(tk.Tk):
         self.zone_switch = (hx + 120, hy + 14, hx + 144, hy + 40)
         a = self.S(hx + 150, hy + 20)
         if w.batt_in[k]:
-            b = self.S(px0 + 6, py0 + 9)
+            b = self.S(px0 + 17, py0 + 9)
             mid = self.S(hx + 190, hy + 4)
         else:
             b = self.S(hx + 196, hy + 30)
             mid = self.S(hx + 180, hy + 46)
-        for col, off in (('#cc3b32', -3), ('#1b1e22', 3)):
+        cab = CABLE_SETS[w.active]
+        for col, off in ((cab['a'], -3), (cab['b'], 3)):
             self.cv.create_line(a[0], a[1] + off, mid[0], mid[1] + off, b[0], b[1] + off, smooth=True, fill=col, width=max(2, int(2.4 * self.zoom)), tags=getattr(self, '_tag', 'dyn'))
-        pw, ph = (20.0, 14.0)
-        plug = (b[0] - pw * self.zoom / 2, b[1] - ph * self.zoom / 2, b[0] + pw * self.zoom / 2, b[1] + ph * self.zoom / 2)
-        self.cv.create_rectangle(*plug, fill='#f2f2f0' if not w.batt_in[k] else '#cdd3d6', outline='#8d949b', width=2)
+        if w.batt_in[k]:                 # seated: it covers the socket whole
+            q1 = self.S(px0 - 2, py0 - 2)
+            q2 = self.S(px0 + 36, py0 + 20)
+            plug = (q1[0], q1[1], q2[0], q2[1])
+        else:
+            pw, ph = (22.0, 15.0)
+            plug = (b[0] - pw * self.zoom / 2, b[1] - ph * self.zoom / 2,
+                    b[0] + pw * self.zoom / 2, b[1] + ph * self.zoom / 2)
+        self.cv.create_rectangle(*plug, fill='#cdd3d6' if w.batt_in[k] else '#f2f2f0', outline='#8d949b', width=2)
+        if w.batt_in[k]:
+            self.cv.create_rectangle(plug[0] + 3, plug[1] + 3, plug[2] - 3,
+                                     plug[1] + (plug[3] - plug[1]) * 0.42,
+                                     fill='#b6bcc2', outline='', tags=getattr(self, '_tag', 'dyn'))
         self.plug_px = plug
-        if not w.batt_in[k]:
-            self._t(hx + 150, hy + 66, '전지 플러그를 확장 보드의 PWR 소켓으로 끌어다 꽂으세요.', 7, '#e8c02a')
-        self._t(bx + 260, by + 5, '버튼 A/B : 측정값 표시', 7, '#7b838b', anchor='e')
+        # the plug hint would run off the panel; the status list already says it
+        if self._roomy():
+            self._t(bx + PW - 12, by + 5, 'A:P0  B:P1', 7, '#7b838b', anchor='e')
 
     def _draw_matrix(self):
         """only the lit LEDs have to be redrawn every frame."""
@@ -670,17 +797,41 @@ class App(tk.Tk):
                     q1 = self.S(bx0 - bw / 2 * math.sin(ang) * -1, by0 + bw / 2 * math.cos(ang) * -1)
                     q2 = self.S(bx0 + bw / 2 * math.sin(ang) * -1, by0 - bw / 2 * math.cos(ang) * -1)
                     self.cv.create_line(q1[0], q1[1], q2[0], q2[1], fill='#3a3f46', width=max(1, int(0.09 * P * self.zoom)), tags=getattr(self, '_tag', 'dyn'))
-            self.cv.create_text(*self.S(mx, my - 0.62 * P), text=cid, fill='#6b7278', font=('Consolas', max(6, int(7 * self.zoom))))
+            q = self.S(mx, my - 0.68 * P)
+            self._plate_text(q[0], q[1], cid, max(8, 9 * self.zoom), '#c7ced5')
+
+    def _draw_loose_wire(self, key):
+        """a jumper with only one end in place dangles from it"""
+        j = self.w.jump[key]
+        if not j['hdr'] and (not j['hole']):
+            return
+        p0 = self.hdr_pos.get(tuple(j['hdr'])) if j['hdr'] else hole_pos(j['hole'])
+        if not p0:
+            return
+        st = LOOSE_STUB[WIRES.index(key)]
+        a = self.S(*p0)
+        b = self.S(p0[0] + st[2], p0[1] + st[3])
+        c = self.S(p0[0] + st[0], p0[1] + st[1])
+        wdt = max(2, int(0.16 * P * self.zoom))
+        tg = getattr(self, '_tag', 'dyn')
+        for col, ww in ((self.case(key), wdt + 3), (self.wire(key), wdt)):
+            self.cv.create_line(a[0], a[1], c[0], c[1], b[0], b[1],
+                                smooth=True, fill=col, width=ww, tags=tg)
+        r = 0.24 * P * self.zoom
+        self.cv.create_oval(a[0] - r, a[1] - r, a[0] + r, a[1] + r,
+                            fill=self.wire(key), outline='#0c1218', tags=tg)
 
     def _draw_wires(self):
         w = self.w
-        pins = getattr(self, 'pin_xy', {})
-        for key in ('vc', 'gnd', 'probe'):
-            h = w.cir.lead.get(key)
-            if not h or key not in pins:
+        for key in WIRES:
+            j = w.jump[key]
+            if not j['hdr'] or not j['hole']:
+                self._draw_loose_wire(key)
                 continue
-            p0 = pins[key]
-            p1 = hole_pos(h)
+            p0 = self.hdr_pos.get(tuple(j['hdr']))
+            if not p0:
+                continue
+            p1 = hole_pos(j['hole'])
             a, b = (self.S(*p0), self.S(*p1))
             mid = self.S((p0[0] + p1[0]) / 2 + 40, (p0[1] + p1[1]) / 2 + 60)
             wdt = max(2, int(0.16 * P * self.zoom))
@@ -689,18 +840,22 @@ class App(tk.Tk):
             self.cv.create_line(a[0], a[1], mid[0], mid[1], b[0], b[1], smooth=True, fill=self.wire(key), width=wdt, tags=tg)
             r = 0.24 * P * self.zoom
             self.cv.create_oval(b[0] - r, b[1] - r, b[0] + r, b[1] + r, fill=self.wire(key), outline='#0c1218', tags=tg)
-            self.cv.create_text(b[0] + 14, b[1] - 12, text=LEAD_LABEL[key], fill=self.case(key) if key == 'gnd' else self.wire(key), font=('Malgun Gothic', max(6, int(7 * self.zoom))), tags=tg)
+            self.cv.create_oval(a[0] - r * 0.8, a[1] - r * 0.8, a[0] + r * 0.8, a[1] + r * 0.8,
+                                fill=self.wire(key), outline='#0c1218', tags=tg)
+            self._plate_text(b[0] + 18, b[1] - 14, hdr_name(j['hdr'][0], j['hdr'][1]),
+                             max(9, 10 * self.zoom),
+                             '#8fb4f0' if j['hdr'][1] == 'G' else self.wire(key))
 
     def _draw_carry(self):
         px, py = self.mouse
         if self.carry_cell:
             self.cv.create_rectangle(px + 8, py - 7, px + 42, py + 7, fill='#c9c2ad', outline='#8d8674', tags='dyn')
             self.cv.create_rectangle(px + 42, py - 3, px + 47, py + 3, fill='#b9b2a0', outline='#8d8674', tags='dyn')
-            self.cv.create_text(px + 8, py - 14, anchor='w', fill=C_ACC, text='AAA 건전지 — 홀더의 빈 칸을 클릭', font=('Malgun Gothic', 9, 'bold'), tags='dyn')
+            self._plate_text(px + 8 + 60, py - 14, 'AAA 건전지 — 홀더의 빈 칸을 클릭', 9, C_ACC)
         if self.carry and self.carry[0] == 'res':
-            self.cv.create_text(px + 16, py - 14, text='저항 %s — 첫 구멍을 클릭' % self.carry[1], anchor='w', fill=C_ACC, font=('Malgun Gothic', 10, 'bold'))
-        elif self.carry and self.carry[0] == 'lead':
-            self.cv.create_text(px + 16, py - 14, text='%s 점퍼선 — 꽂을 구멍을 클릭' % LEAD_LABEL[self.carry[1]], anchor='w', fill=C_ACC, font=('Malgun Gothic', 10, 'bold'))
+            self._plate_text(px + 16 + 60, py - 14, '저항 %s — 첫 구멍을 클릭' % self.carry[1], 10, C_ACC)
+        elif self.carry and self.carry[0] == 'wire':
+            self._plate_text(px + 16 + 60, py - 14, LEAD_LABEL[self.carry[1]] + CARRY_TAIL, 10, C_ACC)
         if self.pending:
             p = self.S(*hole_pos(self.pending))
             self.cv.create_line(p[0], p[1], px, py, fill=C_ACC, dash=(4, 3), width=2, tags=getattr(self, '_tag', 'dyn'))
@@ -713,6 +868,82 @@ class App(tk.Tk):
         a = self.S(z[0], z[1])
         b = self.S(z[2], z[3])
         return (a[0], a[1], b[0], b[1])
+
+    def _hpx(self, r, minpx=20):
+        """screen rect, grown so it is never smaller than minpx"""
+        x0, y0, x1, y1 = r
+        if x1 - x0 < minpx:
+            c = (x0 + x1) / 2.0
+            x0, x1 = (c - minpx / 2.0, c + minpx / 2.0)
+        if y1 - y0 < minpx:
+            c = (y0 + y1) / 2.0
+            y0, y1 = (c - minpx / 2.0, c + minpx / 2.0)
+        return (x0, y0, x1, y1)
+
+    def _hz(self, z, minpx=20):
+        return self._hpx(self._sz(z), minpx)
+
+    def _pick_nearest(self, zones, x, y, rmax):
+        """neighbouring controls sit closer than the enlarged zones, so the
+           nearest centre wins"""
+        best, bd = (None, rmax * rmax)
+        for key, z in zones:
+            r = self._sz(z)
+            cx, cy = ((r[0] + r[2]) / 2.0, (r[1] + r[3]) / 2.0)
+            d = (cx - x) ** 2 + (cy - y) ** 2
+            if d <= bd:
+                best, bd = (key, d)
+        return best
+
+    def _wire_at(self, px, py, rmax=12.0):
+        """the drawn wire is a target along its whole length"""
+        best, bd = (None, rmax * rmax)
+        for key in WIRES:
+            j = self.w.jump[key]
+            if not j['hdr'] and (not j['hole']):
+                continue
+            if j['hdr'] and j['hole']:
+                p0 = self.hdr_pos.get(tuple(j['hdr']))
+                if not p0:
+                    continue
+                p1 = hole_pos(j['hole'])
+                mm = ((p0[0] + p1[0]) / 2.0 + 40, (p0[1] + p1[1]) / 2.0 + 60)
+            else:                       # one end still free: the hanging stub
+                p0 = self.hdr_pos.get(tuple(j['hdr'])) if j['hdr'] else hole_pos(j['hole'])
+                if not p0:
+                    continue
+                st = LOOSE_STUB[WIRES.index(key)]
+                p1 = (p0[0] + st[2], p0[1] + st[3])
+                mm = (p0[0] + st[0], p0[1] + st[1])
+            a = self.S(*p0)
+            b = self.S(*p1)
+            m = self.S(*mm)
+            for i in range(25):
+                u = i / 24.0
+                v = 1.0 - u
+                qx = v * v * a[0] + 2 * v * u * m[0] + u * u * b[0]
+                qy = v * v * a[1] + 2 * v * u * m[1] + u * u * b[1]
+                d = (qx - px) ** 2 + (qy - py) ** 2
+                if d <= bd:
+                    best, bd = (key, d)
+        return best
+
+    def _roomy(self):
+        """below this zoom a caption is wider than the gap it was laid out in,
+           so it would print on top of the parts; the side panel says it all
+           anyway"""
+        return self.zoom >= 0.85
+
+    def _plate_text(self, px, py, txt, size, fill):
+        """a label that has to sit over the board gets its own plate"""
+        f = ('Malgun Gothic', max(8, int(size)), 'normal')
+        tg = getattr(self, '_tag', 'dyn')
+        t = self.cv.create_text(px, py, text=txt, fill=fill, font=f, tags=tg)
+        x0, y0, x1, y1 = self.cv.bbox(t)
+        r = self.cv.create_rectangle(x0 - 3, y0 - 2, x1 + 3, y1 + 2,
+                                     fill='#12151a', outline='', tags=tg)
+        self.cv.tag_raise(t, r)
+        return t
 
     def on_motion(self, e):
         self.mouse = (e.x, e.y)
@@ -731,17 +962,37 @@ class App(tk.Tk):
         self.pending = None
         self.say('첫 번째 리드를 꽂을 구멍을 클릭하세요.')
 
+    def _free_hand(self, what):
+        """holding a cell and a jumper at once used to make one click do two
+        things; only one thing can be in hand."""
+        w = self.w
+        if what != 'cell' and w.cell_hand:
+            w.cells_free += 1
+            self.carry_cell = False
+        if what == 'cell' and self.carry:
+            self.carry = None
+            self.pending = None
+
     def on_click(self, e):
         x, y = (e.x, e.y)
         self.mouse = (x, y)
         w = self.w
         k = w.active
-        if self._in(self._sz(self.zone_switch), x, y):
+        spare = self._pick_nearest(list(getattr(self, 'zone_wire', [])), x, y, 16.0)
+        if spare is not None:
+            self._free_hand('wire')
+            self.carry = ('wire', spare)
+            self.pending = None
+            self.say(LEAD_LABEL[spare] + TAKE_MSG)
+            return
+        if self._in(self._hz(self.zone_switch, 26), x, y):
             w.switch[k] = not w.switch[k]
             self.say('전지 홀더 스위치를 %s.' % ('켰습니다' if w.switch[k] else '껐습니다'))
             return
-        for c, z in enumerate(getattr(self, 'zone_slot', [])):
-            if self._in(self._sz(z), x, y):
+        c = self._pick_nearest(list(enumerate(getattr(self, 'zone_slot', []))), x, y, 20.0)
+        if c is not None:
+            self._free_hand('cell')
+            if True:
                 if w.cells[k] > c:
                     w.unload_cell(k)
                     self.carry_cell = False
@@ -753,9 +1004,9 @@ class App(tk.Tk):
                     self.carry_cell = False
                     self.say('건전지를 %d/2 개 넣었습니다.' % w.cells[k])
                 return
-        for c, z in enumerate(getattr(self, 'zone_cell', [])):
-            if not self._in(self._sz(z), x, y):
-                continue
+        c = self._pick_nearest(list(enumerate(getattr(self, 'zone_cell', []))), x, y, 18.0)
+        if c is not None:
+            self._free_hand('cell')
             if self.carry_cell:
                 w.cells_free += 1
                 self.carry_cell = False
@@ -765,24 +1016,73 @@ class App(tk.Tk):
                 self.carry_cell = True
                 self.say('건전지를 집었습니다. 홀더의 빈 칸을 클릭해 넣으세요.')
             return
-        if self._in(self.plug_px, x, y):
+        if self.plug_px and self._in(self._hpx(self.plug_px, 26), x, y):
             self.dragging_plug = True
             return
-        if self._in(self._sz(self.zone_btnA), x, y) or self._in(self._sz(self.zone_btnB), x, y):
-            self.press_button()
+        if self._in(self._hz(self.zone_btnA, 28), x, y):
+            self.press_button('A')
             return
-        for key, z in getattr(self, 'zone_pin', {}).items():
-            if self._in(self._sz(z), x, y):
-                self.carry = ('lead', key)
+        if self._in(self._hz(self.zone_btnB, 28), x, y):
+            self.press_button('B')
+            return
+        hd = self._pick_nearest([((c2, r2), z) for c2, r2, z in getattr(self, 'zone_hdr', [])], x, y, 11.0)
+        if hd is not None:
+            self._free_hand('wire')
+            col, row = hd
+            there = w.wire_at_hdr(col, row)
+            if self.carry and self.carry[0] == 'wire':
+                wid = self.carry[1]
+                if there and there != wid:
+                    self.say(HDR_TAKEN)
+                    return
+                w.jump[wid]['hdr'] = (col, row)
+                if w.jump[wid]['hole']:
+                    self.carry = None
+                    self.say(LEAD_LABEL[wid] + ' : ' + hdr_name(col, row) + ARROW + self._node_name(w.jump[wid]['hole']))
+                else:
+                    self.say(LEAD_LABEL[wid] + INTO_HDR + hdr_name(col, row))
+                return
+            if there:
+                self.carry = ('wire', there)
+                w.jump[there]['hdr'] = None
+                self.say(LEAD_LABEL[there] + TAKE_MSG)
+                return
+            free = w.free_wire()
+            if free is None:
+                self.say(NO_FREE)
+                return
+            w.jump[free]['hdr'] = (col, row)
+            self.carry = ('wire', free)
+            self.say(LEAD_LABEL[free] + INTO_HDR + hdr_name(col, row))
+            return
+        if not self.carry:
+            key = self._wire_at(x, y)
+            if key is not None:
+                self._free_hand('wire')
+                j = w.jump[key]
+                if j['hdr'] and j['hole']:     # both ends in: drop the nearer
+                    ph = self.S(*self.hdr_pos[tuple(j['hdr'])])
+                    pb = self.S(*hole_pos(j['hole']))
+                    dh = (ph[0] - x) ** 2 + (ph[1] - y) ** 2
+                    db = (pb[0] - x) ** 2 + (pb[1] - y) ** 2
+                    if dh <= db:
+                        j['hdr'] = None
+                    else:
+                        j['hole'] = None
+                self.carry = ('wire', key)
                 self.pending = None
-                self.say('%s 점퍼선을 꽂을 구멍을 클릭하세요.' % LEAD_LABEL[key])
+                self.say(LEAD_LABEL[key] + TAKE_MSG)
                 return
         h = self.nearest_hole(x, y)
-        if self.carry and self.carry[0] == 'lead':
+        if self.carry and self.carry[0] == 'wire':
             if h:
-                w.set_lead(self.carry[1], h)
-                self.say('%s 점퍼선을 %s 에 연결했습니다.' % (LEAD_LABEL[self.carry[1]], self._node_name(h)))
-                self.carry = None
+                wid = self.carry[1]
+                w.jump[wid]['hole'] = h
+                if w.jump[wid]['hdr']:
+                    self.carry = None
+                    self.say(LEAD_LABEL[wid] + ' : ' + hdr_name(w.jump[wid]['hdr'][0], w.jump[wid]['hdr'][1]) + ARROW + self._node_name(h))
+                else:
+                    self.say(LEAD_LABEL[wid] + INTO_BOARD + self._node_name(h))
             return
         if self.carry and self.carry[0] == 'res':
             if not h:
@@ -821,6 +1121,18 @@ class App(tk.Tk):
             self.carry = None
             self.pending = None
             return
+        key = self._wire_at(e.x, e.y)
+        if key is not None:
+            self.w.jump[key] = {'hdr': None, 'hole': None}
+            self.say(LEAD_LABEL[key] + PULLED_OUT)
+            return
+        hd = self._pick_nearest([((c2, r2), z) for c2, r2, z in getattr(self, 'zone_hdr', [])], e.x, e.y, 11.0)
+        if hd is not None:
+            at = self.w.wire_at_hdr(hd[0], hd[1])
+            if at:
+                self.w.jump[at] = {'hdr': None, 'hole': None}
+                self.say(LEAD_LABEL[at] + PULLED_OUT)
+                return
         cid = self._resistor_at(e.x, e.y)
         if cid:
             self.w.remove(cid)
@@ -828,10 +1140,11 @@ class App(tk.Tk):
             return
         h = self.nearest_hole(e.x, e.y)
         if h:
-            for key, hh in list(self.w.cir.lead.items()):
+            for key in WIRES:
+                hh = self.w.jump[key]['hole']
                 if hh == h:
-                    self.w.cir.lead[key] = None
-                    self.say('%s 점퍼선을 뽑았습니다.' % LEAD_LABEL[key])
+                    self.w.jump[key] = {'hdr': None, 'hole': None}
+                    self.say(LEAD_LABEL[key] + PULLED_OUT)
                     return
 
     def on_wheel(self, e, direction=None):
@@ -868,7 +1181,7 @@ class App(tk.Tk):
             x0, y0, a, b = self._p0
             self.pan = [a + e.x - x0, b + e.y - y0]
 
-    def press_button(self):
+    def press_button(self, which='A'):
         w = self.w
         k = w.active
         if w.cells[k] < 2:
@@ -877,12 +1190,18 @@ class App(tk.Tk):
         if not w.batt_in[k]:
             self.say('전지 홀더가 연결되어 있지 않습니다. 플러그를 PWR 소켓에 꽂으세요.')
             return
-        r = self.w.measure()
+        r = self.w.measure(which)
         if r == 'off':
             self.say('전지 홀더 스위치가 꺼져 있습니다.')
             return
+        if r == 'novc':
+            self.say('3V 헤더에 점퍼선을 꽂아야 회로에 전원이 들어갑니다.')
+            return
+        if r == 'nognd':
+            self.say('GND 헤더에 점퍼선을 꽂아야 기준 전위가 생깁니다.')
+            return
         if r == 'nowire':
-            self.say('Vc, GND, 탐침 점퍼선이 모두 연결되어야 측정할 수 있습니다.')
+            self.say('회로가 끊겨 있습니다.')
             return
         if r == 'dead':
             self.say('이 Micro:bit는 고장났습니다. 다른 장치를 연결하거나 교체를 요청하세요.')
@@ -893,6 +1212,9 @@ class App(tk.Tk):
             self.say('단락! Vc와 GND가 부하 없이 연결되어 장치가 고장났습니다.')
             self.ask_spare()
             return
+        pin = BTN_PIN.get(which or 'A', 0)
+        if self.w.roles()['pin'].get(pin) is None:
+            self.say('P' + str(pin) + FLOAT_MSG)
         self.last_reading = r
         self.scroll = (str(r), time.perf_counter())
 
@@ -923,9 +1245,17 @@ class App(tk.Tk):
     def _status(self):
         w = self.w
         L = []
-        miss = [LEAD_LABEL[k] for k in ('vc', 'gnd', 'probe') if not w.cir.lead.get(k)]
+        R = w.roles()
+        miss = []
+        if not R['vc']:
+            miss.append('3V')
+        if not R['gnd']:
+            miss.append('GND')
+        if R['pin'].get(0) is None:
+            miss.append('P0')
         if miss:
-            L.append('연결되지 않은 점퍼선 : ' + ', '.join(miss))
+            L.append('아직 꽂지 않은 헤더 : ' + ', '.join(miss))
+        L.append('확장 보드 헤더 : S 줄은 P0–P16, V 줄은 3V, G 줄은 GND입니다. 프로그램이 읽는 것은 P0(버튼 A)과 P1(버튼 B) 뿐입니다.')
         if w.cells[w.active] < 2:
             L.append('건전지 %d/2 — 여분 %d개' % (w.cells[w.active], w.cells_free))
         elif not w.batt_in[w.active]:
@@ -934,7 +1264,7 @@ class App(tk.Tk):
             L.append('전지 홀더 스위치 : OFF')
         if w.dev.dead:
             L.append('⚠ ' + '현재 Micro:bit 고장')
-        L.append('계통 점검 : 탐침을 GND 마디에 대면 0에 가깝고, Vc 마디에 대면 1023에 가까워야 합니다.')
+        L.append('계통 점검 : P0 점퍼선을 GND 마디에 대면 0, 3V 마디에 대면 1023에 가까워야 합니다.')
         if w.msg:
             L.append('• ' + w.msg)
         self.status.config(text='\n\n'.join(L))
