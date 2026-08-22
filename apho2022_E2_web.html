@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <title>Acoustic Blackbox</title>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Materialize -->
+  <link rel="stylesheet" href="../_apho2022/materialize.min.css" />
+  <script src="../_apho2022/materialize.min.js"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <!-- Chart JS -->
+  <script src="../_apho2022/chart.min.js"></script>
+
+  <!-- Scripts -->
+  <script src="basic.js" defer></script>
+  <script src="Source.js" defer></script>
+  <script src="Detector.js" defer></script>
+  <script src="simulation.js" defer></script>
+  <script src="LinAlg.js" defer></script>
+  <script src="graph.js" defer></script>
+  <script src="utils.js" defer></script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../_apho2022/style.css" />
+</head>
+
+<body>
+</body>
+
+<div class="text">
+  <div align="right">
+    <!-- <span>Contact:</span> -->
+    &nbsp;
+    <a href="mailto:praveen@hbcse.tifr.res.in" target="_blank">
+      <i class="material-icons" style="position:absolute; top:0px;">email</i>
+    </a>
+  </div>
+  <br>
+  <div class="container">
+    <div class="row">
+      <center>
+        <div class="col l3">
+          <span>r<sub>D</sub> (m):</span>
+          <input id="dist-input" type="number">
+        </div>
+        <div class="col l3">
+          <span>&theta; (degrees):</span>
+          <input id="dist-angle-input" type="number">
+        </div>
+        <div class="col l3">
+          <span>v<sub>D</sub> (m/s):</span>
+          <input id="vel-input" type="number">
+        </div>
+        <div class="col l3">
+          <span>&gamma; (degrees):</span>
+          <input id="vel-angle-input" type="number">
+        </div>
+      </center>
+    </div>
+    <div class="row">
+      <center>
+        <div class="col l4">
+          <span>Graph start time, t<sub>i</sub> (s):</span>
+          <input id="simul-start-time-input" type="number">
+        </div>
+        <div class="col l4">
+          <span>Graph end time, t<sub>f</sub> (s):</span>
+          <input id="simul-end-time-input" type="number">
+        </div>
+        <div class="col l4">
+          <span>Data-point interval &Delta; (s):</span>
+          <input id="time-step-input" type="number">
+        </div>
+        <button class="btn purple darken-4" onclick="initParams()">Plot Graph</button>
+      </center>
+    </div>
+  </div>
+  <br>
+  <center>
+    <canvas id="graph-canvas"></canvas>
+  </center>
+  <!--<h2>Extremas</h2>-->
+  <br>
+  <div class="container">
+    <div class="row">
+      <center>
+        <table id="table">
+        </table>
+      </center>
+    </div>
+  </div>
+  <br />
+  <br />
+  <hr />
+  <center>
+    <p>
+      This Simulation was developed by Chandan Relekar, Siddhant Mukherjee, Siddharth Tiwary, Charudutt Kadolkar, and
+      Praveen Pathak for Asian Physics Olympaid-2022 which was held at Dehradun, India. The team can be contacted <a
+        href="mailto:praveen@hbcse.tifr.res.in" target="_blank">here</a>.
+      <br> <br>
+      Click <a href="https://github.com/SidM1811/doppler" target="_blank">here</a> to access the repository
+    </p>
+  </center>
+</div>
+
+</html>

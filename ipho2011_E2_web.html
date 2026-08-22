@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#2E3945">
+<title>IPhO 2011 E2 — 역학 블랙박스 · Mechanical Blackbox · HaslaLab</title>
+<meta name="description" content="IPhO 2011 실험 2번을 브라우저에서 실행합니다. 공이 든 원통을 실 고리로 매달아 무게중심을 찾고, 구멍마다 걸어 진자 주기를 재어 공의 위치와 질량비를 알아냅니다. 계산은 대신 해주지 않습니다.">
+<link rel="canonical" href="https://haslalab.org/sim/ipho2011_E2_web.html">
+<link rel="alternate" hreflang="ko" href="https://haslalab.org/sim/ipho2011_E2_web.html?lang=ko">
+<link rel="alternate" hreflang="en" href="https://haslalab.org/sim/ipho2011_E2_web.html?lang=en">
+<link rel="alternate" hreflang="x-default" href="https://haslalab.org/sim/ipho2011_E2_web.html">
+<meta property="og:site_name" content="HaslaLab">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IPhO 2011 E2 — 역학 블랙박스 · Mechanical Blackbox">
+<meta property="og:description" content="IPhO 2011 실험 2번을 브라우저에서 실행합니다. 공이 든 원통을 실 고리로 매달아 무게중심을 찾고, 구멍마다 걸어 진자 주기를 잽니다.">
+<meta property="og:url" content="https://haslalab.org/sim/ipho2011_E2_web.html">
+<meta property="og:image" content="https://haslalab.org/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://haslalab.org/og.png">
+<style>
+  :root{
+    --bg:#f4f6f8; --panel:#ffffff; --ink:#1b2430; --muted:#5b6b7c;
+    --line:#d8e0e8; --accent:#2c6f9b; --accent-soft:#eaf4fb;
+    --disp-bg:#101418; --disp-fg:#8fd6ff;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,
+         "Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  }
+  .wrap{max-width:1500px;margin:0 auto;padding:12px 16px 16px;display:flex;gap:16px;align-items:flex-start}
+  @media (max-width:1080px){ .wrap{flex-direction:column} }
+
+  /* ── stage ── */
+  .stage{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
+  .card h3{margin:0 0 8px;font-size:13px;font-weight:600;color:var(--muted)}
+  #bench{display:block;width:100%;height:auto;border-radius:6px;touch-action:none;cursor:crosshair}
+  #bench.grabbing{cursor:grabbing}
+
+  /* ── control panel ── */
+  .panel{
+    flex:0 0 300px; background:var(--panel); border:1px solid var(--line);
+    border-radius:10px; padding:14px; position:sticky; top:12px;
+  }
+  @media (max-width:1080px){ .panel{position:static;flex:1 1 auto;width:100%} }
+  .panel h2{
+    font-size:12px; letter-spacing:.04em; text-transform:uppercase;
+    color:var(--accent); margin:16px 0 7px; padding-bottom:5px;
+    border-bottom:1px solid var(--line);
+  }
+  .panel h2:first-of-type{margin-top:0}
+  button{
+    width:100%; padding:8px 10px; margin:4px 0; cursor:pointer;
+    background:#fff; border:1px solid var(--line); border-radius:6px;
+    font:inherit; font-size:13px; color:var(--ink); text-align:left;
+    transition:background .12s,border-color .12s;
+  }
+  button:hover:not(:disabled){background:var(--accent-soft);border-color:var(--accent)}
+  button.primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+  button.primary:hover:not(:disabled){background:#22587c}
+  .row{display:flex;gap:6px}
+  .row button{flex:1;text-align:center;margin:4px 0}
+  .readout{
+    font:12.5px ui-monospace,Consolas,monospace; color:var(--muted);
+    background:#f7f9fb; border:1px solid var(--line); border-radius:6px;
+    padding:6px 8px; margin-top:8px;
+  }
+  .status{
+    font:12.5px/1.6 -apple-system,"Segoe UI","Malgun Gothic",sans-serif;
+    color:var(--accent); background:#f7f9fb; border:1px solid var(--line);
+    border-radius:6px; padding:8px 9px; margin-top:2px; min-height:42px;
+  }
+  .note{font-size:11.5px;color:#8494a3;line-height:1.65;margin:8px 0 0;white-space:pre-line}
+  #sw{display:block;margin:2px auto 0;background:#eef1ec;border-radius:6px;cursor:pointer}
+  .hidden{display:none !important}
+
+  /* ── header + tabs ── */
+  header{
+    max-width:1500px;margin:0 auto;padding:18px 16px 0;
+    display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap
+  }
+  header h1{margin:0;font-size:19px;font-weight:650}
+  header p{margin:3px 0 0;font-size:13px;color:var(--muted)}
+  .lang{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;background:#fff}
+  .lang button{
+    width:auto;margin:0;border:0;border-radius:0;padding:7px 15px;
+    font-size:13px;font-weight:600;color:var(--muted);text-align:center
+  }
+  .lang button.on{background:var(--accent);color:#fff}
+  .tabs{max-width:1500px;margin:0 auto;padding:12px 16px 0;display:flex;gap:8px;flex-wrap:wrap}
+  .tabs button{
+    width:auto;margin:0;padding:8px 16px;border-radius:8px 8px 0 0;
+    border:1px solid var(--line);border-bottom-color:transparent;
+    background:#eceff3;color:var(--muted);font-weight:600;font-size:13px;text-align:center
+  }
+  .tabs button.on{background:var(--panel);color:var(--accent);border-bottom-color:var(--panel)}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1 id="t-title"></h1>
+    <p id="t-sub"></p>
+  </div>
+  <div class="lang">
+    <button id="btn-ko" class="on">한국어</button>
+    <button id="btn-en">English</button>
+  </div>
+</header>
+
+<div class="tabs">
+  <button id="tabA" class="on"></button>
+  <button id="tabB"></button>
+</div>
+
+<div class="wrap">
+  <!-- ═══════════ STAGE ═══════════ -->
+  <div class="stage">
+    <div class="card">
+      <h3 id="t-benchcap"></h3>
+      <canvas id="bench"></canvas>
+    </div>
+  </div>
+
+  <!-- ═══════════ CONTROLS ═══════════ -->
+  <aside class="panel">
+    <h2 id="t-h-part"></h2>
+    <div class="status" id="status"></div>
+
+    <div id="actA">
+      <button id="btnHold"></button>
+      <button id="btnRehang"></button>
+    </div>
+    <div id="actB" class="hidden">
+      <div class="readout" id="selLbl"></div>
+    </div>
+
+    <div id="swBox" class="hidden">
+      <h2 id="t-h-sw"></h2>
+      <canvas id="sw" width="254" height="182"></canvas>
+      <div class="row">
+        <button id="swStart"></button>
+        <button id="swStop"></button>
+        <button id="swReset"></button>
+      </div>
+    </div>
+
+    <h2 id="t-h-view"></h2>
+    <div class="readout" id="scaleLbl"></div>
+    <div class="row">
+      <button id="btnFit"></button>
+      <button id="btn11"></button>
+    </div>
+    <button id="btnNew"></button>
+    <p class="note" id="t-note"></p>
+  </aside>
+</div>
+
+<script>
+"use strict";
+
+/* ══════════════════════════════════════════════════════════════
+   0.  i18n  —  language is switched by a button, no page reload
+   ══════════════════════════════════════════════════════════════ */
+const T = {
+  ko:{
+    title:"IPhO 2011 실험 2 — 역학 블랙박스 : 공이 든 원통",
+    sub:"가상 실험실 · 실 고리로 균형을 잡고, 구멍마다 걸어 주기를 재세요",
+    tabA:"Part A · 무게중심 / 길이", tabB:"Part B · 주기",
+    headA:"Part A · 무게중심과 길이", headB:"Part B · 주기 측정",
+    benchcapA:"실험대 — 핀에 걸린 실 고리 안의 알루미늄 원통 · 자 · 연필 · 지우개",
+    benchcapB:"실험대 — 진자 구멍으로 핀에 걸린 원통 · 자 · 연필 · 지우개",
+    hSw:"초시계", start:"시작", stop:"정지", reset:"리셋",
+    hold:"손으로 받치기", letgo:"손 떼기", rehang:"원통 다시 걸기",
+    hView:"보기", fit:"화면에 맞춤", one:"실제 크기",
+    newrig:"새 장치 (다른 블랙박스)",
+    scale:"배율 %s×%s", actual:"  (실제 크기)",
+    selPin:"핀에 걸린 구멍: #%d", selSel:"선택된 구멍: #%d", selNone:"선택된 구멍 없음",
+    tipA:"원통 위 휠: 실 이동 · 자 위 휠: 회전 · 원통 클릭: 손 떼기 · 그 외 휠: 확대",
+    tipB:"자 위 휠: 회전 · 그 외 휠: 확대 · 우클릭: 핀에서 빼기 · 스페이스: 초시계",
+    hintA:"• 마우스 휠: 실 위치 2 mm 이동 (Shift+휠 = 0.2 mm 미세 조정)\n"+
+          "• 왼쪽 클릭: 받치던 손을 뗍니다\n"+
+          "• 미끄러지는 도중 클릭하면 손가락으로 붙잡을 수 있습니다\n"+
+          "• 빠진 원통은 클릭해 집어서 고리에 가져다 대고 다시 클릭하면 끼워집니다\n"+
+          "• 자·연필·지우개는 끌어서 옮깁니다 (연필로 관을 문지르면 자국이 남고 지우개로 문지르면 지워집니다)\n"+
+          "• 자 위에서 휠을 돌리면 커서를 중심으로 자가 회전합니다\n"+
+          "• 그 밖의 곳에서 휠: 확대 / 축소   • Ctrl+휠: 언제나 확대 / 축소",
+    hintB:"• 원통의 진자 구멍을 클릭해 고르고 이어서 받침판의 핀 구멍을 클릭하면 그 구멍이 핀에 걸립니다\n"+
+          "• 우클릭: 원통을 핀에서 뺍니다\n"+
+          "• 걸린 원통을 끌면 젖혔다 놓을 수 있고 진폭 제한은 없습니다 (360°)\n"+
+          "• 내려놓은 원통은 끌어서 옮깁니다\n"+
+          "• 자·연필·지우개도 끌어서 옮깁니다 (자 위에서 휠을 돌리면 자가 회전)\n"+
+          "  Part A에서 남긴 연필 자국은 그대로 남아 있습니다\n"+
+          "• 휠: 확대 / 축소   • 스페이스바: 초시계 시작 / 정지",
+    /* rig messages */
+    mLoopFirst:"먼저 실 고리를 핀에 거세요.",
+    mAlreadyPin:"원통이 이미 핀에 걸려 있습니다.",
+    mInLoop:"원통을 실 고리 안에 넣었습니다. 고리를 좌우로 끌어 균형을 맞추세요.",
+    mThreadOff:"실 고리를 먼저 치우세요.",
+    mNoHole:"그런 구멍은 없습니다.",
+    mOnPin:"원통을 핀에 걸었습니다.",
+    mOnBench:"원통을 실험대에 내려놓았습니다.",
+    mHoleSel:"구멍 #%d 를 선택했습니다. 이제 핀 구멍을 클릭하세요.",
+    mClickHole:"먼저 원통의 진자 구멍을 클릭하세요.",
+    mOffPin:"원통을 핀에서 뺐습니다.",
+    mTakenOff:"원통을 내려놓았습니다.",
+    mLoopRemoved:"실 고리를 치웠습니다.",
+    mCaught:"손가락으로 받쳐 멈췄습니다.",
+    mHolding:"원통을 손으로 받치고 있습니다.",
+    mLetGo:"손을 떼었습니다.",
+    mInHand:"원통을 집었습니다. 실 고리에 가져다 대고 클릭하세요.",
+    mBackInLoop:"원통을 다시 실 고리에 끼웠습니다.",
+    mHangFirst:"먼저 원통을 핀에 거세요.",
+    mClickLoop:"실 고리 위치에서 클릭하세요.",
+    /* status line */
+    sSetup:"실험대 준비 중",
+    sBpick:"Part B - 원통의 진자 구멍을 클릭하세요.",
+    sBsel:"Part B - 구멍 #%d 선택됨. 핀 구멍을 클릭하세요.",
+    sBal:"균형 실험 - ", sSlip:"  (미끄러지는 중!)",
+    vLevel:"수평", vBottom:"아래쪽 끝이 내려감", vTop:"위쪽 끝이 내려감",
+    vCarried:"손에 들고 있음", vHeld:"손으로 받치는 중 - 좌클릭으로 손을 떼세요",
+    vFallen:"원통이 빠져 떨어짐 - 클릭해서 집으세요",
+    sPend:"진자 실험 - 구멍 #%d, 기울기 %s deg",
+    note:"화면에는 실제 기구와 눈에 보이는 것만 나옵니다. 프로그램은 아무것도 계산해 주지 않습니다."
+  },
+  en:{
+    title:"IPhO 2011 Experiment 2 — Mechanical Blackbox: a cylinder with a ball inside",
+    sub:"Virtual laboratory · balance it in the thread loop, then time it hole by hole",
+    tabA:"Part A - centre of mass & length", tabB:"Part B - periods",
+    headA:"Part A - centre of mass & length", headB:"Part B - period measurement",
+    benchcapA:"bench — the aluminium cylinder in the thread loop on the pin, ruler, pencil, rubber",
+    benchcapB:"bench — the cylinder hung on the pin by a pivot hole, ruler, pencil, rubber",
+    hSw:"Stopwatch", start:"START", stop:"STOP", reset:"RESET",
+    hold:"Support by hand", letgo:"Let go", rehang:"Re-hang the cylinder",
+    hView:"View", fit:"fit to window", one:"actual size",
+    newrig:"New apparatus (another blackbox)",
+    scale:"scale %s x%s", actual:"  (actual size)",
+    selPin:"hanging by hole #%d", selSel:"selected hole #%d", selNone:"no hole selected",
+    tipA:"wheel on tube: loop - on ruler: turn - click tube: let go - elsewhere: zoom",
+    tipB:"wheel on ruler: turn - elsewhere: zoom - right click: off the pin - space: stopwatch",
+    hintA:"- wheel over the tube: slide the loop 2 mm (Shift+wheel = 0.2 mm fine steps)\n"+
+          "- the finger keeps holding the tube until you click the tube itself\n"+
+          "- click while it is slipping to catch it with your finger\n"+
+          "- click a fallen tube to pick it up, then click at the loop to slide it back in\n"+
+          "- drag the ruler, pencil and rubber about (sweep the pencil to mark the tube, the rubber to wipe marks off)\n"+
+          "- the wheel over the ruler turns it about the point under the cursor\n"+
+          "- the wheel anywhere else zooms   - Ctrl+wheel: always zooms",
+    hintB:"- click a pivot hole in the cylinder, then click the pin on the base plate to hang the tube by that hole\n"+
+          "- right click: take the tube off the pin\n"+
+          "- drag a hanging tube aside and let go; any amplitude, a full turn included\n"+
+          "- drag the tube about when it is off\n"+
+          "- drag the ruler, pencil and rubber about (the wheel over the ruler turns it)\n"+
+          "  pencil marks made in Part A are still on the tube here\n"+
+          "- wheel: zoom   - space bar: start / stop the stopwatch",
+    mLoopFirst:"Hang the thread loop on the pin first.",
+    mAlreadyPin:"The cylinder is already hanging on the pin.",
+    mInLoop:"Cylinder placed in the loop. Drag the loop to balance it.",
+    mThreadOff:"Take the thread loop off first.",
+    mNoHole:"No such hole.",
+    mOnPin:"Cylinder hung on the pin.",
+    mOnBench:"Cylinder placed on the bench.",
+    mHoleSel:"Hole #%d selected. Now click the pin.",
+    mClickHole:"Click one of the holes in the cylinder first.",
+    mOffPin:"Cylinder taken off the pin.",
+    mTakenOff:"Cylinder taken off.",
+    mLoopRemoved:"Thread loop removed.",
+    mCaught:"Caught it with your finger.",
+    mHolding:"Holding the cylinder steady.",
+    mLetGo:"Let go.",
+    mInHand:"Cylinder in hand. Bring it to the loop and click.",
+    mBackInLoop:"Cylinder back in the loop.",
+    mHangFirst:"Hang the cylinder on the pin first.",
+    mClickLoop:"Click at the hanging loop.",
+    sSetup:"Setting up",
+    sBpick:"Part B - click a pivot hole in the cylinder.",
+    sBsel:"Part B - hole #%d selected. Click the pin.",
+    sBal:"Balance - ", sSlip:"  (slipping!)",
+    vLevel:"level", vBottom:"far end down", vTop:"near end down",
+    vCarried:"in hand", vHeld:"supported by hand - left click to let go",
+    vFallen:"slipped out - click it to pick it up",
+    sPend:"Pendulum - hole #%d, angle %s deg",
+    note:"The screen shows only the apparatus and what the naked eye would see. Nothing is computed for you."
+  }
+};
+let lang = (new URLSearchParams(location.search).get("lang")==="en") ? "en" : "ko";
+const $ = id=>document.getElementById(id);
+const L_ = () => T[lang];
+const fmt = (s, ...a)=>{ let i=0; return s.replace(/%d|%s/g, ()=>a[i++]); };
+const copysign = (x,s)=> (s<0 ? -Math.abs(x) : Math.abs(x));
+/* write to the DOM only when the text really changed */
+const _dom = {};
+function setTxt(id, s){ if(_dom[id]!==s){ _dom[id]=s; $(id).textContent = s; } }
+
+/* ══════════════════════════════════════════════════════════════
+   1.  random helpers  (a seeded stream, as random.Random in Python)
+   ══════════════════════════════════════════════════════════════ */
+function mulberry32(a){
+  return function(){
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function stream(seed){
+  const r = mulberry32(seed>>>0);
+  return {
+    random:r,
+    uniform:(a,b)=>a+r()*(b-a),
+    gauss:(mu,sd)=>{
+      let u=0,v=0; while(u===0)u=r(); while(v===0)v=r();
+      return mu + sd*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+    }
+  };
+}
+
+/* reproduces the apparatus of the official 2011 solution sheet */
+const OFFICIAL_SEED = 20110714;
+
+/* ══════════════════════════════════════════════════════════════
+   2.  HIDDEN TRUTH
+        Hidden physical parameters of one apparatus.
+        Never exposed to the user.
+   ══════════════════════════════════════════════════════════════ */
+function makeTruth(seed){
+  const rng = stream(seed ^ 0x1234);
+  const official = (seed === OFFICIAL_SEED);
+  let L,hole0,pitch,nHoles,ratio,z,g,dOut;
+  let m,M,xcm,Icm,r,Rmin,holes;
+
+  for(let attempt=0; attempt<2000; attempt++){
+    if(official){
+      L=0.3000; hole0=0.0110; pitch=0.0100; nHoles=16;
+      ratio=2.66744; z=0.252688; g=9.8100; dOut=0.0220;
+    }else{
+      L=rng.uniform(0.280,0.320);
+      hole0=rng.uniform(0.0090,0.0140);
+      pitch=0.0100; nHoles=null;
+      ratio=rng.uniform(2.20,3.40);
+      z=rng.uniform(0.78*L, 0.90*L);
+      g=rng.uniform(9.780,9.830);
+      dOut=rng.uniform(0.0205,0.0235);
+    }
+    m = 0.02500;
+    M = ratio*m;
+    xcm = (m*z + M*L/2.0)/(M+m);
+    Icm = M*L*L/12.0 + M*(xcm-L/2.0)**2 + m*(z-xcm)**2;
+    r = Icm/(M+m);
+    Rmin = Math.sqrt(r);
+
+    if(nHoles===null) nHoles = Math.floor((xcm - 0.016 - hole0)/pitch) + 1;
+    holes = [];
+    for(let i=0;i<nHoles;i++) holes.push(hole0 + i*pitch);
+    const Rl = holes.map(h=>xcm-h);
+    const Rlo = Math.min(...Rl), Rhi = Math.max(...Rl);
+
+    if(nHoles < 12) continue;
+    if(Rlo < 0.0140) continue;
+    if(!(Rlo + 0.008 < Rmin && Rmin < Rhi - 0.020)) continue;
+    if(z > L - 0.012) continue;
+    break;
+  }
+  return {
+    seed, L, d_out:dOut, d_in:dOut-0.0030, m, M, z, g,
+    holes, x_cm:xcm, I_cm:Icm, r, R_min:Rmin, d_ball:0.0130,
+    /* height of the bench top below the pin: clear of the longest swing */
+    bench_y: Math.max(0.300, L - holes[0] + 0.012)
+  };
+}
+
+/* ══════════════════════════════════════════════════════════════
+   3.  THE RIG
+        Nothing here returns a derived physical quantity: only
+        instrument readings and what is visible on the bench.
+   ══════════════════════════════════════════════════════════════ */
+const LOOP_LEVER    = 0.0250;   /* effective contact half-height   [m] */
+const LOOP_DEADBAND = 0.00030;  /* loop band half-width            [m] */
+const LOOP_MU_S     = 0.78;     /* tightly tied loop on aluminium      */
+const LOOP_MU_K     = 0.68;
+const EYE_LEVEL_DEG = 0.55;     /* below this the eye calls it level   */
+const LOOP_DROP     = 0.115;    /* thread from the pin to the loop [m] */
+const RULER_LEN     = 0.350;
+const RULER_H       = 0.030;
+const RULER_REACH   = 0.038;
+const PENCIL_LEN    = 0.110;
+const PENCIL_U = 0.80, PENCIL_V = 0.60;
+const ERASER_W = 0.042, ERASER_H = 0.019;
+
+function makeRig(truth){
+  const R = { truth, rng: stream((truth.seed ^ 0x5EED)>>>0), t:0.0 };
+
+  R.resetAll = function(){
+    R.loop_present = true;      /* thread loop hanging on the pin */
+    R.mode = null;              /* null | "balance" | "pendulum" | "free" */
+    R.thread_x = null;          /* loop position from the cylinder top [m] */
+    R.hole_index = null;
+    R.sel_hole = null;
+    R.tilt = 0.0;               /* rad, +: bottom end (right) low */
+    R.tilt_v = 0.0;
+    R.slipping = false;
+    R.fallen = false;
+    R.theta = 0.0;              /* pendulum angle [rad] */
+    R.omega = 0.0;
+    R.released = false;
+    R.marks = [];               /* pencil marks, m from the top */
+    R.carried = false;
+    R.held = false;
+    R.sw_running = false;
+    R.sw_t0 = 0.0;
+    R.sw_value = 0.0;
+    R._fall_v = 0.0; R._fall_drop = 0.0; R._slide_v = 0.0;
+    R.ruler_pos = [-truth.L*0.60, truth.bench_y + 0.022];
+    R.ruler_angle = 0.0;
+    R.pencil_pos = [0.075, truth.bench_y + 0.030];
+    R.eraser_pos = [0.150, truth.bench_y + 0.030];
+    R.free_pos = [0.0, truth.bench_y - truth.d_out*0.5];
+    R.carry_pos = null;
+  };
+  const no = s => [false, s];
+
+  /* ---------------- assembly ---------------------------------------- */
+  R.mount_on_loop = function(x){
+    if(!R.loop_present) return no(L_().mLoopFirst);
+    if(R.mode==="pendulum") return no(L_().mAlreadyPin);
+    R.mode = "balance";
+    R.thread_x = (x===undefined||x===null) ? truth.L*0.5 : x;
+    R.tilt = 0.0; R.tilt_v = 0.0;
+    R.slipping = false; R.fallen = false;
+    R.carried = false; R.held = false;
+    R._fall_v = 0.0; R._fall_drop = 0.0;
+    return [true, L_().mInLoop];
+  };
+  R.mount_on_pin = function(i){
+    if(R.mode==="balance") return no(L_().mThreadOff);
+    if(!(i>=0 && i<truth.holes.length)) return no(L_().mNoHole);
+    R.mode = "pendulum";
+    R.hole_index = i;
+    R.theta = 0.0; R.omega = 0.0;
+    R.released = false; R.fallen = false;
+    return [true, L_().mOnPin];
+  };
+  R.enter_part_a = function(){
+    if(R.mode==="balance") return [true,""];
+    const x = (R.thread_x!==null) ? R.thread_x : truth.L*0.5;
+    R.mode = null; R.hole_index = null; R.sel_hole = null;
+    R.loop_present = true;
+    const out = R.mount_on_loop(x);
+    R.hold(true);
+    return out;
+  };
+  R.enter_part_b = function(){
+    if(R.mode==="pendulum" || R.mode==="free") return [true,""];
+    R.mode = "free";
+    R.loop_present = false;
+    R.free_pos = [0.0, truth.bench_y - truth.d_out*0.5];
+    R.theta = R.omega = 0.0;
+    R.released = false; R.fallen = false;
+    R.sel_hole = null; R.hole_index = null;
+    return [true, L_().mOnBench];
+  };
+  R.select_hole = function(i){
+    if(!(i>=0 && i<truth.holes.length)) return [false,""];
+    R.sel_hole = i;
+    return [true, fmt(L_().mHoleSel, i+1)];
+  };
+  R.connect_selected_to_pin = function(){
+    if(R.sel_hole===null) return no(L_().mClickHole);
+    return R.mount_on_pin(R.sel_hole);
+  };
+  R.unmount_from_pin = function(){
+    if(R.mode!=="pendulum") return [false,""];
+    R.mode = "free"; R.hole_index = null;
+    R.theta = R.omega = 0.0; R.released = false;
+    return [true, L_().mOffPin];
+  };
+  R.take_cylinder_off = function(){
+    R.mode = null; R.hole_index = null; R.thread_x = null;
+    R.theta = R.omega = 0.0; R.tilt = R.tilt_v = 0.0;
+    R.released = false; R.slipping = false; R.fallen = false;
+    R.carried = false;
+    return [true, L_().mTakenOff];
+  };
+  R.take_thread_off = function(){
+    if(R.mode==="balance") R.take_cylinder_off();
+    R.loop_present = false;
+    return [true, L_().mLoopRemoved];
+  };
+
+  /* ---------------- bench actions ------------------------------------ */
+  R.drag_loop_to = function(x){
+    if(R.mode!=="balance" || R.fallen) return [false,""];
+    R.thread_x = Math.max(0.004, Math.min(truth.L-0.004, x));
+    return [true,""];
+  };
+  R.catch_ = function(){
+    if(R.mode!=="balance") return [false,""];
+    if(R.fallen) return R.pick_up_cylinder();
+    R.hold(true);
+    return [true, L_().mCaught];
+  };
+  R.hold = function(on){
+    if(R.mode!=="balance") return [false,""];
+    R.held = !!on;
+    if(R.held){ R.slipping = false; R._slide_v = 0.0; }
+    return [true, R.held ? L_().mHolding : L_().mLetGo];
+  };
+  R.nudge_loop = function(delta){
+    if(R.mode!=="balance" || R.fallen || R.thread_x===null) return [false,""];
+    return R.drag_loop_to(R.thread_x + delta);
+  };
+  R.pick_up_cylinder = function(){
+    if(R.mode!=="balance" || !R.fallen) return [false,""];
+    R.carried = true;
+    return [true, L_().mInHand];
+  };
+  R.insert_into_loop = function(){
+    if(!R.carried) return [false,""];
+    const x = (R.thread_x!==null) ? R.thread_x : truth.L*0.5;
+    R.carried = false; R.mode = null; R.loop_present = true;
+    const out = R.mount_on_loop(Math.min(Math.max(x,0.006), truth.L-0.006));
+    R.hold(true);
+    return [out[0], L_().mBackInLoop];
+  };
+  R.pull_aside = function(deg){
+    if(R.mode!=="pendulum" || R.fallen) return [false,""];
+    R.theta = deg*Math.PI/180; R.omega = 0.0; R.released = false;
+    return [true,""];
+  };
+  R.release = function(){
+    if(R.mode!=="pendulum") return no(L_().mHangFirst);
+    R.released = true;
+    return [true,""];
+  };
+  R.stop_swing = function(){
+    R.released = false; R.theta = 0.0; R.omega = 0.0;
+    return [true,""];
+  };
+
+  /* ---------------- world geometry ----------------------------------- */
+  R.fall_drop = ()=> R._fall_drop || 0.0;
+  R.cyl_world = function(){
+    if(R.mode==="balance"){
+      if(R.carried && R.carry_pos)
+        return [R.carry_pos[0]-truth.L*0.5, R.carry_pos[1], 1.0, 0.0];
+      const cx=0.0, cy=LOOP_DROP + R.fall_drop();
+      const ux=Math.cos(R.tilt), uy=Math.sin(R.tilt);
+      const grip = R.fallen ? truth.L*0.5 : R.thread_x;
+      return [cx-ux*grip, cy-uy*grip, ux, uy];
+    }
+    if(R.mode==="pendulum"){
+      const ux=Math.sin(R.theta), uy=Math.cos(R.theta);
+      const s = truth.holes[R.hole_index];
+      return [-ux*s, -uy*s, ux, uy];
+    }
+    if(R.mode==="free")
+      return [R.free_pos[0]-truth.L*0.5, R.free_pos[1], 1.0, 0.0];
+    return [0.0,0.0,0.0,1.0];
+  };
+  R.axial_of = function(x,y){
+    const [ox,oy,ux,uy]=R.cyl_world();
+    return [(x-ox)*ux + (y-oy)*uy, -(x-ox)*uy + (y-oy)*ux];
+  };
+  R.on_cylinder = function(x,y,pad){
+    pad = pad||0.0;
+    const [s,t]=R.axial_of(x,y);
+    return -pad<=s && s<=truth.L+pad && Math.abs(t)<=truth.d_out*0.5+pad;
+  };
+  R.feature_position = function(feat){
+    const kind = feat[0];
+    if(kind==="top") return 0.0;
+    if(kind==="bottom") return truth.L;
+    if(kind==="hole") return truth.holes[feat[1]];
+    if(kind==="loop") return R.thread_x;
+    if(kind==="mark") return R.marks.length ? R.marks[feat[1]] : null;
+    if(kind==="axial") return feat[1];
+    return null;
+  };
+  R.feature_world = function(feat){
+    const s = R.feature_position(feat);
+    if(s===null || s===undefined) return null;
+    const [ox,oy,ux,uy]=R.cyl_world();
+    return [ox+ux*s, oy+uy*s];
+  };
+
+  /* ---------------- hand tools ---------------------------------------- */
+  R.move_ruler = (x,y)=>{ R.ruler_pos=[x,y]; };
+  R.rotate_ruler = function(dr, px, py){
+    if(px!==undefined && px!==null){
+      const dx=R.ruler_pos[0]-px, dy=R.ruler_pos[1]-py;
+      const c=Math.cos(dr), sn=Math.sin(dr);
+      R.ruler_pos = [px+dx*c-dy*sn, py+dx*sn+dy*c];
+    }
+    R.ruler_angle = (R.ruler_angle + dr) % (2*Math.PI);
+    if(R.ruler_angle<0) R.ruler_angle += 2*Math.PI;
+  };
+  R.ruler_frame = function(x,y){
+    const dx=x-R.ruler_pos[0], dy=y-R.ruler_pos[1];
+    const c=Math.cos(R.ruler_angle), sn=Math.sin(R.ruler_angle);
+    return [dx*c+dy*sn, -dx*sn+dy*c];
+  };
+  R.on_ruler = function(x,y){
+    const [s,t]=R.ruler_frame(x,y);
+    return -0.010<=s && s<=RULER_LEN+0.010 && Math.abs(t)<=RULER_H*0.5;
+  };
+  R.pencil_to = function(x,y,drawing){
+    R.pencil_pos=[x,y];
+    if(!drawing) return [false,""];
+    const [s,t]=R.axial_of(x,y);
+    if(0.0<=s && s<=truth.L && Math.abs(t)<=truth.d_out*0.5){
+      if(R.marks.every(mk=>Math.abs(s-mk)>0.0008)){ R.marks.push(s); return [true,""]; }
+    }
+    return [false,""];
+  };
+  R.on_eraser = function(x,y){
+    const [ex,ey]=R.eraser_pos;
+    return Math.abs(x-ex)<=ERASER_W*0.5+0.004 && Math.abs(y-ey)<=ERASER_H*0.5+0.004;
+  };
+  R.eraser_to = function(x,y,rubbing){
+    R.eraser_pos=[x,y];
+    if(!rubbing) return [false,""];
+    const [s,t]=R.axial_of(x,y);
+    if(Math.abs(t)<=truth.d_out*0.5+ERASER_H*0.5){
+      const keep = R.marks.filter(mk=>Math.abs(mk-s)>ERASER_W*0.5);
+      if(keep.length!==R.marks.length){ R.marks=keep; return [true,""]; }
+    }
+    return [false,""];
+  };
+  R.on_pencil = function(x,y){
+    const [px,py]=R.pencil_pos;
+    const s = (x-px)*PENCIL_U + (y-py)*PENCIL_V;
+    const t = -(x-px)*PENCIL_V + (y-py)*PENCIL_U;
+    return -0.006<=s && s<=PENCIL_LEN+0.005 && Math.abs(t)<=0.011;
+  };
+
+  /* ---------------- instruments ---------------------------------------- */
+  R.stopwatch_start = function(){
+    if(R.sw_running) return [false,""];
+    R.sw_running = true;
+    R.sw_t0 = R.t + R.rng.gauss(0.0,0.070);   /* human reaction on the button */
+    return [true,""];
+  };
+  R.stopwatch_stop = function(){
+    if(!R.sw_running) return [false,""];
+    R.sw_running = false;
+    R.sw_value = Math.max(0.0, (R.t + R.rng.gauss(0.0,0.070)) - R.sw_t0);
+    return [true,""];
+  };
+  R.stopwatch_reset = function(){
+    R.sw_running = false; R.sw_value = 0.0;
+    return [true,""];
+  };
+  R.stopwatch_display = function(){
+    let v = R.sw_running ? (R.t - R.sw_t0) : R.sw_value;
+    v = Math.max(0.0, v);
+    return String(Math.floor(v/60)).padStart(2,"0") + ":" +
+           (v%60).toFixed(2).padStart(5,"0");
+  };
+
+  /* ---------------- what the eye sees ----------------------------------- */
+  R.bench_readout = function(){
+    const out = {mode:R.mode, fallen:R.fallen};
+    if(R.mode==="balance"){
+      const deg = R.tilt*180/Math.PI;
+      let view;
+      if(R.carried) view="carried";
+      else if(R.held) view="held";
+      else if(R.fallen) view="fallen";
+      else if(Math.abs(deg)<EYE_LEVEL_DEG) view="level";
+      else if(deg>0) view="bottom_down";
+      else view="top_down";
+      out.tilt_view = view;
+      out.sliding = R.slipping;
+    }else if(R.mode==="free"){
+      out.selected_hole = R.sel_hole;
+    }else if(R.mode==="pendulum"){
+      out.angle_deg = Math.round(R.theta*180/Math.PI*2.0)/2.0;
+      out.swinging = R.released;
+      out.hole = R.hole_index;
+    }
+    out.stopwatch = R.stopwatch_display();
+    return out;
+  };
+  R.status_line = function(){
+    const d = L_(), r = R.bench_readout();
+    if(r.mode===null) return d.sSetup;
+    if(r.mode==="free")
+      return (R.sel_hole===null) ? d.sBpick : fmt(d.sBsel, R.sel_hole+1);
+    if(r.mode==="balance"){
+      const map = {level:d.vLevel, bottom_down:d.vBottom, top_down:d.vTop,
+                   carried:d.vCarried, held:d.vHeld, fallen:d.vFallen};
+      let s = d.sBal + map[r.tilt_view];
+      if(r.sliding) s += d.sSlip;
+      return s;
+    }
+    return fmt(d.sPend, r.hole+1, r.angle_deg.toFixed(1));
+  };
+
+  /* ---------------- time stepping ---------------------------------------- */
+  R.step = function(dt){
+    R.t += dt;
+    if(R.mode==="free") return;
+    if(R.mode==="balance"){
+      if(R.carried) return;
+      if(R.fallen) stepFall(dt); else stepBalance(dt);
+    }else if(R.mode==="pendulum" && !R.fallen){
+      stepPendulum(dt);
+    }
+  };
+  function stepFall(dt){
+    let v = R._fall_v + truth.g*dt;
+    let d = R.fall_drop() + v*dt;
+    const limit = truth.bench_y - LOOP_DROP - truth.d_out*0.5;
+    if(d >= limit){ d = limit; v = 0.0; R.tilt = 0.0; R.tilt_v = 0.0; }
+    R._fall_v = v; R._fall_drop = d;
+  }
+  function stepBalance(dt){
+    if(R.held){
+      R.tilt += (0.0 - R.tilt)*Math.min(1.0, 14.0*dt);
+      R.tilt_v = 0.0; R.slipping = false; R._slide_v = 0.0;
+      return;
+    }
+    const d = truth.x_cm - R.thread_x;
+    const d_eff = (Math.abs(d)<=LOOP_DEADBAND) ? 0.0
+                : d - copysign(LOOP_DEADBAND, d);
+    const target = Math.atan2(d_eff, LOOP_LEVER);
+
+    /* settle towards the equilibrium tilt (damped 2nd order) */
+    const w0=11.0, zeta=0.42;
+    const acc = w0*w0*(target - R.tilt) - 2.0*zeta*w0*R.tilt_v;
+    R.tilt_v += acc*dt;
+    R.tilt   += R.tilt_v*dt;
+
+    const limit = Math.atan(LOOP_MU_S);
+    if(Math.abs(R.tilt) > limit) R.slipping = true;
+    if(R.slipping){
+      const mu = LOOP_MU_K;
+      const a = truth.g*(Math.abs(Math.sin(R.tilt)) - mu*Math.cos(R.tilt));
+      if(a <= 0.0){ R.slipping = false; R._slide_v = 0.0; }
+      else{
+        R._slide_v += a*dt;
+        /* the cylinder runs down-slope: the contact point moves up-slope */
+        R.thread_x -= copysign(R._slide_v*dt, d);
+        if(R.thread_x < 0.0 || R.thread_x > truth.L){
+          R.fallen = true; R.slipping = false;
+          R._fall_v = 0.0; R._fall_drop = 0.0;
+        }
+      }
+    }else{
+      R._slide_v = 0.0;
+    }
+  }
+  function stepPendulum(dt){
+    if(!R.released) return;
+    const Rr = truth.x_cm - truth.holes[R.hole_index];
+    const Ip = truth.I_cm + (truth.M+truth.m)*Rr*Rr;
+    const Wg = (truth.M+truth.m)*truth.g*Rr;
+    const b  = 2.0*Ip/78.0;                    /* light air/pivot damping */
+    const acc = (th,om)=>(-Wg*Math.sin(th) - b*om)/Ip;
+    /* RK4 */
+    const k1v = acc(R.theta, R.omega),                     k1x = R.omega;
+    const k2v = acc(R.theta+0.5*dt*k1x, R.omega+0.5*dt*k1v), k2x = R.omega+0.5*dt*k1v;
+    const k3v = acc(R.theta+0.5*dt*k2x, R.omega+0.5*dt*k2v), k3x = R.omega+0.5*dt*k2v;
+    const k4v = acc(R.theta+dt*k3x, R.omega+dt*k3v),         k4x = R.omega+dt*k3v;
+    R.theta += dt/6.0*(k1x+2*k2x+2*k3x+k4x);
+    R.omega += dt/6.0*(k1v+2*k2v+2*k3v+k4v);
+    if(R.theta >  Math.PI) R.theta -= 2*Math.PI;   /* a full rotation is allowed */
+    else if(R.theta < -Math.PI) R.theta += 2*Math.PI;
+  }
+
+  R.resetAll();
+  return R;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   4.  ARTWORK
+        everything reconstructed from the apparatus photograph on
+        page 2 of the official problem sheet
+   ══════════════════════════════════════════════════════════════ */
+const COL_TABLE="#93ab8b", COL_TABLE_DK="#7e9678";
+const COL_AL=["#63696d","#8f9599","#bcc2c6","#e3e7e9","#aeb4b8","#767c80"];
+const COL_AL_EDGE="#4d5255", COL_HOLE="#22262a", COL_PLATE="#d7e4e8";
+const COL_PIN="#3a3f43", COL_THREAD="#f4f2ec", COL_RULER="#c9302c", COL_MARK="#43403c";
+
+const cv  = $("bench"),  ctx  = cv.getContext("2d");
+const swc = $("sw"),     swx  = swc.getContext("2d");
+let G = ctx;                       /* the context the helpers draw on */
+
+function fontStr(size, family, weight){
+  const fam = (family==="Courier") ? '"Courier New",Consolas,monospace'
+                                   : '-apple-system,"Segoe UI",Roboto,"Malgun Gothic",sans-serif';
+  return (weight?weight+" ":"") + Math.max(1,size).toFixed(1) + "px " + fam;
+}
+/* largest size whose rendering of `text` really fits in the box */
+const _fitCache = {};
+function fitFont(text, maxW, maxH, family, weight, floor){
+  floor = floor||4;
+  const key = [family||"", weight||"", text.length, Math.floor(maxW), Math.floor(maxH)].join("|");
+  if(_fitCache[key]!==undefined) return _fitCache[key];
+  let size = Math.max(floor, Math.min(Math.floor(maxH), 64));
+  while(size > floor){
+    G.font = fontStr(size, family, weight);
+    if(G.measureText(text).width <= maxW && size*1.20 <= maxH) break;
+    size--;
+  }
+  _fitCache[key] = size;
+  return size;
+}
+function line(x0,y0,x1,y1,col,w,cap,dash){
+  G.beginPath(); G.moveTo(x0,y0); G.lineTo(x1,y1);
+  G.strokeStyle=col; G.lineWidth=Math.max(0.4,w||1);
+  G.lineCap=cap||"butt"; G.setLineDash(dash||[]);
+  G.stroke(); G.setLineDash([]);
+}
+function poly(pts, fill, outline, w){
+  G.beginPath(); G.moveTo(pts[0][0],pts[0][1]);
+  for(let i=1;i<pts.length;i++) G.lineTo(pts[i][0],pts[i][1]);
+  G.closePath();
+  if(fill){ G.fillStyle=fill; G.fill(); }
+  if(outline){ G.strokeStyle=outline; G.lineWidth=Math.max(0.4,w||1); G.stroke(); }
+}
+function rect(x0,y0,x1,y1,fill,outline,w){
+  if(fill){ G.fillStyle=fill; G.fillRect(x0,y0,x1-x0,y1-y0); }
+  if(outline){ G.strokeStyle=outline; G.lineWidth=Math.max(0.4,w||1); G.strokeRect(x0,y0,x1-x0,y1-y0); }
+}
+function oval(x0,y0,x1,y1,fill,outline,w){
+  const cx=(x0+x1)/2, cy=(y0+y1)/2, rx=Math.abs(x1-x0)/2, ry=Math.abs(y1-y0)/2;
+  G.beginPath(); G.ellipse(cx,cy,Math.max(rx,.01),Math.max(ry,.01),0,0,2*Math.PI);
+  if(fill){ G.fillStyle=fill; G.fill(); }
+  if(outline){ G.strokeStyle=outline; G.lineWidth=Math.max(0.4,w||1); G.stroke(); }
+}
+function arcOutline(x0,y0,x1,y1,startDeg,extentDeg,col,w){
+  const cx=(x0+x1)/2, cy=(y0+y1)/2, rx=Math.abs(x1-x0)/2, ry=Math.abs(y1-y0)/2;
+  /* tk measures counter-clockwise from the +x axis; canvas y points down */
+  const a0=-startDeg*Math.PI/180, a1=-(startDeg+extentDeg)*Math.PI/180;
+  G.beginPath(); G.ellipse(cx,cy,rx,ry,0,a0,a1,true);
+  G.strokeStyle=col; G.lineWidth=Math.max(0.5,w); G.stroke();
+}
+function txt(x,y,s,col,size,family,weight,angle){
+  G.save(); G.translate(x,y); if(angle) G.rotate(angle);
+  G.font = fontStr(size, family, weight);
+  G.fillStyle = col; G.textAlign="center"; G.textBaseline="middle";
+  G.fillText(s,0,0); G.restore();
+}
+/* screen point at axial offset s and transverse offset t (pixels) */
+const _pt=(ox,oy,ux,uy,s,t)=>[ox+ux*s-uy*t, oy+uy*s+ux*t];
+
+/*  Draw the hollow aluminium cylinder.  (ox, oy) is the screen position of
+    the centre of the TOP end face, (ux, uy) the unit vector along the axis
+    pointing from the top end towards the bottom end.
+    The ball inside is NEVER drawn — it is a blackbox.                     */
+function drawCylinder(ox,oy,ux,uy,ppm,truth,marks,showHoles){
+  const Lp = truth.L*ppm, rp = truth.d_out*0.5*ppm, n = COL_AL.length;
+  for(let i=0;i<n;i++){
+    const t0=-rp+2.0*rp*i/n, t1=-rp+2.0*rp*(i+1)/n;
+    poly([_pt(ox,oy,ux,uy,0,t0), _pt(ox,oy,ux,uy,Lp,t0),
+          _pt(ox,oy,ux,uy,Lp,t1), _pt(ox,oy,ux,uy,0,t1)], COL_AL[i]);
+  }
+  poly([_pt(ox,oy,ux,uy,0,-rp), _pt(ox,oy,ux,uy,Lp,-rp),
+        _pt(ox,oy,ux,uy,Lp,rp), _pt(ox,oy,ux,uy,0,rp)],
+       null, COL_AL_EDGE, Math.max(1, ppm*0.0006));
+  /* end faces (the tube is open, with a dark bore visible) */
+  for(const s of [0.0, Lp]){
+    const bore = rp*0.72;
+    const a=_pt(ox,oy,ux,uy,s,-bore), b=_pt(ox,oy,ux,uy,s,bore);
+    line(a[0],a[1],b[0],b[1],"#4a4f52",Math.max(2, ppm*0.0022));
+  }
+  if(showHoles!==false){
+    const hr = 0.0019*ppm;
+    for(const h of truth.holes){
+      const s = h*ppm, pl=[];
+      for(let k=0;k<8;k++){
+        const a = 2*Math.PI*k/8;
+        pl.push(_pt(ox,oy,ux,uy, s+hr*Math.cos(a), hr*0.85*Math.sin(a)));
+      }
+      poly(pl, COL_HOLE, "#585d60", 1);
+    }
+  }
+  for(const mk of marks||[]){
+    const s = mk*ppm;
+    const p0=_pt(ox,oy,ux,uy,s,-rp), p1=_pt(ox,oy,ux,uy,s,rp);
+    line(p0[0],p0[1],p1[0],p1[1],COL_MARK,Math.max(1, ppm*0.0009));
+  }
+}
+/*  Perspex base plate clamped to the table edge.  The thin pin passes
+    through the middle of the block, so (x, y) — the pivot — is at the
+    centre of the fixture.                                                */
+function drawBasePlate(x,y,ppm){
+  const w=0.150*ppm, h=0.062*ppm, d=0.022*ppm;
+  const top=y-h/2, bot=y+h/2;
+  poly([[x-w/2,top],[x+w/2,top],[x+w/2+d,top-d],[x-w/2+d,top-d]],"#c3d3d8","#8fa2a8",1);
+  rect(x-w/2,top,x+w/2,bot,COL_PLATE,"#8fa2a8",1);
+  line(x-w/2,bot,x+w/2,bot,"#93a6ac",1);
+  drawPinHead(x,y,ppm);
+}
+/* the thin pin seen end-on, sticking out of the plate towards us */
+function drawPinHead(x,y,ppm){
+  const pr = Math.max(3.0, 0.0042*ppm);
+  oval(x-pr*1.5,y-pr*1.5,x+pr*1.5,y+pr*1.5,"#9aa0a4","#6b7175",1);
+  oval(x-pr,y-pr,x+pr,y+pr,COL_PIN,"#22262a",1);
+}
+/* thread loop: two strands from the pin down to a loop round the tube */
+function drawThread(px,py,cx,cy,rp,ux,uy,ppm){
+  const w = Math.max(1, ppm*0.0008);
+  const span = Math.max(2.0, 0.0035*ppm);
+  const lx=ux*span, ly=uy*span;
+  line(px,py,cx-lx,cy-ly,COL_THREAD,w);
+  line(px,py,cx+lx,cy+ly,COL_THREAD,w);
+  const pl=[];
+  for(let k=0;k<24;k++){
+    const a=2*Math.PI*k/24;
+    pl.push(_pt(cx,cy,ux,uy, span*Math.cos(a), rp*Math.sin(a)));
+  }
+  poly(pl, null, COL_THREAD, w);
+}
+/*  The 35 cm plastic ruler of the photograph.  (x, y) is the 0 graduation
+    and the scale runs along `angle`.  As on a real ruler the scale is
+    inset from the ends of the body, the three tick lengths stay clearly
+    different, and the numerals are printed in the clear band underneath. */
+function drawRuler(x,y,ppm,length,angle){
+  length = (length===undefined) ? RULER_LEN : length;
+  angle  = angle || 0.0;
+  const ux=Math.cos(angle), uy=Math.sin(angle);
+  const Lp=length*ppm, hp=RULER_H*ppm;
+  const bw = Math.max(1.0, hp*0.05);            /* moulded rim */
+  const inset = Math.max(bw*2.0, hp*0.22);      /* the scale does not reach the ends */
+
+  poly([_pt(x,y,ux,uy,-inset,-hp/2), _pt(x,y,ux,uy,Lp+inset,-hp/2),
+        _pt(x,y,ux,uy,Lp+inset,hp/2), _pt(x,y,ux,uy,-inset,hp/2)],
+       "#f5efe2", COL_RULER, bw);
+
+  const t0 = -hp/2 + bw;                        /* graduations start inside the rim */
+  const mm_px = 0.001*ppm;
+  const step = (mm_px>=3.0) ? 1 : (mm_px>=1.2 ? 5 : 10);
+  for(let i=0; i<=Math.round(length*1000); i+=step){
+    let ln,col,wd;
+    if(i%10===0){ ln=hp*0.46; col="#33383a"; wd=Math.max(1.0,hp*0.030); }
+    else if(i%5===0){ ln=hp*0.30; col="#3b4143"; wd=Math.max(1.0,hp*0.024); }
+    else{ ln=hp*0.16; col="#6a7073"; wd=1.0; }
+    const a=_pt(x,y,ux,uy,i*mm_px,t0), b=_pt(x,y,ux,uy,i*mm_px,t0+ln);
+    line(a[0],a[1],b[0],b[1],col,wd);
+  }
+  /* numerals in the clear band below the graduations */
+  const cm_px = 0.01*ppm;
+  const n_cm = Math.round(length*100);
+  const band_top = t0 + hp*0.46;
+  const band_bot = hp/2 - bw;
+  const band_c = 0.5*(band_top+band_bot);
+  const band_h = Math.min(hp*0.36, band_bot-band_top);
+  const label = String(n_cm);
+  let fs=0, every=1;
+  for(const ev of [1,2,5,10]){
+    every = ev;
+    fs = fitFont(label, cm_px*ev*0.80, band_h);
+    if(fs>=6) break;
+  }
+  if(fs<6) return;
+  for(let i=0;i<=n_cm;i+=every){
+    const c=_pt(x,y,ux,uy,i*cm_px,band_c);
+    txt(c[0],c[1],String(i),"#33383a",fs,null,null,angle);
+  }
+}
+/*  The hand-held stopwatch of the problem-sheet photograph: a teal oval
+    body with a crown button on top, two side buttons, a lanyard eye and a
+    pale rectangular LCD window carrying the reading.                      */
+function drawStopwatch(x,y,r,text){
+  /* lanyard eye and crown button */
+  rect(x-r*0.14,y-r*1.34,x+r*0.14,y-r*0.92,"#8d9498","#5f666a",1);
+  oval(x-r*0.24,y-r*1.56,x+r*0.24,y-r*1.18,null,"#5f666a",Math.max(2,r*0.07));
+  /* side buttons */
+  for(const sx of [-1,1])
+    rect(x+sx*r*0.92, y-r*0.66, x+sx*r*1.14, y-r*0.40, "#8d9498","#5f666a",1);
+  /* body */
+  oval(x-r,y-r,x+r,y+r,"#1d7a8b","#14606e",Math.max(1,r*0.05));
+  oval(x-r*0.90,y-r*0.90,x+r*0.90,y+r*0.90,"#2fa5b8","#1d7a8b",1);
+  arcOutline(x-r*0.86,y-r*0.86,x+r*0.86,y+r*0.86,35,110,"#63c4d2",Math.max(1,r*0.06));
+  /* LCD window */
+  const lw=r*0.88, lh=r*0.32;
+  rect(x-lw, y-lh-r*0.02, x+lw, y+lh-r*0.02, "#cdd8c6","#5d675a",Math.max(1,r*0.035));
+  const fs = fitFont(text, 2.0*lw*0.86, 2.0*lh*0.82, "Courier","bold",5);
+  txt(x, y-r*0.02, text, "#1b2220", fs, "Courier","bold");
+  const fa = fitFont("ALBA", r*0.80, r*0.24);
+  txt(x, y-r*0.52, "ALBA", "#e8f3f5", fa);
+  const fb = fitFont("1/100 sec", r*1.00, r*0.20);
+  txt(x, y+r*0.56, "1/100 sec", "#cfeaef", fb);
+}
+/*  A fingertip seen from the side, propping the tube up from underneath.
+    (tx, ty) is the contact point on the lower surface of the cylinder.   */
+function drawFinger(tx,ty,ppm){
+  const ux=0.62, uy=0.79;                    /* finger axis, down and to the right */
+  const ln=0.062*ppm, wd=Math.max(4.0, 0.015*ppm);
+  const ex=tx+ux*ln, ey=ty+uy*ln;
+  line(tx,ty,ex,ey,"#e3bd9c",wd,"round");
+  line(tx+ux*ln*0.10, ty+uy*ln*0.10, ex,ey, "#f0d0b2", wd*0.52, "round");
+  const kx=tx+ux*ln*0.55, ky=ty+uy*ln*0.55;  /* knuckle crease */
+  line(kx-uy*wd*0.42, ky+ux*wd*0.42, kx+uy*wd*0.42, ky-ux*wd*0.42,
+       "#c99f7e", Math.max(1, wd*0.10));
+  const nx=tx+ux*ln*0.17, ny=ty+uy*ln*0.17;  /* nail */
+  const pl=[];
+  for(let k=0;k<12;k++){
+    const a=2*Math.PI*k/12;
+    const ca=wd*0.34*Math.cos(a), sa=wd*0.22*Math.sin(a);
+    pl.push([nx+ux*ca-uy*sa, ny+uy*ca+ux*sa]);
+  }
+  poly(pl,"#f7e6d6","#d3b295",1);
+}
+/* a rubber block with its paper sleeve, seen from above */
+function drawEraser(cx,cy,ppm){
+  const w=ERASER_W*ppm*0.5, h=ERASER_H*ppm*0.5;
+  rect(cx-w,cy-h,cx+w,cy+h,"#f2dfe0","#b99aa0",1);
+  rect(cx-w*0.34,cy-h,cx+w*0.34,cy+h,"#4d6fb0","#33518a",1);
+  line(cx-w,cy-h*0.45,cx+w,cy-h*0.45,"#ffffff",1);
+}
+/* a pencil whose point is at (tx, ty), body running down to the right */
+function drawPencil(tx,ty,ppm){
+  const ux=0.80, uy=0.60;
+  const ln=0.110*ppm, hw=Math.max(2.0, 0.0055*ppm);
+  const pt=(s,t)=>[tx+ux*s-uy*t, ty+uy*s+ux*t];
+  const wa=0.0, wb=0.020*ppm;
+  poly([pt(wa,0), pt(wb,-hw), pt(wb,hw)], "#e4d2ae","#a67f22",1);
+  poly([pt(wa,0), pt(0.008*ppm,-hw*0.42), pt(0.008*ppm,hw*0.42)], "#3c3a37");
+  poly([pt(wb,-hw), pt(ln*0.90,-hw), pt(ln*0.90,hw), pt(wb,hw)], "#e2b13c","#a67f22",1);
+  poly([pt(ln*0.90,-hw), pt(ln,-hw), pt(ln,hw), pt(ln*0.90,hw)], "#c0392b","#8e2c21",1);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   5.  THE LABORATORY VIEW
+        One physical bench, seen twice.  `part` is "A" or "B"; it
+        decides how the mouse behaves and which hardware is in use,
+        but the apparatus and the hand tools are the same objects
+        in both views.
+   ══════════════════════════════════════════════════════════════ */
+let seed  = (()=>{ const q=new URLSearchParams(location.search).get("seed");
+                   return q ? (parseInt(q,10)|0) : OFFICIAL_SEED; })();
+let truth = makeTruth(seed);
+let rig   = makeRig(truth);
+
+/* pixels per metre at 1:1 — one CSS pixel is 1/96 inch */
+const PPM_TRUE = Math.max(1200.0, Math.min(6000.0, 96.0/0.0254));
+
+const V = {                              /* the view state of each tab */
+  A:{ ppm:PPM_TRUE, pan:[0,0], anchor:0.28, fitted:false },
+  B:{ ppm:PPM_TRUE, pan:[0,0], anchor:0.36, fitted:false }
+};
+let part = "A";
+let CVW = 900, CVH = 660, DPR = 1;
+let dragMode = null, pendingHole = null, pressXY = [0,0], grab = [0,0], last = [0,0];
+let hoverXY = [0,0];
+let statusMsg = "";
+const view = ()=>V[part];
+
+function viewBox(){
+  const top = (part==="A") ? 0.075 : Math.max(truth.holes[truth.holes.length-1]+0.012, 0.075);
+  const need_h = top + truth.bench_y + 0.085;
+  const need_w = truth.L * ((part==="A") ? 1.20 : 1.05);
+  return [need_w, need_h, top/need_h];
+}
+function scaleFit(){
+  const w = Math.max(CVW, 640), h = Math.max(CVH, 520);
+  const [nw,nh,anchor] = viewBox();
+  const v = view();
+  v.fitted = true; v.anchor = anchor;
+  v.ppm = Math.max(180.0, Math.min(14000.0, Math.min(w/nw, h/nh)*0.94));
+  v.pan = [0,0];
+}
+function scale1to1(){
+  const v = view();
+  v.ppm = PPM_TRUE; v.anchor = viewBox()[2]; v.pan = [0,0]; v.fitted = true;
+}
+function w2s(x,y){
+  const v = view();
+  return [CVW*0.5 + v.pan[0] + x*v.ppm, CVH*v.anchor + v.pan[1] + y*v.ppm];
+}
+function s2w(sx,sy){
+  const v = view();
+  return [(sx - (CVW*0.5+v.pan[0]))/v.ppm, (sy - (CVH*v.anchor+v.pan[1]))/v.ppm];
+}
+
+/* ── mouse ──────────────────────────────────────────────────── */
+function holeAt(wx,wy){
+  const [ox,oy,ux,uy] = rig.cyl_world();
+  let best=null, bd=1e9;
+  truth.holes.forEach((h,i)=>{
+    const d = Math.hypot(ox+ux*h-wx, oy+uy*h-wy);
+    if(d<bd){ best=i; bd=d; }
+  });
+  return bd < Math.max(0.0035, 8.0/view().ppm) ? best : null;
+}
+/*  Hit testing follows what is drawn on top of what: the pencil and the
+    rubber lie on everything, then the apparatus, and the ruler last —
+    exactly the stacking order the drawing uses.                          */
+function onPress(ex,ey,button){
+  last = [ex,ey];
+  const [wx,wy] = s2w(ex,ey);
+
+  if(rig.on_eraser(wx,wy)){
+    dragMode = "eraser";
+    grab = [wx-rig.eraser_pos[0], wy-rig.eraser_pos[1]];
+    rig.eraser_to(wx-grab[0], wy-grab[1], true);
+    return;
+  }
+  if(rig.on_pencil(wx,wy)){
+    dragMode = "pencil";
+    grab = [wx-rig.pencil_pos[0], wy-rig.pencil_pos[1]];
+    rig.pencil_to(wx-grab[0], wy-grab[1], true);
+    return;
+  }
+
+  if(part==="A"){
+    if(rig.carried){
+      if(Math.hypot(wx, wy-LOOP_DROP) < 0.030) status(rig.insert_into_loop()[1]);
+      else status(L_().mClickLoop);
+      return;
+    }
+    if(rig.slipping || (rig.fallen && rig.on_cylinder(wx,wy,0.010))){
+      const m = rig.catch_()[1];
+      hoverXY = [ex,ey];
+      rig.carry_pos = [wx,wy];
+      status(m);
+      return;
+    }
+    if(rig.held && rig.on_cylinder(wx,wy,truth.d_out)){
+      status(rig.hold(false)[1]);
+      return;
+    }
+  }else{
+    if(Math.hypot(wx,wy) < Math.max(0.008, 10.0/view().ppm)){
+      status(rig.connect_selected_to_pin()[1]);
+      return;
+    }
+    const i = holeAt(wx,wy);
+    if(i!==null){
+      /* a click selects the hole, but a drag from the same point
+         moves or swings the tube instead */
+      dragMode = "hole"; pendingHole = i; pressXY = [ex,ey];
+      grab = [wx-rig.free_pos[0], wy-rig.free_pos[1]];
+      return;
+    }
+    if(rig.on_cylinder(wx,wy,truth.d_out*0.4)){
+      if(rig.mode==="pendulum"){ dragMode="swing"; rig.released=false; return; }
+      if(rig.mode==="free"){
+        dragMode="move"; grab=[wx-rig.free_pos[0], wy-rig.free_pos[1]];
+        return;
+      }
+    }
+  }
+
+  if(rig.on_ruler(wx,wy)){
+    dragMode = "ruler";
+    grab = [wx-rig.ruler_pos[0], wy-rig.ruler_pos[1]];
+    return;
+  }
+  dragMode = "pan";
+}
+function onMotion(ex,ey){
+  const [wx,wy] = s2w(ex,ey);
+  if(dragMode==="hole"){
+    if(Math.hypot(ex-pressXY[0], ey-pressXY[1]) < 5) return;
+    dragMode = (rig.mode==="pendulum") ? "swing" : "move";
+    if(dragMode==="swing") rig.released = false;
+  }
+  const v = view();
+  if(dragMode==="pan"){
+    v.pan[0] += ex-last[0]; v.pan[1] += ey-last[1];
+  }else if(dragMode==="ruler"){
+    rig.move_ruler(wx-grab[0], wy-grab[1]);
+  }else if(dragMode==="pencil"){
+    rig.pencil_to(wx-grab[0], wy-grab[1], true);
+  }else if(dragMode==="eraser"){
+    rig.eraser_to(wx-grab[0], wy-grab[1], true);
+  }else if(dragMode==="move"){
+    rig.free_pos = [wx-grab[0], wy-grab[1]];
+  }else if(dragMode==="swing"){
+    rig.pull_aside(Math.atan2(wx,wy)*180/Math.PI);
+  }
+  last = [ex,ey];
+}
+function onRelease(){
+  if(dragMode==="swing") rig.release();
+  else if(dragMode==="hole") status(rig.select_hole(pendingHole)[1]);
+  dragMode = null;
+}
+function zoomBy(d){
+  const v = view();
+  v.ppm = Math.max(180.0, Math.min(14000.0, v.ppm*(d>0 ? 1.12 : 1/1.12)));
+}
+function onWheel(ex,ey,d,fine,zoom){
+  const [wx,wy] = s2w(ex,ey);
+  if(zoom){ zoomBy(d); return; }
+  /*  the loop only moves while the pointer is on the cylinder, so that
+      turning the ruler can never slide it by accident, and the tube takes
+      precedence because it is drawn on top of the ruler                  */
+  if(part==="A" && rig.mode==="balance" && !(rig.fallen||rig.carried)
+     && rig.on_cylinder(wx,wy,truth.d_out)){
+    const step = fine ? 0.0002 : 0.0020;
+    rig.hold(true);
+    rig.nudge_loop(d>0 ? -step : step);
+    return;
+  }
+  if(rig.on_ruler(wx,wy)){
+    /* the wheel turns the ruler about the point under the cursor */
+    const step = (fine ? 0.5 : 2.5)*Math.PI/180;
+    rig.rotate_ruler(d>0 ? step : -step, wx, wy);
+    return;
+  }
+  zoomBy(d);
+}
+
+/* ── drawing ────────────────────────────────────────────────── */
+function redraw(){
+  G = ctx;
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+
+  const v = view(), ppm = v.ppm;
+  const w = CVW, h = CVH;
+  const by = w2s(0.0, truth.bench_y)[1];
+  const [px,py] = w2s(0.0, 0.0);
+
+  rect(0,0,w,h,COL_TABLE);
+  rect(0,by,w,h,COL_TABLE_DK);
+  line(0,py,w,py,"#7d9577",1,"butt",[6,6]);
+  drawBasePlate(px,py,ppm);
+
+  drawRuler(...w2s(rig.ruler_pos[0], rig.ruler_pos[1]), ppm, RULER_LEN, rig.ruler_angle);
+
+  if(rig.mode!==null){
+    const [oxw,oyw,ux,uy] = rig.cyl_world();
+    const [ox,oy] = w2s(oxw,oyw);
+    if(rig.mode==="balance"){
+      const [cx,cy] = w2s(0.0, LOOP_DROP);
+      if(rig.fallen || rig.carried){
+        drawThread(px,py,cx,cy, truth.d_out*0.5*ppm*1.25, 1.0, 0.0, ppm);
+      }else{
+        const [lx,ly] = w2s(oxw+ux*rig.thread_x, oyw+uy*rig.thread_x);
+        drawThread(px,py,lx,ly, truth.d_out*0.5*ppm*1.25, ux, uy, ppm);
+      }
+    }
+    drawCylinder(ox,oy,ux,uy,ppm,truth,rig.marks);
+    if(rig.mode==="balance" && rig.held && !(rig.fallen||rig.carried)){
+      const tp = _pt(ox,oy,ux,uy, rig.thread_x*ppm, truth.d_out*0.5*ppm);
+      drawFinger(tp[0],tp[1],ppm);
+    }
+    if(rig.sel_hole!==null && (rig.mode==="free"||rig.mode==="pendulum")){
+      const p = _pt(ox,oy,ux,uy, truth.holes[rig.sel_hole]*ppm, 0.0);
+      const q = Math.max(6.0, 0.005*ppm);
+      oval(p[0]-q,p[1]-q,p[0]+q,p[1]+q,null,"#ffd54f",2);
+    }
+    drawPinHead(px,py,ppm);
+    if(rig.mode==="pendulum")
+      line(px,py,px,py+truth.L*1.05*ppm,"#7d9577",1,"butt",[3,5]);
+  }
+
+  drawPencil(...w2s(rig.pencil_pos[0], rig.pencil_pos[1]), ppm);
+  drawEraser(...w2s(rig.eraser_pos[0], rig.eraser_pos[1]), ppm);
+
+  G.font = fontStr(13); G.fillStyle="#2f3a2c";
+  G.textAlign="left"; G.textBaseline="alphabetic";
+  G.fillText(rig.status_line(), 10, h-10);
+  G.font = fontStr(10.5); G.fillStyle="#4d5c49"; G.textAlign="right";
+  G.fillText(part==="A" ? L_().tipA : L_().tipB, w-10, h-10);
+}
+let swCache = null;
+function drawPanelStopwatch(){
+  if(part!=="B") return;
+  const s = rig.stopwatch_display();
+  if(s===swCache) return;
+  swCache = s;
+  G = swx;
+  swx.setTransform(1,0,0,1,0,0);
+  swx.clearRect(0,0,swc.width,swc.height);
+  swx.setTransform(DPR,0,0,DPR,0,0);
+  rect(0,0,254,182,"#eef1ec");
+  drawStopwatch(254*0.5, 106, 62, s);
+  G = ctx;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   6.  PANEL
+   ══════════════════════════════════════════════════════════════ */
+function status(m){ if(m){ statusMsg = m; } }
+function syncPanel(){
+  const d = L_();
+  setTxt("t-h-part", (part==="A") ? d.headA : d.headB);
+  setTxt("t-benchcap", (part==="A") ? d.benchcapA : d.benchcapB);
+  setTxt("t-note", ((part==="A") ? d.hintA : d.hintB) + "\n" + d.note);
+  setTxt("status", statusMsg || rig.status_line());
+  $("actA").classList.toggle("hidden", part!=="A");
+  $("actB").classList.toggle("hidden", part!=="B");
+  $("swBox").classList.toggle("hidden", part!=="B");
+  setTxt("btnHold", rig.held ? d.letgo : d.hold);
+  setTxt("btnRehang", d.rehang);
+  if(part==="B"){
+    let s;
+    if(rig.mode==="pendulum") s = fmt(d.selPin, rig.hole_index+1);
+    else if(rig.sel_hole!==null) s = fmt(d.selSel, rig.sel_hole+1);
+    else s = d.selNone;
+    setTxt("selLbl", s);
+  }
+  const sc = Math.round(view().ppm/PPM_TRUE*100)/100;
+  setTxt("scaleLbl", fmt(d.scale, sc.toFixed(2),
+                         Math.abs(sc-1.0)<0.01 ? d.actual : ""));
+}
+function setPart(p){
+  part = p;
+  if(p==="A") rig.enter_part_a(); else rig.enter_part_b();
+  $("tabA").className = p==="A" ? "on" : "";
+  $("tabB").className = p==="B" ? "on" : "";
+  if(!view().fitted) scaleFit();
+  swCache = null;
+  syncPanel();
+}
+$("tabA").onclick = ()=>setPart("A");
+$("tabB").onclick = ()=>setPart("B");
+
+$("btnHold").onclick  = ()=>{ status(rig.hold(!rig.held)[1]); };
+$("btnRehang").onclick = ()=>{
+  const x = rig.thread_x || truth.L*0.5;
+  rig.take_cylinder_off();
+  rig.loop_present = true;
+  rig.mount_on_loop(x);
+  rig.hold(true);
+};
+$("swStart").onclick = ()=>rig.stopwatch_start();
+$("swStop").onclick  = ()=>rig.stopwatch_stop();
+$("swReset").onclick = ()=>rig.stopwatch_reset();
+/* one press starts the watch, the next one stops it */
+function swToggle(){ if(rig.sw_running) rig.stopwatch_stop(); else rig.stopwatch_start(); }
+swc.addEventListener("click", swToggle);
+
+$("btnFit").onclick = ()=>scaleFit();
+$("btn11").onclick  = ()=>scale1to1();
+$("btnNew").onclick = ()=>{
+  seed = (Math.floor(Math.random()*1e8)+1)|0;
+  truth = makeTruth(seed);
+  rig   = makeRig(truth);
+  V.A.fitted = V.B.fitted = false;
+  statusMsg = "";
+  setPart(part);
+  rig.move_ruler(-truth.L*0.60, LOOP_DROP+0.055);
+  rig.pencil_to(truth.L*0.30, LOOP_DROP+0.090);
+  rig.eraser_to(truth.L*0.30-0.055, LOOP_DROP+0.150);
+  scaleFit();
+};
+
+/* ══════════════════════════════════════════════════════════════
+   7.  EVENTS
+   ══════════════════════════════════════════════════════════════ */
+function evXY(e){
+  const r = cv.getBoundingClientRect();
+  return [(e.clientX-r.left)*CVW/r.width, (e.clientY-r.top)*CVH/r.height];
+}
+let down = false;
+cv.addEventListener("pointerdown", e=>{
+  if(e.button===2) return;
+  down = true; cv.setPointerCapture(e.pointerId);
+  const [x,y]=evXY(e); onPress(x,y,e.button);
+  cv.classList.add("grabbing"); e.preventDefault();
+});
+cv.addEventListener("pointermove", e=>{
+  const [x,y]=evXY(e);
+  hoverXY=[x,y];
+  if(rig.carried) rig.carry_pos = s2w(x,y);
+  if(down) onMotion(x,y);
+});
+cv.addEventListener("pointerup", ()=>{
+  if(!down) return;
+  down=false; cv.classList.remove("grabbing"); onRelease();
+});
+cv.addEventListener("pointercancel", ()=>{ down=false; dragMode=null; cv.classList.remove("grabbing"); });
+cv.addEventListener("contextmenu", e=>{
+  e.preventDefault();
+  if(part==="B") status(rig.unmount_from_pin()[1]);
+});
+cv.addEventListener("wheel", e=>{
+  e.preventDefault();
+  const [x,y]=evXY(e);
+  onWheel(x,y, e.deltaY<0 ? 1 : -1, e.shiftKey, e.ctrlKey||e.metaKey);
+}, {passive:false});
+/* space bar: start the stopwatch, press again to stop it */
+window.addEventListener("keydown", e=>{
+  if(e.code==="Space" || e.key===" "){
+    if(document.activeElement && document.activeElement.tagName==="BUTTON")
+      document.activeElement.blur();
+    e.preventDefault();
+    if(part==="B") swToggle();
+  }
+});
+
+/* ══════════════════════════════════════════════════════════════
+   8.  LANGUAGE
+   ══════════════════════════════════════════════════════════════ */
+function applyLang(){
+  const d = T[lang];
+  document.documentElement.lang = lang;
+  document.title = (lang==="ko")
+    ? "IPhO 2011 E2 — 역학 블랙박스 · Mechanical Blackbox · HaslaLab"
+    : "IPhO 2011 E2 — Mechanical Blackbox · HaslaLab";
+  $("t-title").textContent = d.title;
+  $("t-sub").textContent   = d.sub;
+  $("tabA").textContent    = d.tabA;
+  $("tabB").textContent    = d.tabB;
+  $("t-h-sw").textContent  = d.hSw;
+  $("swStart").textContent = d.start;
+  $("swStop").textContent  = d.stop;
+  $("swReset").textContent = d.reset;
+  $("t-h-view").textContent= d.hView;
+  $("btnFit").textContent  = d.fit;
+  $("btn11").textContent   = d.one;
+  $("btnNew").textContent  = d.newrig;
+  $("btn-ko").className = lang==="ko" ? "on" : "";
+  $("btn-en").className = lang==="en" ? "on" : "";
+  statusMsg = "";
+  swCache = null;
+  syncPanel();
+}
+$("btn-ko").onclick = ()=>{ lang="ko"; applyLang(); };
+$("btn-en").onclick = ()=>{ lang="en"; applyLang(); };
+
+/* ══════════════════════════════════════════════════════════════
+   9.  MAIN LOOP
+   ══════════════════════════════════════════════════════════════ */
+function layout(){
+  DPR = window.devicePixelRatio || 1;
+  const r = cv.parentElement.getBoundingClientRect();
+  CVW = Math.max(360, Math.floor(r.width-24));
+  CVH = Math.max(460, Math.min(Math.round(CVW*0.74), Math.round(window.innerHeight*0.82)));
+  cv.style.height = CVH+"px";
+  cv.width  = Math.round(CVW*DPR);
+  cv.height = Math.round(CVH*DPR);
+  swc.style.width = "254px"; swc.style.height = "182px";
+  swc.width  = Math.round(254*DPR);
+  swc.height = Math.round(182*DPR);
+  swCache = null;
+  if(!V.A.fitted && part==="A") scaleFit();
+  if(!V.B.fitted && part==="B") scaleFit();
+}
+
+let lastT = performance.now();
+function loop(now){
+  const dt = Math.min(0.06, (now-lastT)/1000);
+  lastT = now;
+  const n = Math.max(1, Math.floor(dt/0.004)+1);
+  for(let i=0;i<n;i++) rig.step(dt/n);
+  drawPanelStopwatch();
+  redraw();
+  syncPanel();
+  requestAnimationFrame(loop);
+}
+
+/* ── boot ── */
+window.addEventListener("resize", layout);
+layout();
+rig.enter_part_a();
+rig.move_ruler(-truth.L*0.60, LOOP_DROP+0.055);
+rig.pencil_to(truth.L*0.30, LOOP_DROP+0.090);
+rig.eraser_to(truth.L*0.30-0.055, LOOP_DROP+0.150);
+scaleFit();
+applyLang();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

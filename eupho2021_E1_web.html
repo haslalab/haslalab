@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EuPhO 2021 E1 — Hidden wire</title>
+<style>
+:root{--bg:#0c0c0c;--fg:#cccccc;--dim:#7d7d7d;--accent:#4ec9b0;--line:#2a2a2a;--panel:#141414}
+*{box-sizing:border-box}
+body{margin:0;background:#1e1e1e;color:var(--fg);
+     font:14px/1.5 ui-sans-serif,system-ui,"Segoe UI","Malgun Gothic",sans-serif;
+     height:100vh;display:flex;flex-direction:column;overflow:hidden}
+header{padding:12px 16px 10px;background:var(--panel);border-bottom:1px solid var(--line)}
+header h1{margin:0 0 3px;font-size:15px;color:#e8e8e8}
+header p{margin:0;color:var(--dim);font-size:12.5px}
+header details{margin-top:7px}
+header summary{cursor:pointer;color:var(--accent);font-size:12.5px}
+header ul{margin:6px 0 0;padding-left:18px;color:var(--dim);font-size:12.5px}
+header li{margin:2px 0}
+#screen{flex:1;overflow-y:auto;background:var(--bg);padding:12px 16px;
+        font:13px/1.45 ui-monospace,Consolas,"Courier New",monospace;white-space:pre-wrap;
+        word-break:break-word}
+#screen .in{color:#9cdcfe}
+#bar{display:flex;align-items:center;gap:0;background:var(--bg);border-top:1px solid var(--line);
+     padding:6px 16px 10px}
+#ps{color:var(--fg);font:13px/1.45 ui-monospace,Consolas,"Courier New",monospace;
+    white-space:pre;flex:none}
+#inp{flex:1;min-width:0;background:transparent;border:0;outline:0;color:#9cdcfe;
+     font:13px/1.45 ui-monospace,Consolas,"Courier New",monospace;padding:0}
+#tools{display:flex;gap:8px;padding:8px 16px;background:var(--panel);border-top:1px solid var(--line)}
+button{background:#2d2d2d;color:var(--fg);border:1px solid var(--line);border-radius:4px;
+       padding:5px 12px;font:12.5px inherit;cursor:pointer}
+button:hover{border-color:var(--accent);color:var(--accent)}
+
+</style>
+</head>
+<body>
+<script>
+/* EuPhO 2021 E1 "Hidden wire" — browser build of the official console program
+   (E1_hidden_wire_win.exe / _linux / _osx).
+
+   EuPhO did not publish the source for 2021, so the engine is written from the
+   problem statement with the parameters the official solution states are "the
+   values preset in the simulation program": h = 5.0 mm, B_E = 4.0e-5 T and a
+   wire projection y = -0.58 x + 75.3 mm.  Checked against the official data
+   tables: I = +5 A at (0, 75) gives -143 deg, at (20, 75) gives -79 deg. */
+
+var A_WIRE = -0.58, B_WIRE = 75.3, H_DEPTH = 5.0e-3, B_EARTH = 4.0e-5;
+var MU0 = 4e-7 * Math.PI, L_SIDE = 100.0, I_MAX = 5.0, POS_SIGMA = 0.5;
+var SEP = new Array(32).join('-');
+
+function gauss(s) {
+  var u = 1 - Math.random(), v = Math.random();
+  return s * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+
+function phiDeg(I, xmm, ymm) {
+  var theta = Math.atan(A_WIRE);
+  var tx = Math.cos(theta), ty = Math.sin(theta);
+  var rx = xmm * 1e-3, ry = (ymm - B_WIRE) * 1e-3, rz = H_DEPTH;
+  var dot = rx * tx + ry * ty;
+  var px = rx - dot * tx, py = ry - dot * ty, pz = rz;
+  var d2 = px * px + py * py + pz * pz;
+  var c = MU0 * I / (2 * Math.PI * d2);
+  return Math.atan2(c * (ty * pz), c * (-tx * pz) + B_EARTH) * 180 / Math.PI;
+}
+
+var PROGRAM = {
+  title: 'EuPhO 2021 E1 — Hidden wire',
+  subtitle: '주최측이 배포한 것은 콘솔 실행 파일뿐입니다. 이 페이지는 그 프로그램을 브라우저에서 그대로 돌리는 판입니다.',
+  notes: [
+    '공식 바이너리는 <code>EuPhO-2021/official/official_binaries/{Windows,Linux,OSX}/</code>에 있습니다. 이 페이지는 그것과 같은 프롬프트·범위·반올림·출력 형식을 씁니다.',
+    '2021년은 소스가 공개되지 않아 물리는 문제지에서 다시 썼고, 숨은 값은 공식 해답이 "시뮬레이션에 설정된 값과 두 자리까지 일치한다"고 밝힌 h = 5.0 mm, B<sub>E</sub> = 4.0&times;10<sup>-5</sup> T, 도선 y = &minus;0.58x + 75.3 mm를 씁니다.',
+    '공식 해답의 데이터 표와 대조했습니다 — I = +5 A일 때 (0, 75)에서 &phi; = &minus;143&deg;, (20, 75)에서 &minus;79&deg;로 일치합니다.',
+    'I는 0.1 A, x·y는 1 mm로 반올림되고, 나침반을 놓을 때마다 약 0.5 mm의 오차가 생깁니다. &phi;는 1&deg; 단위로 출력됩니다.',
+    '과제: (a) 도선의 식 y = ax + b와 그 불확도, 양의 전류 방향 (b) 깊이 h와 지구자기 수평성분 B<sub>E</sub>.'
+  ],
+  run: async function (term) {
+    async function ask(prompt, lo, hi) {
+      for (;;) {
+        var raw = (await term.ask(prompt)).trim();
+        var v = parseFloat(raw);
+        if (raw === '' || isNaN(v)) { term.writeln('Invalid input.'); continue; }
+        if (!(v >= lo && v <= hi)) { term.writeln('Value out of range.'); continue; }
+        return v;
+      }
+    }
+    for (;;) {
+      var I = await ask('Enter I (A) between -5.0 and 5.0: ', -I_MAX, I_MAX);
+      var x = await ask('Enter X (mm) between 0 and 100: ', 0, L_SIDE);
+      var y = await ask('Enter Y (mm) between 0 and 100: ', 0, L_SIDE);
+      I = Math.round(I * 10) / 10;
+      x = Math.round(x);
+      y = Math.round(y);
+      var phi = Math.round(phiDeg(I, x + gauss(POS_SIGMA), y + gauss(POS_SIGMA)));
+      term.writeln('PHI = ' + phi + ' degrees');
+      term.writeln(SEP);
+    }
+  }
+};
+
+</script>
+<script>
+/* Console emulator for the olympiad programs whose originals are command-line
+   executables.  A program module defines a global PROGRAM:
+
+     PROGRAM = { title, subtitle, notes: [...], run: async function (term) {...} }
+
+   and drives the screen through term.write / term.writeln / term.ask, so the
+   prompts and the streamed output land on screen exactly as the original
+   executable prints them. */
+(function () {
+  var screen, ps, inp, pending = null, history = [], hpos = 0;
+
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  var term = {
+    write: function (s) {
+      screen.insertAdjacentHTML('beforeend', esc(s));
+      screen.scrollTop = screen.scrollHeight;
+    },
+    writeln: function (s) { term.write((s === undefined ? '' : s) + '\n'); },
+    echo: function (s) {
+      screen.insertAdjacentHTML('beforeend', '<span class="in">' + esc(s) + '</span>\n');
+      screen.scrollTop = screen.scrollHeight;
+    },
+    clear: function () { screen.innerHTML = ''; },
+    /* write the prompt, then wait for a line; the typed text is echoed after it,
+       which is what a terminal shows */
+    ask: function (prompt) {
+      term.write(prompt === undefined ? '' : prompt);
+      ps.textContent = prompt === undefined ? '' : prompt;
+      inp.focus();
+      return new Promise(function (resolve) { pending = resolve; });
+    },
+    /* let the browser paint between long computations */
+    yieldFrame: function () {
+      return new Promise(function (r) { setTimeout(r, 0); });
+    }
+  };
+
+  function submit() {
+    if (!pending) return;
+    var v = inp.value;
+    inp.value = '';
+    if (v !== '') { history.push(v); hpos = history.length; }
+    term.echo(v);
+    ps.textContent = '';
+    var done = pending;
+    pending = null;
+    done(v);
+  }
+
+  window.addEventListener('DOMContentLoaded', function () {
+    document.title = PROGRAM.title;
+
+    var head = document.createElement('header');
+    head.innerHTML =
+      '<h1>' + esc(PROGRAM.title) + '</h1>' +
+      (PROGRAM.subtitle ? '<p>' + esc(PROGRAM.subtitle) + '</p>' : '') +
+      (PROGRAM.notes && PROGRAM.notes.length
+        ? '<details><summary>이 프로그램에 대하여</summary><ul>' +
+          PROGRAM.notes.map(function (n) { return '<li>' + n + '</li>'; }).join('') +
+          '</ul></details>'
+        : '');
+    document.body.appendChild(head);
+
+    screen = document.createElement('div');
+    screen.id = 'screen';
+    document.body.appendChild(screen);
+
+    var bar = document.createElement('div');
+    bar.id = 'bar';
+    ps = document.createElement('span');
+    ps.id = 'ps';
+    inp = document.createElement('input');
+    inp.id = 'inp';
+    inp.autocomplete = 'off';
+    inp.spellcheck = false;
+    bar.appendChild(ps);
+    bar.appendChild(inp);
+    document.body.appendChild(bar);
+
+    var tools = document.createElement('div');
+    tools.id = 'tools';
+    var bRestart = document.createElement('button');
+    bRestart.textContent = '다시 시작 (Ctrl+C)';
+    var bCopy = document.createElement('button');
+    bCopy.textContent = '화면 복사';
+    var bSave = document.createElement('button');
+    bSave.textContent = '.txt로 저장';
+    tools.appendChild(bRestart);
+    tools.appendChild(bCopy);
+    tools.appendChild(bSave);
+    document.body.appendChild(tools);
+
+    inp.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { submit(); e.preventDefault(); }
+      else if (e.key === 'ArrowUp') {
+        if (hpos > 0) { hpos--; inp.value = history[hpos]; }
+        e.preventDefault();
+      } else if (e.key === 'ArrowDown') {
+        if (hpos < history.length - 1) { hpos++; inp.value = history[hpos]; }
+        else { hpos = history.length; inp.value = ''; }
+        e.preventDefault();
+      } else if (e.key === 'c' && e.ctrlKey) {
+        start();
+      }
+    });
+    screen.addEventListener('click', function () {
+      if (!window.getSelection().toString()) inp.focus();
+    });
+
+    bRestart.addEventListener('click', start);
+    bCopy.addEventListener('click', function () {
+      navigator.clipboard.writeText(screen.textContent).then(function () {
+        bCopy.textContent = '복사됨';
+        setTimeout(function () { bCopy.textContent = '화면 복사'; }, 1200);
+      }, function () {});
+    });
+    bSave.addEventListener('click', function () {
+      var blob = new Blob([screen.textContent], { type: 'text/plain;charset=utf-8' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = PROGRAM.title.replace(/[^\w.-]+/g, '_') + '.txt';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+
+    function start() {
+      pending = null;
+      ps.textContent = '';
+      inp.value = '';
+      term.clear();
+      inp.focus();
+      Promise.resolve(PROGRAM.run(term)).catch(function (err) {
+        term.writeln('\n[' + err.message + ']');
+      });
+    }
+    start();
+  });
+})();
+
+</script>
+</body>
+</html>

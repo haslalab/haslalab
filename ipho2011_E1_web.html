@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#2E3945">
+<title>IPhO 2011 E1 — 전기 블랙박스 · Electrical Blackbox · HaslaLab</title>
+<meta name="description" content="IPhO 2011 실험 1번을 브라우저에서 실행합니다. 발진기에 물린 정전용량식 변위 센서의 주파수를 멀티미터로 읽고, 알려진 축전기로 눈금을 매깁니다. 계산은 대신 해주지 않습니다.">
+<link rel="canonical" href="https://haslalab.org/sim/ipho2011_E1_web.html">
+<link rel="alternate" hreflang="ko" href="https://haslalab.org/sim/ipho2011_E1_web.html?lang=ko">
+<link rel="alternate" hreflang="en" href="https://haslalab.org/sim/ipho2011_E1_web.html?lang=en">
+<link rel="alternate" hreflang="x-default" href="https://haslalab.org/sim/ipho2011_E1_web.html">
+<meta property="og:site_name" content="HaslaLab">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IPhO 2011 E1 — 전기 블랙박스 · Electrical Blackbox">
+<meta property="og:description" content="IPhO 2011 실험 1번을 브라우저에서 실행합니다. 발진기에 물린 정전용량식 변위 센서의 주파수를 멀티미터로 읽고, 알려진 축전기로 눈금을 매깁니다.">
+<meta property="og:url" content="https://haslalab.org/sim/ipho2011_E1_web.html">
+<meta property="og:image" content="https://haslalab.org/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://haslalab.org/og.png">
+<style>
+  :root{
+    --bg:#f4f6f8; --panel:#ffffff; --ink:#1b2430; --muted:#5b6b7c;
+    --line:#d8e0e8; --accent:#2c6f9b; --accent-soft:#eaf4fb;
+    --disp-bg:#101418; --disp-fg:#8fd6ff;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,
+         "Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  }
+  .wrap{max-width:1560px;margin:0 auto;padding:16px;display:flex;gap:16px;align-items:flex-start}
+  @media (max-width:1080px){ .wrap{flex-direction:column} }
+
+  /* ── control panel ── */
+  .panel{
+    flex:0 0 290px; background:var(--panel); border:1px solid var(--line);
+    border-radius:10px; padding:14px; position:sticky; top:16px;
+  }
+  @media (max-width:1080px){ .panel{position:static;flex:1 1 auto;width:100%} }
+  .panel h2{
+    font-size:12px; letter-spacing:.04em; text-transform:uppercase;
+    color:var(--accent); margin:16px 0 7px; padding-bottom:5px;
+    border-bottom:1px solid var(--line);
+  }
+  .panel h2:first-of-type{margin-top:0}
+  button{
+    width:100%; padding:8px 10px; margin:4px 0; cursor:pointer;
+    background:#fff; border:1px solid var(--line); border-radius:6px;
+    font:inherit; font-size:13px; color:var(--ink); text-align:left;
+    transition:background .12s,border-color .12s;
+  }
+  button:hover:not(:disabled){background:var(--accent-soft);border-color:var(--accent)}
+  button.primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+  button.primary:hover:not(:disabled){background:#22587c}
+  .readout{
+    font:12.5px ui-monospace,Consolas,monospace; color:var(--muted);
+    background:#f7f9fb; border:1px solid var(--line); border-radius:6px;
+    padding:6px 8px; margin-top:8px;
+  }
+  .note{font-size:11.5px;color:#8494a3;line-height:1.65;margin-top:10px;white-space:pre-line}
+
+  /* ── stage ── */
+  .stage{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
+  .card h3{margin:0 0 8px;font-size:13px;font-weight:600;color:var(--muted)}
+  canvas{display:block;width:100%;height:auto;border-radius:6px;touch-action:none}
+  #bench{cursor:default}
+
+  /* ── header ── */
+  header{
+    max-width:1560px;margin:0 auto;padding:18px 16px 0;
+    display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap
+  }
+  header h1{margin:0;font-size:19px;font-weight:650}
+  header p{margin:3px 0 0;font-size:13px;color:var(--muted)}
+  .lang{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;background:#fff}
+  .lang button{
+    width:auto;margin:0;border:0;border-radius:0;padding:7px 15px;
+    font-size:13px;font-weight:600;color:var(--muted);text-align:center
+  }
+  .lang button.on{background:var(--accent);color:#fff}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1 id="t-title"></h1>
+    <p id="t-sub"></p>
+  </div>
+  <div class="lang">
+    <button id="btn-ko" class="on">한국어</button>
+    <button id="btn-en">English</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- ═══════════ CONTROLS ═══════════ -->
+  <aside class="panel">
+    <h2 id="t-h-bench"></h2>
+    <button id="btnBatt"></button>
+    <button id="btnReset" class="primary"></button>
+
+    <h2 id="t-h-table"></h2>
+    <div class="readout" id="t-t1"></div>
+    <p class="note" id="t-note"></p>
+  </aside>
+
+  <!-- ═══════════ STAGE ═══════════ -->
+  <div class="stage">
+    <div class="card">
+      <h3 id="t-benchcap"></h3>
+      <canvas id="bench"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ══════════════════════════════════════════════════════════════
+   0.  i18n  —  language is switched by a button, no page reload
+   ══════════════════════════════════════════════════════════════ */
+const T = {
+  ko:{
+    title:"IPhO 2011 실험 1 — 전기 블랙박스 : 정전용량식 변위 센서",
+    sub:"가상 실험실 · 리드선 끝을 끌어다 단자에 물리고, 위 극판을 밀어 보세요",
+    hBench:"실험대", newbatt:"새 건전지", reset:"처음으로",
+    hTable:"TABLE 1 — 축전기 표시값",
+    t1:"TABLE 1   33J: 34±1   68: 68±1   82J: 84±1   151: 150±1  (pF)",
+    benchcap:"실험대 — 나무 밑판 위의 블랙박스 · 발진기 · MASTECH 멀티미터",
+    note:"• 스위치를 올리고 다이얼을 Hz 에 맞추면 발진 주파수가 보입니다.\n"+
+         "• 멀티미터 리드선 끝을 끌어 발진기의 빨강·검정 잭에 물리세요.\n"+
+         "• 9 V 건전지의 스냅 리드선을 발진기의 (+)(−) 입력에 물려야 발진합니다.\n"+
+         "• 건전지 상자에는 다 쓴 것이 섞여 있습니다. 리드선을 건전지 단자에 대고 다이얼을 20 V 에 두면 전압을 잴 수 있습니다.\n"+
+         "• 나무 블랙박스의 위 극판은 끌어서 밀 수 있고, 오른쪽 끝이 mm 눈금을 가리킵니다.\n"+
+         "• 부품 상자의 축전기를 실험대로 꺼내 악어클립으로 물면 블랙박스 대신 그 축전기가 발진기에 붙습니다. 두 축전기를 겹쳐 놓으면 다리가 묶여 병렬이 됩니다.\n"+
+         "• 다이얼 위에서 휠을 굴리면 한 칸씩 돌아갑니다.\n"+
+         "프로그램은 아무것도 계산해 주지 않습니다."
+  },
+  en:{
+    title:"IPhO 2011 Experiment 1 — Electrical Blackbox: Capacitive Displacement Sensor",
+    sub:"Virtual laboratory · drag the lead ends onto the terminals and push the upper plate",
+    hBench:"Bench", newbatt:"New battery", reset:"Restart",
+    hTable:"TABLE 1 — marking on the capacitors",
+    t1:"TABLE 1   33J: 34±1   68: 68±1   82J: 84±1   151: 150±1  (pF)",
+    benchcap:"bench — the blackbox, the oscillator and the MASTECH multimeter on the wooden base",
+    note:"• Throw the switch and set the dial to Hz to see the oscillator frequency.\n"+
+         "• Drag the ends of the meter leads onto the red and black jacks of the oscillator.\n"+
+         "• The snap leads of the 9 V battery must sit on the (+)(−) inputs of the oscillator.\n"+
+         "• The box of batteries has flat ones in it. Put the meter leads on the battery terminals and turn the dial to 20 V to measure it.\n"+
+         "• The upper plate of the wooden blackbox is dragged along; its right-hand edge reads against the millimetre scale.\n"+
+         "• Take a capacitor out of the tray and grip it with the crocodile clips: it then replaces the blackbox at the oscillator. Stack two of them and their leads are tied together, i.e. in parallel.\n"+
+         "• The wheel over the dial turns it one position at a time.\n"+
+         "Nothing is computed for you."
+  }
+};
+let lang = (new URLSearchParams(location.search).get("lang")==="en") ? "en" : "ko";
+const $ = id=>document.getElementById(id);
+
+/* ══════════════════════════════════════════════════════════════
+   1.  HIDDEN TRUTH  —  identical to the Python constants
+   ══════════════════════════════════════════════════════════════ */
+const EPS0    = 8.85e-12;
+const K_DIEL  = 1.5;
+const D_GAP   = 0.20e-3;
+const W_TOOTH = 5.0e-3;
+const B_TOOTH = 60.0e-3;
+const DC_STEP = K_DIEL * EPS0 * B_TOOTH * W_TOOTH / D_GAP;
+const C_OFF   = 60.0e-12;
+const ALPHA0  = 714e-9;
+const C_STRAY = 17.9e-12;
+const TRAVEL_MM = 60.0;
+const DMM_HZ_FS = 19.99;
+const BATT_GOOD = [9.05, 9.55];   /* nearly new battery */
+const BATT_WEAK = [6.60, 8.85];   /* flat battery       */
+const BATT_DRAIN = 0.0008;
+
+const uni = (a,b)=>a+Math.random()*(b-a);
+function newBattery(pWeak=0.30){
+  const [lo,hi] = (Math.random()<pWeak) ? BATT_WEAK : BATT_GOOD;
+  return Math.round(uni(lo,hi)*100)/100;
+}
+
+const CAPS = [["33J",34,33.6e-12], ["68",68,67.4e-12],
+              ["82J",84,83.8e-12], ["151",150,149.2e-12]];
+
+/* ── palette ── */
+const C_BG="#d6dadb", C_TRAY="#c5cacb", C_WIRE_R="#a5251f", C_WIRE_B="#17191a",
+      C_GHOST="#8b9096", C_SEL="#ffb300";
+const BOARD_S=1.00, DMM_S=0.66, CARD_S=0.62, BODY_S=0.85;
+
+/* ── coordinates inside the board photograph (1072 x 394) ── */
+const BW=1072, BH=394;
+const JR=[167,135], JB=[165,215];
+const SCREW1=[292,81], SCREW2=[283,312];
+const SWI=[33,281];
+const CLIP_OUT_R=[226,168], CLIP_OUT_B=[226,206];
+const BATT_P=[52,40], BATT_N=[52,66];
+const BINP=[24,116], BINN=[24,142];
+
+/* ── the real dial of the MASTECH (screen angles, 0 deg = right) ── */
+const DIAL = [["off",-90,"OFF"],
+              ["v1000",-52,"1000"], ["v200",-30,"200"], ["v20",-8,"20"],
+              ["v2",14,"2"],   ["a20m",36,"20m"], ["a200m",58,"200m"],
+              ["hz",82,"Hz"],  ["temp",104,"°C"],
+              ["c20u",126,"20µ"], ["c200n",148,"200n"],
+              ["r200k",170,"200k"], ["r20k",192,"20k"],
+              ["r2k",214,"2k"],  ["r200",236,"200"]];
+const DIAL_ORDER = DIAL.map(d=>d[0]);
+const DIAL_ANG = {}; DIAL.forEach(d=>DIAL_ANG[d[0]]=d[1]);
+const SLIDER_XR=825, SLIDER_Y=58, SLIDER_Y2=338, SLIDER_W=300, PXMM=2.334;
+const CLIP_HOME_R=[330,258], CLIP_HOME_B=[412,196];
+
+/* ══════════════════════════════════════════════════════════════
+   2.  PHYSICS
+   ══════════════════════════════════════════════════════════════ */
+function C_blackbox(x_mm){
+  const x = Math.min(Math.max(x_mm,0.0), TRAVEL_MM-1e-9);
+  const n = 1 + Math.floor(x/(2*W_TOOTH*1e3));
+  const ph = x % (2*W_TOOTH*1e3);
+  const tri = 1.0 - Math.abs(ph - W_TOOTH*1e3)/(W_TOOTH*1e3);
+  return C_OFF + n*DC_STEP*tri;
+}
+const V_OSC_MIN = 7.60;   /* below this the oscillator will not start at all */
+const V_OSC_OK  = 8.60;   /* only above this does it run to specification    */
+function oscState(battV, connected){
+  if(!connected || battV < V_OSC_MIN) return 0;
+  return battV >= V_OSC_OK ? 2 : 1;
+}
+function frequency(Ctot, battV){
+  if(Ctot <= 0) return null;
+  let a = ALPHA0;
+  if(battV < V_OSC_OK) a *= 1.0 - 0.16*(V_OSC_OK - battV);
+  return a/Ctot;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   3.  CANVAS — a thin tkinter-shaped drawing layer
+   ══════════════════════════════════════════════════════════════ */
+const CW = 1340, CH = 760;             /* logical canvas size, as in Python */
+const cv = $("bench");
+const ctx = cv.getContext("2d");
+let DPR = 1, cssW = CW;
+
+const PT = 4/3;                        /* tk point size -> css pixels */
+function fnt(size, family, weight){
+  const fam = (family==="Courier New") ? '"Courier New",Consolas,monospace'
+                                       : 'Helvetica,Arial,"Malgun Gothic",sans-serif';
+  return (weight?weight+" ":"") + (size*PT).toFixed(1) + "px " + fam;
+}
+function setStroke(col,w,cap,dash){
+  ctx.strokeStyle = col; ctx.lineWidth = w||1;
+  ctx.lineCap = cap||"butt"; ctx.lineJoin = "round";
+  ctx.setLineDash(dash||[]);
+}
+function gRect(x0,y0,x1,y1,fill,outline,width){
+  if(fill){ ctx.fillStyle=fill; ctx.fillRect(x0,y0,x1-x0,y1-y0); }
+  if(outline){ setStroke(outline,width||1); ctx.strokeRect(x0,y0,x1-x0,y1-y0); }
+}
+function gOval(x0,y0,x1,y1,fill,outline,width,dash){
+  const cx=(x0+x1)/2, cy=(y0+y1)/2, rx=Math.abs(x1-x0)/2, ry=Math.abs(y1-y0)/2;
+  ctx.beginPath(); ctx.ellipse(cx,cy,Math.max(rx,.01),Math.max(ry,.01),0,0,2*Math.PI);
+  if(fill){ ctx.fillStyle=fill; ctx.fill(); }
+  if(outline){ setStroke(outline,width||1,"butt",dash); ctx.stroke(); ctx.setLineDash([]); }
+}
+function gLine(pts,col,width,cap,dash){
+  ctx.beginPath(); ctx.moveTo(pts[0][0],pts[0][1]);
+  for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i][0],pts[i][1]);
+  setStroke(col,width,cap,dash); ctx.stroke(); ctx.setLineDash([]);
+}
+/* tk's smooth 3-point line: passes through the ends, pulled towards the middle */
+function gSmooth(p0,pm,p1,col,width,cap){
+  ctx.beginPath(); ctx.moveTo(p0[0],p0[1]);
+  ctx.quadraticCurveTo(pm[0],pm[1],p1[0],p1[1]);
+  setStroke(col,width,cap); ctx.stroke();
+}
+function gPoly(pts,fill,outline,width){
+  ctx.beginPath(); ctx.moveTo(pts[0][0],pts[0][1]);
+  for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i][0],pts[i][1]);
+  ctx.closePath();
+  if(fill){ ctx.fillStyle=fill; ctx.fill(); }
+  if(outline){ setStroke(outline,width||1); ctx.stroke(); }
+}
+function gRound(x0,y0,x1,y1,r,fill,outline,width){
+  ctx.beginPath();
+  ctx.moveTo(x0+r,y0);
+  ctx.lineTo(x1-r,y0); ctx.quadraticCurveTo(x1,y0,x1,y0+r);
+  ctx.lineTo(x1,y1-r); ctx.quadraticCurveTo(x1,y1,x1-r,y1);
+  ctx.lineTo(x0+r,y1); ctx.quadraticCurveTo(x0,y1,x0,y1-r);
+  ctx.lineTo(x0,y0+r); ctx.quadraticCurveTo(x0,y0,x0+r,y0);
+  ctx.closePath();
+  if(fill){ ctx.fillStyle=fill; ctx.fill(); }
+  if(outline){ setStroke(outline,width||1); ctx.stroke(); }
+}
+function gText(x,y,txt,fill,font,anchor){
+  ctx.font = font; ctx.fillStyle = fill;
+  ctx.textAlign = anchor==="e" ? "right" : (anchor==="nw"||anchor==="w") ? "left" : "center";
+  ctx.textBaseline = anchor==="nw" ? "top" : "middle";
+  ctx.fillText(txt,x,y);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   4.  APPARATUS ARTWORK
+        (the problem-sheet photograph measured pixel by pixel and
+         redrawn as vectors — no image files anywhere)
+   ══════════════════════════════════════════════════════════════ */
+const C_WOOD="#7a5a46",  C_WOOD_D="#4e392c",
+      C_LID="#6c4c33",   C_LID_D="#4a3221",
+      C_SLIDE="#8a6a52", C_TRACK="#5e483c", C_TAPE="#0a0a0a",
+      C_END="#6e4d3c",   C_BOX="#bec0bb",   C_BOX_D="#9ea09b",
+      C_JR="#9c211e",    C_JB="#333331",    C_SCALE="#dfe3e6",
+      C_SCREW="#c9ccce", C_STICK="#f4f4f6", C_BATT="#3a3a3e",
+      C_DMM_Y="#f2c231", C_DMM_K="#333533", C_LCD="#96a896", C_CARD="#9cdfdd";
+const PXMM_ART = 2.334;
+
+function grain(x0,y0,x1,y1,col,step,P,slant){
+  slant = (slant===undefined)?6:slant;
+  for(let x=Math.floor(x0); x<x1; x+=step){
+    const a=P(x,y0), b=P(x+slant,y1);
+    gLine([a,b],col,1);
+  }
+}
+
+/* the sliding upper plate — its right-hand edge reads the scale */
+function artSlider(P, s, slideMm){
+  const rect=(x0,y0,x1,y1,fill,outline,width)=>{
+    const a=P(x0,y0), b=P(x1,y1); gRect(a[0],a[1],b[0],b[1],fill,outline,width);
+  };
+  const xr = 825 + slideMm*PXMM_ART;
+  const xl = xr - 300.0;                       /* the left end runs under the lid */
+  rect(xl,58,xr,338,C_SLIDE,"#4c3626",Math.max(1,Math.floor(2*s)));
+  grain(xl+4,62,xr-4,334,"#7b5c46",22,P,2);
+  rect(xl,58,xr,68,"#9d7d63",null);                       /* highlight on the top edge */
+  rect(xr-9,58,xr,338,"#9d7d63","#4c3626",Math.max(1,Math.floor(s)));  /* grip edge */
+  rect(xr,62,xr+5,342,"#3d2c22",null);                    /* shadow */
+  const a=P(xr,340), b=P(xr,350);                         /* index line for the scale */
+  gLine([a,b],"#c0202a",Math.max(1,Math.floor(2*s)));
+}
+
+function artIndicators(P, s, swOn, led){
+  const ovl=(x0,y0,x1,y1,fill,outline,width)=>{
+    const a=P(x0,y0), b=P(x1,y1); gOval(a[0],a[1],b[0],b[1],fill,outline,width);
+  };
+  /* LED */
+  ovl(70,171,82,183,(led===2?"#57ff57":(led===1?"#2e7a33":"#26331f")),"#2c3a2c",1);
+  /* power switch */
+  const sx=SWI[0], sy=SWI[1];
+  const ang = (swOn?72:108)*Math.PI/180;                   /* which way the lever lies */
+  const a=P(sx+26*Math.cos(ang), sy+26*Math.sin(ang)), b=P(sx,sy);
+  gLine([a,b],"#9aa0a6",Math.max(2,Math.floor(5*s)),"round");
+  gLine([a,b],"#e2e6ea",Math.max(1,Math.floor(2*s)),"round");
+  ovl(sx-8,sy-6,sx+8,sy+6,"#c3c7cb","#6f7376",Math.max(1,Math.floor(1.5*s)));
+  for(let i=0;i<4;i++){                                    /* knurling */
+    gLine([P(sx-5+i*3.4,sy-5),P(sx-5+i*3.4,sy+5)],"#8b9096",1);
+  }
+}
+
+function screws(P,s){
+  const ovl=(x0,y0,x1,y1,fill,outline,width)=>{
+    const a=P(x0,y0), b=P(x1,y1); gOval(a[0],a[1],b[0],b[1],fill,outline,width);
+  };
+  for(const [sx,sy] of [SCREW1,SCREW2]){
+    ovl(sx-9,sy-9,sx+9,sy+9,C_SCREW,"#6f7376",Math.max(1,Math.floor(2*s)));
+    gLine([P(sx-6,sy),P(sx+6,sy)],"#6f7376",1);
+  }
+}
+
+/*  The board seen from above.  `part` selects the layer:
+      "bot"    base plate, track, tape, millimetre scale
+      "slider" the sliding upper plate
+      "top"    lid, rail, end block, oscillator, battery, jacks, screws
+      "ind"    LED and switch
+    The layers are painted in that order so that the plate slides *under*
+    the blackbox lid while staying visible where the track is open.       */
+function artBoard(ox, oy, s, slideMm, swOn, led, part){
+  const P=(x,y)=>[ox+x*s, oy+y*s];
+  const rect=(x0,y0,x1,y1,fill,outline,width)=>{
+    const a=P(x0,y0), b=P(x1,y1); gRect(a[0],a[1],b[0],b[1],fill,outline,width);
+  };
+  const ovl=(x0,y0,x1,y1,fill,outline,width)=>{
+    const a=P(x0,y0), b=P(x1,y1); gOval(a[0],a[1],b[0],b[1],fill,outline,width);
+  };
+
+  if(part==="ind"){ artIndicators(P,s,swOn,led); return P; }
+  if(part==="slider"){ artSlider(P,s,slideMm); return P; }
+
+  if(part==="bot"){
+    /* ---- base plate ---------------------------------------------- */
+    rect(6,6,1062,382,C_WOOD,C_WOOD_D,Math.max(1,Math.floor(2*s)));
+    grain(10,8,1058,380,"#6d4f3d",44,P);
+    /* ---- track (the milled groove) -------------------------------- */
+    rect(736,52,972,342,C_TRACK,"#463529",Math.max(1,Math.floor(2*s)));
+    grain(740,56,970,340,"#544035",30,P,3);
+    /* black tape stuck to the right of the track (fixed) */
+    rect(890,60,970,112,C_TAPE,null);
+    rect(890,285,970,338,C_TAPE,null);
+    /* ---- mm scale (below the track, glued to the base plate) ------- */
+    rect(736,346,982,384,C_SCALE,"#9aa0a4",1);
+    for(let v=-38; v<68; v++){
+      const xx = 825 + v*PXMM_ART;
+      if(!(xx>=740 && xx<=980)) continue;
+      const h = (v%10===0) ? 17 : ((v%5===0) ? 12 : 7);
+      gLine([P(xx,348),P(xx,348+h)],"#1a1a1a",
+            Math.max(1,Math.floor((v%10===0?2:1)*s)));
+      if(v%10===0 && v>=0 && v<=60){
+        const q=P(xx,374);
+        gText(q[0],q[1],String(v),"#1a1a1a",fnt(Math.max(5,Math.floor(9*s))));
+      }
+    }
+    return P;
+  }
+
+  /* ---- blackbox lid ---------------------------------------------- */
+  rect(300,4,736,358,C_LID,C_LID_D,Math.max(1,Math.floor(2*s)));
+  grain(304,8,732,354,"#77543a",38,P);
+  rect(462,143,600,212,C_STICK,"#d6d6d8",1);
+  let q=P(531,163);
+  gText(q[0],q[1],"IPhO 42","#c0166b",fnt(Math.max(6,Math.floor(13*s)),"Helvetica","bold"));
+  q=P(531,190);
+  gText(q[0],q[1],"Bangkok 2011","#4a4a4a",fnt(Math.max(5,Math.floor(8*s))));
+
+  /* ---- right-hand frame rail + end block -------------------------- */
+  rect(970,46,990,348,"#59402f","#3f2c1f",Math.max(1,Math.floor(s)));
+  rect(988,2,1062,386,C_END,C_WOOD_D,Math.max(1,Math.floor(2*s)));
+  grain(992,6,1058,382,"#7a5745",26,P,2);
+
+  /* ---- the oscillator box ----------------------------------------- */
+  rect(6,264,228,276,C_BOX_D,null);
+  rect(4,95,226,268,C_BOX,"#93958f",Math.max(1,Math.floor(2*s)));
+  rect(4,95,226,107,"#d2d4cf",null);
+  /* 9 V battery */
+  rect(47,26,180,93,C_BATT,"#232326",Math.max(1,Math.floor(2*s)));
+  rect(64,36,164,78,"#ececed","#b9b9ba",1);
+  for(let i=0;i<9;i++){
+    const xx = 68 + i*10.4;
+    gLine([P(xx,40),P(xx,72)],"#1c1c1c",Math.max(1,Math.floor((i%3?2:1)*s)));
+  }
+  q=P(114,86);
+  gText(q[0],q[1],"9V","#e4e4e6",fnt(Math.max(6,Math.floor(10*s)),"Helvetica","bold"));
+  for(const [tx,ty,col] of [[BINP[0],BINP[1],"#a5251f"],[BINN[0],BINN[1],"#1a1a1a"]]){
+    ovl(tx-8,ty-8,tx+8,ty+8,"#c9ccce","#6f7376",Math.max(1,Math.floor(2*s)));
+    ovl(tx-4,ty-4,tx+4,ty+4,col,null);
+  }
+  /* the banana jacks */
+  ovl(148,116,186,154,C_JR,"#6d201a",Math.max(1,Math.floor(2*s)));
+  ovl(158,126,176,144,"#3a1512",null);
+  ovl(146,196,184,234,C_JB,"#1c1c1a",Math.max(1,Math.floor(2*s)));
+  ovl(156,206,174,224,"#131315",null);
+  screws(P,s);
+  return P;
+}
+
+/* MASTECH digital multimeter.  reference size 264 x 441 px */
+function artDMM(ox, oy, s, dial, disp, unit){
+  const P=(x,y)=>[ox+x*s, oy+y*s];
+  const rr=(x0,y0,x1,y1,r,fill,outline,width)=>{
+    const a=P(x0,y0), b=P(x1,y1); gRound(a[0],a[1],b[0],b[1],r*s,fill,outline,width);
+  };
+  rr(2,4,262,437,20,C_DMM_Y,"#c79a1c",Math.max(1,Math.floor(2*s)));
+  rr(18,20,246,400,12,C_DMM_K,"#1d1f1d",Math.max(1,Math.floor(2*s)));
+  rr(46,36,218,112,6,C_LCD,"#5d6b5d",Math.max(1,Math.floor(2*s)));
+  let q=P(212,76);
+  gText(q[0],q[1],disp,"#161d16",fnt(Math.max(8,Math.floor(30*s)),"Courier New","bold"),"e");
+  q=P(212,102);
+  gText(q[0],q[1],unit,"#161d16",fnt(Math.max(5,Math.floor(10*s)),"Helvetica","bold"),"e");
+  let a=P(28,126), b=P(60,144);
+  gRect(a[0],a[1],b[0],b[1],"#cc2b22","#7d1a15",1);
+  q=P(152,122);
+  gText(q[0],q[1],"AUTO POWER OFF","#4aa3e0",fnt(Math.max(4,Math.floor(9*s)),"Helvetica","bold"));
+  /* the dial */
+  const cx=128.0, cy=246.0, R=48.0;
+  for(const [nm,deg,lbl] of DIAL){
+    const t = deg*Math.PI/180;
+    const p = P(cx+(R+11)*Math.cos(t), cy+(R+11)*Math.sin(t));
+    gOval(p[0]-1.8*s,p[1]-1.8*s,p[0]+1.8*s,p[1]+1.8*s,"#e8e8e8",null);
+    const col = (nm==="hz"||nm==="off") ? "#ff9a3c" : "#d8d8d8";
+    const w = P(cx+(R+23)*Math.cos(t), cy+(R+23)*Math.sin(t));
+    gText(w[0],w[1],lbl,col,fnt(Math.max(4,Math.floor(8*s)),"Helvetica","bold"));
+  }
+  a=P(cx-R-6,cy-R-6); b=P(cx+R+6,cy+R+6);
+  gOval(a[0],a[1],b[0],b[1],"#232522","#4a4d4a",1);
+  a=P(cx-R,cy-R); b=P(cx+R,cy+R);
+  gOval(a[0],a[1],b[0],b[1],"#2b2d2b","#111",1);
+  for(let i=0;i<10;i++){                                   /* grooves on the knob */
+    const t=i*36*Math.PI/180;
+    gLine([P(cx+R*0.62*Math.cos(t), cy+R*0.62*Math.sin(t)),
+           P(cx+R*0.94*Math.cos(t), cy+R*0.94*Math.sin(t))],"#3d403d",1);
+  }
+  const ang = ((DIAL_ANG[dial]!==undefined)?DIAL_ANG[dial]:-90)*Math.PI/180;
+  gLine([P(cx,cy),P(cx+R*0.86*Math.cos(ang), cy+R*0.86*Math.sin(ang))],
+        "#f2f2f2",Math.max(2,Math.floor(5*s)));
+  /* the sockets */
+  for(const [jx,name] of [[44,"10A"],[98,"mA"],[156,"COM"],[212,"VΩHz"]]){
+    a=P(jx-15,316); b=P(jx+15,346);
+    gOval(a[0],a[1],b[0],b[1],"#7a1f1f","#c8c8c8",Math.max(1,Math.floor(2*s)));
+    a=P(jx-8,323); b=P(jx+8,339);
+    gOval(a[0],a[1],b[0],b[1],"#1a1a1a",null);
+    q=P(jx,358);
+    gText(q[0],q[1],name,"#e8e8e8",fnt(Math.max(4,Math.floor(9*s)),"Helvetica","bold"));
+  }
+  a=P(26,376); b=P(126,396);
+  gRect(a[0],a[1],b[0],b[1],"#13447c",null);
+  q=P(76,386);
+  gText(q[0],q[1],"MASTECH","#ffffff",fnt(Math.max(5,Math.floor(11*s)),"Helvetica","bold"));
+  a=P(214,252); b=P(238,298);
+  gRect(a[0],a[1],b[0],b[1],"#2f7d3a","#1d4f25",1);
+}
+
+/* the green card in the component tray; the slot empties when taken out */
+function artCapCard(cx,cy,s,code,taken){
+  const W=118.0, H=150.0;
+  const P=(x,y)=>[cx+(x-W/2)*s, cy+(y-H/2)*s];
+  let a=P(2,2), b=P(116,148);
+  gRect(a[0],a[1],b[0],b[1],C_CARD,"#5aa8a6",Math.max(1,Math.floor(2*s)));
+  const q=P(59,26);
+  gText(q[0],q[1],code,"#1b3f8b",fnt(Math.max(6,Math.floor(24*s)),"Helvetica","bold"));
+  if(taken){
+    a=P(38,78); b=P(80,118);
+    gOval(a[0],a[1],b[0],b[1],null,"#7fbfbd",1,[3,2]);
+  }else{
+    artCapBody(cx, cy+24*s, s*1.05, code, true);
+  }
+}
+
+/* ceramic disc capacitor; the code is printed small on the disc */
+function artCapBody(cx,cy,s,code,leads){
+  const W=80.0, H=90.0;
+  const P=(x,y)=>[cx+(x-W/2)*s, cy+(y-H/2)*s];
+  if(leads){
+    for(const [x0,x1] of [[34,6],[46,74]]){
+      gSmooth(P(x0,46), P((x0+x1)/2,68), P(x1,88), "#9aa5aa", Math.max(1,Math.floor(3*s)));
+    }
+  }
+  let a=P(16,12), b=P(64,54);
+  gOval(a[0],a[1],b[0],b[1],"#8b7a4e","#5f5433",Math.max(1,Math.floor(1.5*s)));
+  a=P(22,17); b=P(44,31);
+  gOval(a[0],a[1],b[0],b[1],"#a2905f",null);
+  const q=P(40,34);
+  gText(q[0],q[1],code,"#241d0e",fnt(Math.max(4,Math.floor(13*s)),"Helvetica","bold"));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   5.  THE STATE OF THE EXPERIMENT
+   ══════════════════════════════════════════════════════════════ */
+const SC = {
+  swOn:false, dial:"off",
+  probe:{r:null,b:null}, freeProbe:{r:null,b:null},
+  slide:0.0,
+  batt:{p:null,n:null}, freeBatt:{p:null,n:null},
+  caps:{},            /* i -> [x,y]  capacitors taken out onto the bench */
+  clipPos:{r:null,b:null},
+  stack:{},           /* i -> capacitor whose leads it is tied to        */
+  battV:newBattery(), jit:0.0
+};
+function scReset(){
+  SC.swOn=false; SC.dial="off";
+  SC.probe={r:null,b:null}; SC.freeProbe={r:null,b:null};
+  SC.slide=0.0;
+  SC.batt={p:null,n:null}; SC.freeBatt={p:null,n:null};
+  SC.caps={}; SC.clipPos={r:null,b:null}; SC.stack={};
+  SC.battV=newBattery(); SC.jit=0.0;
+}
+const battIn = ()=> SC.batt.p==="BINP" && SC.batt.n==="BINN";
+const meterOk = ()=>{
+  const a=SC.probe.r, b=SC.probe.b;
+  return (a==="JR"&&b==="JB")||(a==="JB"&&b==="JR");
+};
+const osc = ()=> SC.swOn ? oscState(SC.battV, battIn()) : 0;
+
+function display(){
+  const d = SC.dial;
+  if(d==="off") return "";
+  if(d[0]==="v"){                                       /* d.c. volts */
+    const fs = {v1000:1000.0, v200:200.0, v20:20.0, v2:2.0}[d];
+    const p=SC.probe.r, q=SC.probe.b;
+    const onBatt = (p==="BATP"&&q==="BATN")||(p==="BATN"&&q==="BATP");
+    const v = onBatt ? SC.battV : 0.0;
+    if(v > fs) return "1  ";
+    const dec = fs<=20 ? 2 : (fs<=200 ? 1 : 0);
+    return v.toFixed(dec);
+  }
+  if(d[0]==="r") return "1  ";                          /* resistance: open -> overflow */
+  if(d==="temp"||d==="c20u"||d==="c200n"||d[0]==="a") return "0.00";
+  /* --- frequency --- */
+  if(!meterOk()) return "0.00";
+  if(osc()===0) return "0.00";
+  const C = loadC();
+  if(C===null || C<=0) return "1  ";
+  const f = frequency(C + C_STRAY, SC.battV)/1000.0 + SC.jit;
+  return f > DMM_HZ_FS ? "1  " : f.toFixed(2);
+}
+function unitTxt(){
+  const d=SC.dial;
+  if(d==="off") return "";
+  if(d[0]==="v") return "V";
+  if(d[0]==="r") return "Ω";
+  if(d[0]==="a") return "mA";
+  if(d[0]==="c") return "nF";
+  if(d==="temp") return "°C";
+  return "kHz";
+}
+const ready = ()=> osc()===2 && SC.dial==="hz" && meterOk();
+
+/* ══════════════════════════════════════════════════════════════
+   6.  BOARD GEOMETRY AND HIT TESTING
+   ══════════════════════════════════════════════════════════════ */
+const OX=16, OY=14, SCB=BOARD_S;
+const DMM_AT=[1132,44];
+const X = a=>OX+a*SCB, Y = a=>OY+a*SCB;
+const TERM = {JR:JR, JB:JB, BINP:BINP, BINN:BINN};
+
+let drag = null;          /* [kind, key, x, y] */
+let sel = null;
+
+const TOUCH = 20.0;       /* conductors closer than this are taken as touching */
+
+function rootOf(i){
+  const seen=new Set();
+  while(SC.stack[i]!==undefined && !seen.has(i)){ seen.add(i); i=SC.stack[i]; }
+  return i;
+}
+function leadXY(i,which){
+  const [x,y] = SC.caps[rootOf(i)];
+  return [x + (which==="A" ? -34 : 34)*BODY_S, y + 43*BODY_S];
+}
+function battEnd(k){
+  if(drag && drag[0]==="batt" && drag[1]===k) return [drag[2],drag[3]];
+  if(SC.batt[k]){ const p=TERM[SC.batt[k]]; return [X(p[0]),Y(p[1])]; }
+  if(SC.freeBatt[k]) return SC.freeBatt[k];
+  const h = (k==="p") ? [208,16] : [252,16];
+  return [X(h[0]),Y(h[1])];
+}
+function probeEnd(k){
+  if(drag && drag[0]==="probe" && drag[1]===k) return [drag[2],drag[3]];
+  if(SC.probe[k]==="BATP"||SC.probe[k]==="BATN")
+    return battEnd(SC.probe[k]==="BATP" ? "p" : "n");
+  if(SC.probe[k]){ const p=TERM[SC.probe[k]]; return [X(p[0]),Y(p[1])]; }
+  if(SC.freeProbe[k]) return SC.freeProbe[k];
+  const jx = DMM_AT[0] + (k==="b" ? 156 : 212)*DMM_S;
+  return [k==="b" ? jx-34 : jx+30, DMM_AT[1] + 412*DMM_S];
+}
+function clipEnd(k){
+  if(drag && drag[0]==="clip" && drag[1]===k) return [drag[2],drag[3]];
+  if(SC.clipPos[k]) return SC.clipPos[k].slice();
+  const h = (k==="r") ? CLIP_HOME_R : CLIP_HOME_B;
+  return [X(h[0]),Y(h[1])];
+}
+function targetsFor(kind){
+  const out=[];
+  if(kind==="probe"){
+    for(const n of ["JR","JB"]){ const p=TERM[n]; out.push([X(p[0]),Y(p[1]),n]); }
+    for(const [k,n] of [["p","BATP"],["n","BATN"]]){
+      const e=battEnd(k); out.push([e[0],e[1],n]);
+    }
+  }else if(kind==="batt"){
+    for(const n of ["BINP","BINN"]){ const p=TERM[n]; out.push([X(p[0]),Y(p[1]),n]); }
+  }else{
+    for(const i of Object.keys(SC.caps)) for(const w of ["A","B"]){
+      const l=leadXY(+i,w); out.push([l[0],l[1],"c"+w+i]);
+    }
+  }
+  return out;
+}
+function snap(kind,x,y){
+  let best=null, bd=1e9;
+  for(const [tx,ty,n] of targetsFor(kind)){
+    const d=Math.hypot(x-tx,y-ty);
+    if(d<22 && d<bd){ bd=d; best=n; }
+  }
+  return best;
+}
+
+/* ── wiring solver: conductors that touch are welded together ─────── */
+function loadC(){
+  const pts = {R:clipEnd("r"), B:clipEnd("b")};
+  const idx = Object.keys(SC.caps).map(Number);
+  for(const i of idx){ pts["cA"+i]=leadXY(i,"A"); pts["cB"+i]=leadXY(i,"B"); }
+  const par={};
+  const find=a=>{ if(par[a]===undefined) par[a]=a;
+                  while(par[a]!==a){ par[a]=par[par[a]]; a=par[a]; } return a; };
+  const join=(a,b)=>{ const ra=find(a), rb=find(b); if(ra!==rb) par[ra]=rb; };
+  const keys=Object.keys(pts);
+  for(let ii=0;ii<keys.length;ii++) for(let jj=ii+1;jj<keys.length;jj++){
+    const ka=keys[ii], kb=keys[jj];
+    if((ka==="R"||ka==="B") && (kb==="R"||kb==="B")) continue;  /* the two clips never touch */
+    const a=pts[ka], b=pts[kb];
+    if((a[0]-b[0])**2 + (a[1]-b[1])**2 < TOUCH*TOUCH) join(ka,kb);
+  }
+  const gr=find("R"), gb=find("B");
+  const held = idx.some(i=>{
+    const a=find("cA"+i), b=find("cB"+i);
+    return a===gr||a===gb||b===gr||b===gb;
+  });
+  if(!held) return C_blackbox(SC.slide);   /* nothing gripped -> the blackbox is in circuit */
+  if(gr===gb) return null;
+  let tot=0.0;
+  for(const i of idx){
+    const a=find("cA"+i), b=find("cB"+i);
+    if((a===gr&&b===gb)||(a===gb&&b===gr)) tot += CAPS[i][2];
+  }
+  return tot>0 ? tot : null;
+}
+function joints(){
+  const pts=[clipEnd("r"), clipEnd("b")];
+  for(const i of Object.keys(SC.caps)){ pts.push(leadXY(+i,"A")); pts.push(leadXY(+i,"B")); }
+  const out=[];
+  for(let ii=0;ii<pts.length;ii++) for(let jj=ii+1;jj<pts.length;jj++){
+    if(ii<2 && jj<2) continue;
+    const a=pts[ii], b=pts[jj];
+    if((a[0]-b[0])**2 + (a[1]-b[1])**2 < TOUCH*TOUCH)
+      out.push([(a[0]+b[0])/2, (a[1]+b[1])/2]);
+  }
+  return out;
+}
+const trayXY = i => [110 + i*100, 700];
+
+/* ── hit tests ─────────────────────────────────────────────────── */
+function hitTerm(ex,ey){
+  for(const n of ["JR","JB","BINP","BINN"]){
+    const p=TERM[n];
+    if(Math.hypot(ex-X(p[0]), ey-Y(p[1])) < 15) return n;
+  }
+  return null;
+}
+const hitSwitch = (ex,ey)=>
+  Math.abs(ex-X(SWI[0])) < 18*SCB && (ey-Y(SWI[1])) > -12*SCB && (ey-Y(SWI[1])) < 30*SCB;
+function hitDial(ex,ey){
+  const kx = DMM_AT[0]+128*DMM_S, ky = DMM_AT[1]+232*DMM_S;
+  if(Math.hypot(ex-kx, ey-ky) > 80*DMM_S) return null;
+  const a = Math.atan2(ey-ky, ex-kx)*180/Math.PI;
+  let best="off", bd=1e9;
+  for(const [nm,deg] of DIAL){
+    const dd = Math.abs(((a-deg+180)%360+360)%360 - 180);
+    if(dd<bd){ bd=dd; best=nm; }
+  }
+  return best;
+}
+function hitSlider(ex,ey){
+  const xr = X(SLIDER_XR + SC.slide*PXMM);
+  return xr - SLIDER_W*SCB < ex && ex < xr+6 && Y(SLIDER_Y) < ey && ey < Y(SLIDER_Y2);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   7.  DRAWING THE WHOLE BENCH
+   ══════════════════════════════════════════════════════════════ */
+function clipHead(x,y,col){
+  gPoly([[x-15,y-7],[x+8,y-2],[x-15,y+3]],col,"#111",1);
+  gPoly([[x-15,y+9],[x+8,y+4],[x-15,y-1]],col,"#111",1);
+}
+function probeHead(x,y,col){
+  gLine([[x,y],[x-18,y+14]],col,6,"round");
+  gOval(x-4,y-4,x+4,y+4,"#d8d8d8","#555",1);
+}
+
+function redraw(){
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.clearRect(0,0,cv.width,cv.height);
+  const k = (cssW/CW)*DPR;
+  ctx.setTransform(k,0,0,k,0,0);
+
+  /* --- bench and tray --------------------------------------------- */
+  gRect(0,0,CW,CH,C_BG,null);
+  gRect(0,624,1080,CH,C_TRAY,null);
+  gLine([[0,624],[1080,624]],"#a9afb0",2);
+  gText(12,630,T[lang].t1,"#333",fnt(9),"nw");
+
+  /* --- the board, layer by layer ----------------------------------- */
+  const st = osc();
+  artBoard(OX,OY,SCB,SC.slide,SC.swOn,st,"bot");
+  artBoard(OX,OY,SCB,SC.slide,SC.swOn,st,"slider");
+  artBoard(OX,OY,SCB,SC.slide,SC.swOn,st,"top");
+  artBoard(OX,OY,SCB,SC.slide,SC.swOn,st,"ind");
+  artDMM(DMM_AT[0],DMM_AT[1],DMM_S,SC.dial,"","");
+
+  /* --- what the LCD says -------------------------------------------- */
+  const mx=DMM_AT[0], my=DMM_AT[1];
+  gText(mx+212*DMM_S, my+76*DMM_S, display(), "#161d16",
+        fnt(Math.max(8,Math.floor(30*DMM_S)),"Courier New","bold"), "e");
+  gText(mx+212*DMM_S, my+102*DMM_S, unitTxt(), "#161d16",
+        fnt(Math.max(5,Math.floor(10*DMM_S)),"Helvetica","bold"), "e");
+
+  /* --- the battery snap leads --------------------------------------- */
+  for(const [kk,col,src] of [["p","#a5251f",BATT_P],["n","#1a1a1a",BATT_N]]){
+    const [px,py]=battEnd(kk);
+    const sx=X(src[0]), sy=Y(src[1]);
+    gSmooth([sx,sy], [(sx+px)/2,(sy+py)/2-26], [px,py], col, 4);
+    gOval(px-5,py-5,px+5,py+5,col,"#e0e0e0",2);
+  }
+  /* --- the crocodile leads (oscillator -> specimen) ------------------ */
+  for(const [kk,col,src] of [["r",C_WIRE_R,CLIP_OUT_R],["b",C_WIRE_B,CLIP_OUT_B]]){
+    const [px,py]=clipEnd(kk);
+    const sx=X(src[0]), sy=Y(src[1]);
+    gSmooth([sx,sy], [(sx+px)/2-20,(sy+py)/2+34], [px,py], col, 5);
+    clipHead(px,py,col);
+  }
+  /* --- the meter leads ---------------------------------------------- */
+  for(const [kk,col,jx] of [["b",C_WIRE_B,mx+156*DMM_S],["r",C_WIRE_R,mx+212*DMM_S]]){
+    const y0 = my+346*DMM_S;
+    const [px,py]=probeEnd(kk);
+    ctx.beginPath();
+    ctx.moveTo(jx,y0); ctx.lineTo(jx,y0+34);
+    ctx.quadraticCurveTo((jx+px)/2, py+70, px, py);
+    setStroke(col,4); ctx.stroke();
+    probeHead(px,py,col);
+  }
+
+  /* --- capacitors out on the bench ---------------------------------- */
+  for(const key of Object.keys(SC.caps)){
+    const i=+key, [x,y]=SC.caps[key];
+    if(drag && drag[0]==="card" && drag[1]===i) continue;
+    for(const w of ["A","B"]){                     /* leads bent to the shared point */
+      const [lx,ly]=leadXY(i,w);
+      const sx = x + (w==="A" ? -6 : 6)*BODY_S;
+      gSmooth([sx, y+20*BODY_S], [(sx+lx)/2, y+40*BODY_S], [lx,ly], "#9aa5aa", 3);
+    }
+    artCapBody(x,y,BODY_S,CAPS[i][0],false);
+  }
+  for(const key of Object.keys(SC.caps)){
+    for(const w of ["A","B"]){
+      const [lx,ly]=leadXY(+key,w);
+      gOval(lx-4,ly-4,lx+4,ly+4,"#c9ccce","#6f7376",1);
+    }
+  }
+  for(const [jx,jy] of joints())                   /* where they touch */
+    gOval(jx-6,jy-6,jx+6,jy+6,"#d8b24a","#8a6b1f",1);
+
+  /* --- the component tray -------------------------------------------- */
+  for(let i=0;i<4;i++){
+    const [x,y]=trayXY(i);
+    artCapCard(x,y,CARD_S,CAPS[i][0], SC.caps[i]!==undefined);
+  }
+  if(drag && drag[0]==="card")
+    artCapBody(drag[2],drag[3],BODY_S,CAPS[drag[1]][0],true);
+  if(drag && (drag[0]==="probe"||drag[0]==="clip"||drag[0]==="batt")){
+    for(const [tx,ty] of targetsFor(drag[0]))
+      gOval(tx-13,ty-13,tx+13,ty+13,null,C_SEL,2,[3,2]);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   8.  MOUSE
+   ══════════════════════════════════════════════════════════════ */
+function evXY(e){
+  const r = cv.getBoundingClientRect();
+  return [ (e.clientX-r.left)*CW/r.width, (e.clientY-r.top)*CH/r.height ];
+}
+function press(ex,ey){
+  /* 1) grab a lead end (it comes off whatever it was on) */
+  for(const k of ["r","b"]){
+    const [px,py]=probeEnd(k);
+    if(Math.hypot(ex-px,ey-py) < 17){ SC.probe[k]=null; drag=["probe",k,ex,ey]; return; }
+  }
+  for(const k of ["r","b"]){
+    const [px,py]=clipEnd(k);
+    if(Math.hypot(ex-px,ey-py) < 17){ drag=["clip",k,ex,ey]; return; }
+  }
+  for(const k of ["p","n"]){
+    const [px,py]=battEnd(k);
+    if(Math.hypot(ex-px,ey-py) < 15){ SC.batt[k]=null; drag=["batt",k,ex,ey]; return; }
+  }
+  /* 2) switch / dial */
+  if(hitSwitch(ex,ey)){ SC.swOn = !SC.swOn; return; }
+  const d = hitDial(ex,ey);
+  if(d){ SC.dial=d; return; }
+  /* 3) drag the upper plate */
+  if(hitSlider(ex,ey)){ drag=["slide", ex - X(SLIDER_XR + SC.slide*PXMM)]; return; }
+  /* 4) pick up a capacitor (from the bench, or out of the tray) */
+  for(const key of Object.keys(SC.caps)){
+    const i=+key, [x,y]=SC.caps[key];
+    if(Math.abs(ex-x) < 34*BODY_S && Math.abs(ey-y) < 48*BODY_S){
+      drag=["card",i,ex,ey]; return;
+    }
+  }
+  for(let i=0;i<4;i++){
+    if(SC.caps[i]!==undefined) continue;
+    const [x,y]=trayXY(i);
+    const bx=x, by=y+24*CARD_S;
+    if(Math.abs(ex-bx) < 40*CARD_S && Math.abs(ey-by) < 48*CARD_S){
+      SC.caps[i]=[ex,ey]; drag=["card",i,ex,ey]; return;
+    }
+  }
+}
+let lastMt = 0;
+function motion(ex,ey){
+  if(!drag) return;
+  const now = performance.now()/1000;
+  if(now - lastMt < 0.022) return;
+  lastMt = now;
+  const kind = drag[0];
+  if(kind==="slide"){
+    const v = Math.round(((ex - drag[1] - OX)/SCB - SLIDER_XR)*10)/10;
+    SC.slide = Math.min(TRAVEL_MM, Math.max(0.0, v/PXMM));
+  }else if(kind==="card"){
+    drag[2]=ex; drag[3]=ey; SC.caps[drag[1]]=[ex,ey];
+  }else{
+    drag[2]=ex; drag[3]=ey;
+  }
+  dirty = true;
+}
+function release(ex,ey){
+  const d = drag; drag = null;
+  if(!d) return;
+  const kind = d[0];
+  if(kind==="card"){
+    const i=d[1];
+    delete SC.stack[i];
+    for(const j of Object.keys(SC.stack)) if(SC.stack[j]===i) delete SC.stack[j];
+    if(ey > 624 && ex < 1080){                 /* put it back in the tray */
+      delete SC.caps[i];
+    }else{
+      const y = Math.max(60, Math.min(CH-80, ey));
+      SC.caps[i]=[ex,y];
+      /* put it next to another one and the leads are tied: parallel */
+      let best=null;
+      for(const key of Object.keys(SC.caps)){
+        const j=+key; if(j===i) continue;
+        const r=rootOf(j); const [rx,ry]=SC.caps[r];
+        if(Math.abs(ex-rx) < 74 && Math.abs(y-ry) < 96){ best=r; break; }
+      }
+      if(best!==null){
+        let lvl = 1;
+        for(const j of Object.keys(SC.stack)) if(rootOf(+j)===best) lvl++;
+        SC.stack[i]=best;
+        SC.caps[i]=[SC.caps[best][0], SC.caps[best][1] - 46*lvl];
+      }
+    }
+  }else if(kind==="clip"){
+    const k=d[1];
+    const tgt = snap("clip",ex,ey);
+    if(tgt){                                    /* laid exactly on a lead */
+      const i = parseInt(tgt.slice(2),10);
+      SC.clipPos[k] = leadXY(i, tgt[1]).slice();
+    }else{
+      SC.clipPos[k] = [ex,ey];
+    }
+  }else if(kind==="probe" || kind==="batt"){
+    const k=d[1];
+    const tgt = snap(kind,ex,ey);
+    const store = (kind==="probe") ? SC.probe : SC.batt;
+    const free  = (kind==="probe") ? SC.freeProbe : SC.freeBatt;
+    const other = {r:"b", b:"r", p:"n", n:"p"}[k];
+    if(tgt){
+      if(store[other]===tgt){ store[other]=null; free[other]=null; }
+      store[k]=tgt; free[k]=null;
+    }else{
+      store[k]=null; free[k]=[ex,ey];
+    }
+  }
+  dirty = true;
+}
+function wheel(ex,ey,d){
+  /* the wheel over the dial turns it one position at a time, as on the real thing */
+  const kx = DMM_AT[0]+128*DMM_S, ky = DMM_AT[1]+242*DMM_S;
+  if(Math.hypot(ex-kx, ey-ky) > 92*DMM_S) return false;
+  let i = DIAL_ORDER.indexOf(SC.dial); if(i<0) i=0;
+  SC.dial = DIAL_ORDER[((i - d) % DIAL_ORDER.length + DIAL_ORDER.length) % DIAL_ORDER.length];
+  dirty = true;
+  return true;
+}
+
+let down = false;
+cv.addEventListener("pointerdown", e=>{
+  const [x,y]=evXY(e); down=true; cv.setPointerCapture(e.pointerId);
+  press(x,y); dirty=true; e.preventDefault();
+});
+cv.addEventListener("pointermove", e=>{
+  if(!down) return;
+  const [x,y]=evXY(e); motion(x,y);
+});
+cv.addEventListener("pointerup", e=>{
+  if(!down) return;
+  down=false; const [x,y]=evXY(e); release(x,y);
+});
+cv.addEventListener("pointercancel", ()=>{ down=false; drag=null; dirty=true; });
+cv.addEventListener("wheel", e=>{
+  const [x,y]=evXY(e);
+  if(wheel(x,y, e.deltaY<0 ? 1 : -1)) e.preventDefault();
+}, {passive:false});
+
+/* ══════════════════════════════════════════════════════════════
+   9.  PANEL
+   ══════════════════════════════════════════════════════════════ */
+$("btnBatt").onclick = ()=>{ SC.battV = newBattery(0.15); dirty=true; };
+$("btnReset").onclick = ()=>{ scReset(); sel=null; drag=null; dirty=true; };
+
+/* ══════════════════════════════════════════════════════════════
+   10.  LANGUAGE
+   ══════════════════════════════════════════════════════════════ */
+function applyLang(){
+  const d = T[lang];
+  document.documentElement.lang = lang;
+  document.title = (lang==="ko")
+    ? "IPhO 2011 E1 — 전기 블랙박스 · Electrical Blackbox · HaslaLab"
+    : "IPhO 2011 E1 — Electrical Blackbox · HaslaLab";
+  $("t-title").textContent = d.title;
+  $("t-sub").textContent   = d.sub;
+  $("t-h-bench").textContent = d.hBench;
+  $("btnBatt").textContent   = d.newbatt;
+  $("btnReset").textContent  = d.reset;
+  $("t-h-table").textContent = d.hTable;
+  $("t-t1").textContent      = d.t1;
+  $("t-note").textContent    = d.note;
+  $("t-benchcap").textContent= d.benchcap;
+  $("btn-ko").className = lang==="ko" ? "on" : "";
+  $("btn-en").className = lang==="en" ? "on" : "";
+  dirty = true;
+}
+$("btn-ko").onclick = ()=>{ lang="ko"; applyLang(); };
+$("btn-en").onclick = ()=>{ lang="en"; applyLang(); };
+
+/* ══════════════════════════════════════════════════════════════
+   11.  MAIN LOOP
+   ══════════════════════════════════════════════════════════════ */
+let dirty = true;
+function layout(){
+  DPR = window.devicePixelRatio || 1;
+  const r = cv.parentElement.getBoundingClientRect();
+  cssW = Math.max(360, Math.floor(r.width - 24));
+  const cssH = Math.round(cssW*CH/CW);
+  cv.style.height = cssH + "px";
+  cv.width  = Math.round(cssW*DPR);
+  cv.height = Math.round(cssH*DPR);
+  dirty = true;
+}
+/* the 220 ms housekeeping tick of the Python version */
+let lastState = null;
+setInterval(()=>{
+  if(SC.swOn && battIn())
+    SC.battV = Math.max(7.5, SC.battV - BATT_DRAIN*0.2/60.0);
+  const r = Math.random();
+  SC.jit = r<0.6 ? 0.0 : (r<0.8 ? 0.004 : -0.004);
+  const state = display()+"|"+osc()+"|"+SC.dial;
+  if(state !== lastState){ lastState = state; dirty = true; }
+}, 220);
+
+function tick(){
+  if(dirty){ redraw(); dirty = false; }
+  requestAnimationFrame(tick);
+}
+
+window.addEventListener("resize", layout);
+layout(); applyLang(); requestAnimationFrame(tick);
+</script>
+</body>
+</html>
